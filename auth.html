@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillIQ — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent: #6C63FF;
+  --accent2: #FF6B9D;
+  --accent3: #43E8D8;
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.18);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --input-bg: rgba(255,255,255,0.06);
+  --input-border: rgba(255,255,255,0.15);
+  --text: #f0f0f5;
+  --text-muted: rgba(240,240,245,0.55);
+  --error: #ff5c7c;
+  --success: #43E8D8;
+  --admin-color: #FF6B9D;
+  --teacher-color: #43E8D8;
+  --student-color: #6C63FF;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  background: #0a0a1a;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Animated gradient background */
+.bg-wrap {
+  position: fixed; inset: 0; z-index: 0;
+  background: linear-gradient(135deg, #0a0a1a 0%, #0f0f2e 40%, #12001a 100%);
+}
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: float 8s ease-in-out infinite;
+}
+.bg-orb.o1 { width: 500px; height: 500px; background: #6C63FF; top: -150px; left: -150px; animation-delay: 0s; }
+.bg-orb.o2 { width: 400px; height: 400px; background: #FF6B9D; bottom: -100px; right: -100px; animation-delay: -3s; }
+.bg-orb.o3 { width: 300px; height: 300px; background: #43E8D8; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -6s; }
+
+@keyframes float {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-30px) scale(1.05); }
+}
+.o3 { animation: float3 10s ease-in-out infinite !important; }
+@keyframes float3 {
+  0%,100% { transform: translate(-50%,-50%) scale(1); }
+  50% { transform: translate(-50%,-60%) scale(1.1); }
+}
+
+/* Grid overlay */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Main container */
+.auth-container {
+  position: relative; z-index: 10;
+  width: 100%; max-width: 480px;
+  padding: 20px;
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Logo */
+.logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.logo-mark {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 12px;
+  box-shadow: 0 8px 24px rgba(108,99,255,0.4);
+}
+.logo-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px; font-weight: 700;
+  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-text span { color: var(--accent); -webkit-text-fill-color: var(--accent); }
+.logo-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+/* Tab switcher */
+.tab-row {
+  display: flex; gap: 4px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.tab-btn {
+  flex: 1; padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  border: none; background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.tab-btn.active {
+  background: rgba(108,99,255,0.3);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(108,99,255,0.3);
+}
+
+/* Role selector */
+.role-selector {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 20px;
+}
+.role-btn {
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  color: var(--text-muted);
+  font-family: inherit;
+}
+.role-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+.role-btn.selected[data-role="admin"] {
+  border-color: var(--admin-color);
+  background: rgba(255,107,157,0.12);
+  color: var(--admin-color);
+}
+.role-btn.selected[data-role="teacher"] {
+  border-color: var(--teacher-color);
+  background: rgba(67,232,216,0.1);
+  color: var(--teacher-color);
+}
+.role-btn.selected[data-role="student"] {
+  border-color: var(--student-color);
+  background: rgba(108,99,255,0.15);
+  color: var(--student-color);
+}
+.role-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.role-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; }
+
+/* Form label */
+.field-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+/* Inputs */
+.field-wrap { margin-bottom: 16px; position: relative; }
+.input-group {
+  position: relative;
+}
+.input-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 16px; opacity: 0.5; pointer-events: none;
+}
+input[type="text"], input[type="email"], input[type="password"], select {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s;
+  appearance: none;
+}
+input::placeholder { color: rgba(240,240,245,0.3); }
+input:focus, select:focus {
+  border-color: var(--accent);
+  background: rgba(108,99,255,0.08);
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+}
+input.error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(255,92,124,0.15);
+}
+.field-error {
+  font-size: 11px; color: var(--error); margin-top: 5px;
+  display: none;
+}
+.field-error.show { display: block; }
+
+/* Password toggle */
+.pw-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; font-size: 16px; opacity: 0.4;
+  transition: opacity 0.2s; user-select: none;
+}
+.pw-toggle:hover { opacity: 0.8; }
+
+/* Submit button */
+.btn-submit {
+  width: 100%; padding: 14px;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.btn-submit[data-role="admin"] {
+  background: linear-gradient(135deg, #FF6B9D, #e0557e);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(255,107,157,0.4);
+}
+.btn-submit[data-role="teacher"] {
+  background: linear-gradient(135deg, #43E8D8, #2bc9b8);
+  color: #0a1a18;
+  box-shadow: 0 8px 24px rgba(67,232,216,0.35);
+}
+.btn-submit[data-role="student"] {
+  background: linear-gradient(135deg, #6C63FF, #5550cc);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(108,99,255,0.4);
+}
+.btn-submit:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit.loading { pointer-events: none; opacity: 0.7; }
+
+/* Shimmer effect */
+.btn-submit::after {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.4s;
+}
+.btn-submit:hover::after { left: 100%; }
+
+/* Divider */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 20px 0;
+  color: var(--text-muted); font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1;
+  height: 1px; background: rgba(255,255,255,0.08);
+}
+
+/* Alert */
+.alert {
+  padding: 12px 14px; border-radius: 10px;
+  font-size: 13px; margin-bottom: 16px;
+  display: none;
+}
+.alert.show { display: flex; align-items: center; gap: 8px; }
+.alert.success { background: rgba(67,232,216,0.1); border: 1px solid rgba(67,232,216,0.25); color: var(--success); }
+.alert.error { background: rgba(255,92,124,0.1); border: 1px solid rgba(255,92,124,0.25); color: var(--error); }
+
+/* Switch text */
+.switch-text {
+  text-align: center; margin-top: 20px;
+  font-size: 13px; color: var(--text-muted);
+}
+.switch-link {
+  color: var(--accent); font-weight: 600; cursor: pointer;
+  text-decoration: none; transition: opacity 0.2s;
+}
+.switch-link:hover { opacity: 0.8; }
+
+/* Password strength */
+.strength-bar {
+  height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+  margin-top: 6px; overflow: hidden;
+}
+.strength-fill {
+  height: 100%; border-radius: 2px;
+  transition: all 0.3s; width: 0;
+}
+
+/* Hidden */
+.hidden { display: none !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(108,99,255,0.4); border-radius: 2px; }
+
+/* Select arrow */
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: '▾';
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; color: rgba(255,255,255,0.4);
+}
+
+/* Forgot password */
+.forgot-link {
+  font-size: 12px; color: var(--accent); cursor: pointer;
+  float: right; text-decoration: none;
+  transition: opacity 0.2s; line-height: 1;
+}
+.forgot-link:hover { opacity: 0.75; }
+
+/* Checkbox */
+.check-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px; }
+.check-row input[type="checkbox"] { width: 16px; height: 16px; padding: 0; flex-shrink: 0; margin-top: 2px; accent-color: var(--accent); }
+.check-row label { font-size: 12px; color: var(--text-muted); cursor: pointer; }
+
+/* Spinner */
+.spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="bg-wrap">
+  <div class="bg-orb o1"></div>
+  <div class="bg-orb o2"></div>
+  <div class="bg-orb o3"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="auth-container">
+  <div class="glass-card">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-mark">🧠</div>
+      <div class="logo-text">Skill<span>IQ</span></div>
+      <div class="logo-sub">AI-Powered Student Performance Platform</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- Role selector -->
+    <div style="margin-bottom:8px;">
+      <div class="field-label">Sign in as</div>
+    </div>
+    <div class="role-selector" id="role-selector">
+      <button class="role-btn" data-role="admin" onclick="selectRole('admin')">
+        <span class="role-icon">👑</span>
+        <span class="role-label">Admin</span>
+      </button>
+      <button class="role-btn" data-role="teacher" onclick="selectRole('teacher')">
+        <span class="role-icon">📚</span>
+        <span class="role-label">Teacher</span>
+      </button>
+      <button class="role-btn selected" data-role="student" onclick="selectRole('student')">
+        <span class="role-icon">🎓</span>
+        <span class="role-label">Student</span>
+      </button>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="auth-alert"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="field-wrap">
+        <div class="field-label">Email Address</div>
+        <div class="input-group">
+          <span class="input-icon">📧</span>
+          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field-error" id="login-email-err">Please enter a valid email address.</div>
+      </div>
+
+      <div class="field-wrap">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <div class="field-label" style="margin-bottom:0;">Password</div>
+          <a class="forgot-link" onclick="showForgot()">Forgot password?</a>
+        </div>
+        <div class="input-group">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+          <span class="pw-toggle" onclick="togglePw('login-password',this)">👁️</span>
+        </div>
+        <div class="field-error" id="login-pw-err">Password is required.</div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="remember-me">
+        <label for="remember-me">Remember me for 30 days</label>
+      </div>
+
+      <button class="btn-submit" id="login-btn" data-role="student" onclick="handleLogin()">
+        Sign In as Student
+      </button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" class="hidden">
+      <div class="field-wrap">
+        <div class="field-label">Full Name</div>
+        <div class="input-group">
+          <span class="input-icon">👤</span>
+          <input type="text" id="reg-name" placeholder="John Smith" autocomplete="name">
+        </div>
+        <div class="field-error" id="reg-name-err">Name must be at least 2 characters.</div>
+      </div>
+
+      <div class="field-wrap">
+        <div class="field-label">Email Address</div>
+        <div class="input-group">
+          <span class="input-icon">📧</span>
+          <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field-error" id="reg-email-err">Please enter a valid email address.</div>
+      </div>
+
+      <!-- Teacher-specific field -->
+      <div class="field-wrap hidden" id="field-dept">
+        <div class="field-label">Department / Subject</div>
+        <div class="input-group select-wrap">
+          <span class="input-icon">📖</span>
+          <select id="reg-dept" style="padding-left:40px;">
+            <option value="">Select department</option>
+            <option>Mathematics</option>
+            <option>Science</option>
+            <option>English & Literature</option>
+            <option>Computer Science</option>
+            <option>History & Social Studies</option>
+            <option>Arts & Music</option>
+            <option>Physical Education</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field-error" id="reg-dept-err">Please select a department.</div>
+      </div>
+
+      <!-- Student-specific field -->
+      <div class="field-wrap hidden" id="field-grade">
+        <div class="field-label">Grade / Class</div>
+        <div class="input-group select-wrap">
+          <span class="input-icon">🎓</span>
+          <select id="reg-grade" style="padding-left:40px;">
+            <option value="">Select grade</option>
+            <option>Grade 6</option>
+            <option>Grade 7</option>
+            <option>Grade 8</option>
+            <option>Grade 9</option>
+            <option>Grade 10</option>
+            <option>Grade 11</option>
+            <option>Grade 12</option>
+            <option>Undergraduate</option>
+            <option>Postgraduate</option>
+          </select>
+        </div>
+        <div class="field-error" id="reg-grade-err">Please select a grade.</div>
+      </div>
+
+      <!-- Admin-specific field -->
+      <div class="field-wrap hidden" id="field-admin-code">
+        <div class="field-label">Admin Access Code</div>
+        <div class="input-group">
+          <span class="input-icon">🔑</span>
+          <input type="password" id="reg-admin-code" placeholder="Enter admin code">
+        </div>
+        <div class="field-error" id="reg-admincode-err">Invalid admin access code.</div>
+      </div>
+
+      <div class="field-wrap">
+        <div class="field-label">Password</div>
+        <div class="input-group">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="reg-password" placeholder="Min 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)">
+          <span class="pw-toggle" onclick="togglePw('reg-password',this)">👁️</span>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        <div class="field-error" id="reg-pw-err">Password must be at least 8 characters with a number and letter.</div>
+      </div>
+
+      <div class="field-wrap">
+        <div class="field-label">Confirm Password</div>
+        <div class="input-group">
+          <span class="input-icon">🔐</span>
+          <input type="password" id="reg-confirm" placeholder="Re-enter password" autocomplete="new-password">
+          <span class="pw-toggle" onclick="togglePw('reg-confirm',this)">👁️</span>
+        </div>
+        <div class="field-error" id="reg-confirm-err">Passwords do not match.</div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="reg-terms">
+        <label for="reg-terms">I agree to the <a href="#" class="switch-link">Terms of Service</a> and <a href="#" class="switch-link">Privacy Policy</a></label>
+      </div>
+      <div class="field-error" id="reg-terms-err" style="margin-top:-10px; margin-bottom:10px;">You must accept the terms.</div>
+
+      <button class="btn-submit" id="register-btn" data-role="student" onclick="handleRegister()">
+        Create Account
+      </button>
+    </div>
+
+    <div class="switch-text" id="switch-text">
+      Don't have an account? <a class="switch-link" onclick="switchTab('register')">Register here</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let currentRole = 'student';
+let currentTab = 'login';
+
+const DEMO_ACCOUNTS = {
+  'admin@skilliq.com': { password: 'Admin@123', role: 'admin', name: 'System Admin' },
+  'teacher@skilliq.com': { password: 'Teacher@123', role: 'teacher', name: 'Prof. Williams' },
+  'student@skilliq.com': { password: 'Student@123', role: 'student', name: 'Alex Johnson' },
+};
+
+function selectRole(role) {
+  currentRole = role;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`.role-btn[data-role="${role}"]`).classList.add('selected');
+
+  // Update submit buttons
+  const loginBtn = document.getElementById('login-btn');
+  const regBtn = document.getElementById('register-btn');
+  const labels = { admin: 'Admin', teacher: 'Teacher', student: 'Student' };
+  loginBtn.setAttribute('data-role', role);
+  loginBtn.textContent = `Sign In as ${labels[role]}`;
+  regBtn.setAttribute('data-role', role);
+  regBtn.textContent = `Create ${labels[role]} Account`;
+
+  // Show/hide role-specific fields
+  document.getElementById('field-dept').classList.toggle('hidden', role !== 'teacher');
+  document.getElementById('field-grade').classList.toggle('hidden', role !== 'student');
+  document.getElementById('field-admin-code').classList.toggle('hidden', role !== 'admin');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+  });
+  document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
+  const switchText = document.getElementById('switch-text');
+  if (tab === 'login') {
+    switchText.innerHTML = `Don't have an account? <a class="switch-link" onclick="switchTab('register')">Register here</a>`;
+  } else {
+    switchText.innerHTML = `Already have an account? <a class="switch-link" onclick="switchTab('login')">Sign in here</a>`;
+  }
+  clearAlert();
+  clearErrors();
+}
+
+function togglePw(id, el) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') { input.type = 'text'; el.textContent = '🙈'; }
+  else { input.type = 'password'; el.textContent = '👁️'; }
+}
+
+function checkStrength(val) {
+  const fill = document.getElementById('strength-fill');
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^a-zA-Z0-9]/.test(val)) score++;
+  const pct = (score / 4) * 100;
+  const colors = ['#ff5c7c','#FF6B9D','#f0c040','#43E8D8'];
+  fill.style.width = pct + '%';
+  fill.style.background = colors[score - 1] || 'transparent';
+}
+
+function showAlert(msg, type = 'error') {
+  const el = document.getElementById('auth-alert');
+  el.className = `alert ${type} show`;
+  el.innerHTML = (type === 'error' ? '⚠️ ' : '✅ ') + msg;
+}
+function clearAlert() {
+  const el = document.getElementById('auth-alert');
+  el.className = 'alert';
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function hideErr(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('show');
+}
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('input, select').forEach(e => e.classList.remove('error'));
+}
+
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function isValidPassword(p) { return p.length >= 8 && /[a-zA-Z]/.test(p) && /[0-9]/.test(p); }
+
+function handleLogin() {
+  clearErrors(); clearAlert();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  let valid = true;
+
+  if (!isValidEmail(email)) {
+    showErr('login-email-err', 'Please enter a valid email address.');
+    document.getElementById('login-email').classList.add('error');
+    valid = false;
+  }
+  if (!password) {
+    showErr('login-pw-err', 'Password is required.');
+    document.getElementById('login-password').classList.add('error');
+    valid = false;
+  }
+  if (!valid) return;
+
+  // Check demo accounts
+  const btn = document.getElementById('login-btn');
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spinner"></span>Signing in...';
+
+  setTimeout(() => {
+    const account = DEMO_ACCOUNTS[email];
+    if (account && account.password === password && account.role === currentRole) {
+      // Store session
+      sessionStorage.setItem('skilliq_user', JSON.stringify({ name: account.name, email, role: currentRole }));
+      showAlert(`Welcome back, ${account.name}! Redirecting...`, 'success');
+      setTimeout(() => {
+        if (currentRole === 'admin') window.location.href = 'admin.html';
+        else if (currentRole === 'teacher') window.location.href = 'teacher.html';
+        else window.location.href = 'index.html';
+      }, 1200);
+    } else {
+      showAlert('Invalid credentials or role mismatch. Check demo accounts below.', 'error');
+      btn.classList.remove('loading');
+      btn.textContent = `Sign In as ${currentRole.charAt(0).toUpperCase() + currentRole.slice(1)}`;
+    }
+  }, 900);
+}
+
+function handleRegister() {
+  clearErrors(); clearAlert();
+  let valid = true;
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-confirm').value;
+  const terms = document.getElementById('reg-terms').checked;
+
+  if (name.length < 2) {
+    showErr('reg-name-err', 'Name must be at least 2 characters.'); document.getElementById('reg-name').classList.add('error'); valid = false;
+  }
+  if (!isValidEmail(email)) {
+    showErr('reg-email-err', 'Please enter a valid email address.'); document.getElementById('reg-email').classList.add('error'); valid = false;
+  }
+  if (currentRole === 'teacher') {
+    const dept = document.getElementById('reg-dept').value;
+    if (!dept) { showErr('reg-dept-err', 'Please select a department.'); valid = false; }
+  }
+  if (currentRole === 'student') {
+    const grade = document.getElementById('reg-grade').value;
+    if (!grade) { showErr('reg-grade-err', 'Please select a grade.'); valid = false; }
+  }
+  if (currentRole === 'admin') {
+    const code = document.getElementById('reg-admin-code').value;
+    if (code !== 'SKILLIQ-ADMIN-2025') { showErr('reg-admincode-err', 'Invalid admin access code.'); document.getElementById('reg-admin-code').classList.add('error'); valid = false; }
+  }
+  if (!isValidPassword(password)) {
+    showErr('reg-pw-err', 'Password must be at least 8 characters with a number and letter.'); document.getElementById('reg-password').classList.add('error'); valid = false;
+  }
+  if (password !== confirm) {
+    showErr('reg-confirm-err', 'Passwords do not match.'); document.getElementById('reg-confirm').classList.add('error'); valid = false;
+  }
+  if (!terms) {
+    showErr('reg-terms-err', 'You must accept the terms.'); valid = false;
+  }
+  if (!valid) return;
+
+  const btn = document.getElementById('register-btn');
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spinner"></span>Creating account...';
+
+  setTimeout(() => {
+    sessionStorage.setItem('skilliq_user', JSON.stringify({ name, email, role: currentRole }));
+    showAlert(`Account created successfully! Welcome, ${name}!`, 'success');
+    setTimeout(() => {
+      if (currentRole === 'admin') window.location.href = 'admin.html';
+      else if (currentRole === 'teacher') window.location.href = 'teacher.html';
+      else window.location.href = 'index.html';
+    }, 1200);
+  }, 1100);
+}
+
+function showForgot() {
+  const email = document.getElementById('login-email').value;
+  if (!isValidEmail(email)) {
+    showAlert('Enter your email address first, then click Forgot password.', 'error');
+    return;
+  }
+  showAlert(`Password reset link sent to ${email}. (Demo only)`, 'success');
+}
+
+// Pre-fill with demo hint
+document.getElementById('login-email').value = 'student@skilliq.com';
+document.getElementById('login-password').value = 'Student@123';
+</script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillIQ — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="css/glass.css">
+</head>
+<body class="dark-theme">
+<div class="bg-wrap">
+  <div class="bg-orb o1" style="background:#FF6B9D;"></div>
+  <div class="bg-orb o2" style="background:#6C63FF;"></div>
+</div>
+<div class="bg-grid"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-mark">👑</div>
+    <div>
+      <div class="sidebar-title">Skill<span>IQ</span></div>
+      <div class="sidebar-role admin-tag">Admin Panel</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item active" onclick="showSection('overview')">📊 Overview</a>
+    <a class="nav-item" onclick="showSection('users')">👥 User Management</a>
+    <a class="nav-item" onclick="showSection('analytics')">📈 System Analytics</a>
+    <a class="nav-item" onclick="showSection('assessments')">📋 Assessments</a>
+    <a class="nav-item" onclick="showSection('settings')">⚙️ Settings</a>
+    <a class="nav-item" onclick="showSection('reports')">📄 Reports</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">A</div>
+      <div>
+        <div class="user-name" id="admin-name">Admin</div>
+        <div class="user-email" id="admin-email">admin@skilliq.com</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-area">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="section-title">Overview</div>
+      <div class="topbar-sub">System-wide performance metrics</div>
+    </div>
+    <div class="topbar-actions">
+      <div class="glass-pill">🕐 Live</div>
+      <div class="glass-pill" id="top-time"></div>
+      <button class="btn-glass" onclick="location.href='auth.html'">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- ===== OVERVIEW SECTION ===== -->
+  <div class="section active" id="sec-overview">
+    <div class="stats-grid">
+      <div class="stat-card admin-accent">
+        <div class="stat-icon">👥</div>
+        <div class="stat-val">1,284</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-trend up">+12% this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-val">48</div>
+        <div class="stat-label">Active Teachers</div>
+        <div class="stat-trend up">+3 new</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-val">1,198</div>
+        <div class="stat-label">Active Students</div>
+        <div class="stat-trend up">+84 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-val">9,421</div>
+        <div class="stat-label">Assessments Taken</div>
+        <div class="stat-trend up">+1,234 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-val">72.4%</div>
+        <div class="stat-label">Avg Accuracy</div>
+        <div class="stat-trend up">+2.1%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🌐</div>
+        <div class="stat-val">99.8%</div>
+        <div class="stat-label">System Uptime</div>
+        <div class="stat-trend up">All systems go</div>
+      </div>
+    </div>
+
+    <div class="cards-row">
+      <div class="glass-card chart-card">
+        <div class="card-header">📈 Assessment Activity (Last 7 Days)</div>
+        <canvas id="activityChart" height="180"></canvas>
+      </div>
+      <div class="glass-card">
+        <div class="card-header">🏆 Top Performers</div>
+        <div class="leaderboard" id="top-performers"></div>
+      </div>
+    </div>
+
+    <div class="cards-row">
+      <div class="glass-card">
+        <div class="card-header">📋 Recent System Activity</div>
+        <div class="activity-list" id="activity-list"></div>
+      </div>
+      <div class="glass-card">
+        <div class="card-header">🎯 Skill Distribution</div>
+        <canvas id="skillDistChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== USERS SECTION ===== -->
+  <div class="section hidden" id="sec-users">
+    <div class="section-actions">
+      <input type="text" class="search-input" placeholder="🔍 Search users..." oninput="filterUsers(this.value)" id="user-search">
+      <div class="filter-pills">
+        <button class="pill active" onclick="filterRole('all',this)">All</button>
+        <button class="pill" onclick="filterRole('admin',this)">👑 Admins</button>
+        <button class="pill" onclick="filterRole('teacher',this)">📚 Teachers</button>
+        <button class="pill" onclick="filterRole('student',this)">🎓 Students</button>
+      </div>
+      <button class="btn-primary-sm" onclick="showAddUserModal()">+ Add User</button>
+    </div>
+    <div class="glass-card">
+      <table class="data-table">
+        <thead>
+          <tr><th>User</th><th>Role</th><th>Status</th><th>Assessments</th><th>Joined</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="users-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== ANALYTICS SECTION ===== -->
+  <div class="section hidden" id="sec-analytics">
+    <div class="cards-row">
+      <div class="glass-card chart-card">
+        <div class="card-header">📊 Monthly Growth</div>
+        <canvas id="growthChart" height="200"></canvas>
+      </div>
+      <div class="glass-card chart-card">
+        <div class="card-header">🧠 Skill Performance Heatmap</div>
+        <div id="heatmap-grid"></div>
+      </div>
+    </div>
+    <div class="glass-card chart-card">
+      <div class="card-header">⏱️ Average Response Time by Skill</div>
+      <canvas id="responseChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- ===== ASSESSMENTS SECTION ===== -->
+  <div class="section hidden" id="sec-assessments">
+    <div class="stats-grid mini">
+      <div class="stat-card"><div class="stat-val">9,421</div><div class="stat-label">Total Assessments</div></div>
+      <div class="stat-card"><div class="stat-val">342</div><div class="stat-label">Today</div></div>
+      <div class="stat-card"><div class="stat-val">28.4%</div><div class="stat-label">High Risk Students</div></div>
+      <div class="stat-card"><div class="stat-val">4.2 min</div><div class="stat-label">Avg Duration</div></div>
+    </div>
+    <div class="glass-card">
+      <div class="card-header">📋 Recent Assessments</div>
+      <table class="data-table">
+        <thead><tr><th>Student</th><th>Skills</th><th>Score</th><th>Accuracy</th><th>Time</th><th>Risk</th></tr></thead>
+        <tbody id="assessments-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS SECTION ===== -->
+  <div class="section hidden" id="sec-settings">
+    <div class="cards-row">
+      <div class="glass-card">
+        <div class="card-header">⚙️ Platform Settings</div>
+        <div class="settings-group">
+          <div class="setting-row"><span>Allow Student Self-Registration</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="setting-row"><span>Enable AI Insights</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="setting-row"><span>Maintenance Mode</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div>
+          <div class="setting-row"><span>Email Notifications</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="setting-row"><span>Daily Reports</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+        </div>
+        <button class="btn-primary-sm" style="margin-top:16px;" onclick="showAlert('Settings saved!','success')">Save Settings</button>
+      </div>
+      <div class="glass-card">
+        <div class="card-header">📧 Email Templates</div>
+        <div class="settings-group">
+          <div class="setting-row">Welcome Email <button class="btn-xs">Edit</button></div>
+          <div class="setting-row">Assessment Complete <button class="btn-xs">Edit</button></div>
+          <div class="setting-row">Weekly Report <button class="btn-xs">Edit</button></div>
+          <div class="setting-row">Risk Alert <button class="btn-xs">Edit</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== REPORTS SECTION ===== -->
+  <div class="section hidden" id="sec-reports">
+    <div class="cards-row">
+      <div class="glass-card">
+        <div class="card-header">📄 Generate Reports</div>
+        <div class="report-btns">
+          <button class="report-btn" onclick="generateReport('performance')">📊 Performance Report</button>
+          <button class="report-btn" onclick="generateReport('users')">👥 User Activity Report</button>
+          <button class="report-btn" onclick="generateReport('skills')">🧠 Skill Analysis Report</button>
+          <button class="report-btn" onclick="generateReport('risk')">⚠️ Risk Assessment Report</button>
+        </div>
+      </div>
+      <div class="glass-card">
+        <div class="card-header">📥 Export Data</div>
+        <div class="report-btns">
+          <button class="report-btn" onclick="showAlert('Exported as CSV','success')">⬇️ Export Users CSV</button>
+          <button class="report-btn" onclick="showAlert('Exported as CSV','success')">⬇️ Export Assessments CSV</button>
+          <button class="report-btn" onclick="showAlert('Exported as JSON','success')">⬇️ Export Model Data JSON</button>
+        </div>
+      </div>
+    </div>
+    <div class="glass-card" id="report-preview" style="display:none;">
+      <div class="card-header" id="report-header"></div>
+      <div id="report-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal glass-card">
+    <div class="modal-header"><span id="modal-title">Add User</span><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast hidden" id="toast"></div>
+
+<script src="js/glass-shared.js"></script>
+<script>
+// Load user
+const user = JSON.parse(sessionStorage.getItem('skilliq_user') || '{"name":"Admin","email":"admin@skilliq.com","role":"admin"}');
+document.getElementById('admin-name').textContent = user.name;
+document.getElementById('admin-email').textContent = user.email;
+
+// Clock
+function updateClock() {
+  document.getElementById('top-time').textContent = new Date().toLocaleTimeString();
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// Section switching
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('sec-' + id).classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const titles = { overview:'Overview', users:'User Management', analytics:'System Analytics', assessments:'Assessments', settings:'Settings', reports:'Reports' };
+  document.getElementById('section-title').textContent = titles[id];
+}
+
+// ===== CHARTS =====
+const chartDefaults = {
+  color: 'rgba(255,255,255,0.7)',
+  plugins: { legend: { labels: { color: 'rgba(255,255,255,0.7)' } } },
+  scales: {
+    x: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+    y: { ticks: { color: 'rgba(255,255,255,0.5)' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+  }
+};
+
+// Activity chart
+new Chart(document.getElementById('activityChart'), {
+  type: 'line',
+  data: {
+    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    datasets: [{
+      label: 'Assessments',
+      data: [245, 312, 287, 398, 421, 189, 342],
+      borderColor: '#FF6B9D',
+      backgroundColor: 'rgba(255,107,157,0.15)',
+      fill: true, tension: 0.4, pointBackgroundColor: '#FF6B9D'
+    },{
+      label: 'New Users',
+      data: [12, 18, 14, 22, 19, 8, 15],
+      borderColor: '#43E8D8',
+      backgroundColor: 'rgba(67,232,216,0.08)',
+      fill: true, tension: 0.4, pointBackgroundColor: '#43E8D8'
+    }]
+  },
+  options: { ...chartDefaults, responsive: true }
+});
+
+// Skill dist pie
+new Chart(document.getElementById('skillDistChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Mathematics','Logical Reasoning','Aptitude','Problem Solving'],
+    datasets: [{ data: [32,24,22,22], backgroundColor: ['#FF6B9D','#6C63FF','#43E8D8','#f0c040'], borderWidth: 0 }]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.7)', padding: 12 } } } }
+});
+
+// Growth chart
+new Chart(document.getElementById('growthChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [{
+      label: 'Students', data: [820, 934, 1021, 1089, 1145, 1198],
+      backgroundColor: 'rgba(108,99,255,0.7)', borderRadius: 6
+    }]
+  },
+  options: { ...chartDefaults, responsive: true }
+});
+
+// Response time chart
+new Chart(document.getElementById('responseChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Mathematics','Logical Reasoning','Aptitude','Problem Solving'],
+    datasets: [{
+      label: 'Avg Time (sec)',
+      data: [24.3, 18.7, 21.4, 27.1],
+      backgroundColor: ['#FF6B9D','#6C63FF','#43E8D8','#f0c040'],
+      borderRadius: 8
+    }]
+  },
+  options: { ...chartDefaults, responsive: true, indexAxis: 'y' }
+});
+
+// Leaderboard
+const topPerfomers = [
+  { name: 'Priya Sharma', score: 94, badge: '🥇' },
+  { name: 'Ahmed Hassan', score: 91, badge: '🥈' },
+  { name: 'Emma Chen', score: 89, badge: '🥉' },
+  { name: 'Lucas Oliveira', score: 87, badge: '⭐' },
+  { name: 'Sofia Martinez', score: 85, badge: '⭐' },
+];
+document.getElementById('top-performers').innerHTML = topPerfomers.map((p,i) =>
+  `<div class="leader-row"><span class="leader-badge">${p.badge}</span><span style="flex:1">${p.name}</span><span class="score-pill">${p.score}</span></div>`
+).join('');
+
+// Activity list
+const activities = [
+  { time: '2 min ago', msg: 'New admin registered: admin2@skilliq.com', icon: '👑' },
+  { time: '15 min ago', msg: '342 assessments completed today', icon: '📊' },
+  { time: '1h ago', msg: 'Teacher Williams uploaded 20 new questions', icon: '📚' },
+  { time: '2h ago', msg: 'System backup completed successfully', icon: '✅' },
+  { time: '3h ago', msg: '84 new students registered this week', icon: '🎓' },
+];
+document.getElementById('activity-list').innerHTML = activities.map(a =>
+  `<div class="activity-item"><span class="act-icon">${a.icon}</span><div><div class="act-msg">${a.msg}</div><div class="act-time">${a.time}</div></div></div>`
+).join('');
+
+// Users table
+const users = [
+  { name: 'System Admin', email: 'admin@skilliq.com', role: 'admin', status: 'active', assessments: '—', joined: 'Jan 1, 2025' },
+  { name: 'Prof. Williams', email: 'teacher@skilliq.com', role: 'teacher', status: 'active', assessments: '—', joined: 'Jan 15, 2025' },
+  { name: 'Alex Johnson', email: 'student@skilliq.com', role: 'student', status: 'active', assessments: '12', joined: 'Feb 3, 2025' },
+  { name: 'Priya Sharma', email: 'priya@example.com', role: 'student', status: 'active', assessments: '28', joined: 'Feb 10, 2025' },
+  { name: 'Ahmed Hassan', email: 'ahmed@example.com', role: 'student', status: 'active', assessments: '24', joined: 'Mar 5, 2025' },
+  { name: 'Dr. Chen', email: 'chen@example.com', role: 'teacher', status: 'active', assessments: '—', joined: 'Jan 20, 2025' },
+  { name: 'Emma Rodriguez', email: 'emma@example.com', role: 'student', status: 'inactive', assessments: '5', joined: 'Mar 18, 2025' },
+];
+
+let filteredUsers = [...users];
+
+function renderUsers(data) {
+  const roleColors = { admin: '#FF6B9D', teacher: '#43E8D8', student: '#6C63FF' };
+  document.getElementById('users-table').innerHTML = data.map(u =>
+    `<tr>
+      <td><div class="user-cell"><div class="mini-avatar" style="background:${roleColors[u.role]}33; color:${roleColors[u.role]}">${u.name[0]}</div><div><div>${u.name}</div><div style="font-size:11px;color:var(--text-muted)">${u.email}</div></div></div></td>
+      <td><span class="role-tag" style="border-color:${roleColors[u.role]};color:${roleColors[u.role]}">${u.role}</span></td>
+      <td><span class="status-dot ${u.status}"></span>${u.status}</td>
+      <td>${u.assessments}</td>
+      <td>${u.joined}</td>
+      <td><button class="btn-xs" onclick="editUser('${u.email}')">Edit</button> <button class="btn-xs danger" onclick="deleteUser('${u.name}')">Del</button></td>
+    </tr>`
+  ).join('');
+}
+renderUsers(users);
+
+function filterUsers(q) {
+  filteredUsers = users.filter(u => u.name.toLowerCase().includes(q.toLowerCase()) || u.email.toLowerCase().includes(q.toLowerCase()));
+  renderUsers(filteredUsers);
+}
+
+let currentRoleFilter = 'all';
+function filterRole(role, el) {
+  currentRoleFilter = role;
+  document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const data = role === 'all' ? users : users.filter(u => u.role === role);
+  renderUsers(data);
+}
+
+// Assessments table
+const asmts = [
+  { student: 'Alex Johnson', skills: 'Math, Logic', score: 76, acc: '72%', time: '4:12', risk: 'low' },
+  { student: 'Priya Sharma', skills: 'All 4', score: 94, acc: '91%', time: '3:45', risk: 'low' },
+  { student: 'Carlos Diaz', skills: 'Aptitude', score: 48, acc: '52%', time: '6:30', risk: 'high' },
+  { student: 'Yuki Tanaka', skills: 'Math, Problem', score: 63, acc: '65%', time: '5:00', risk: 'medium' },
+  { student: 'Fatima Al-Sayed', skills: 'Logic', score: 81, acc: '84%', time: '3:20', risk: 'low' },
+];
+document.getElementById('assessments-table').innerHTML = asmts.map(a =>
+  `<tr>
+    <td>${a.student}</td><td>${a.skills}</td>
+    <td><strong>${a.score}</strong></td>
+    <td>${a.acc}</td><td>${a.time}</td>
+    <td><span class="risk-badge ${a.risk}">${a.risk}</span></td>
+  </tr>`
+).join('');
+
+// Heatmap
+const skills = ['Math','Logic','Aptitude','Problem'];
+const grades = ['A','B','C','D','F'];
+let heatHtml = '<div class="heatmap">';
+heatHtml += '<div class="heat-row heat-header"><div class="heat-label"></div>' + grades.map(g => `<div class="heat-cell heat-hdr">${g}</div>`).join('') + '</div>';
+skills.forEach(s => {
+  heatHtml += `<div class="heat-row"><div class="heat-label">${s}</div>` + grades.map((g,i) => {
+    const v = [45,72,84,68,12][i] + Math.floor(Math.random()*10-5);
+    const c = `rgba(108,99,255,${v/100})`;
+    return `<div class="heat-cell" style="background:${c}">${v}%</div>`;
+  }).join('') + '</div>';
+});
+heatHtml += '</div>';
+document.getElementById('heatmap-grid').innerHTML = heatHtml;
+
+// Modals
+function showAddUserModal() {
+  document.getElementById('modal-title').textContent = 'Add New User';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="field-wrap"><div class="field-label">Name</div><input class="modal-input" type="text" placeholder="Full name"></div>
+    <div class="field-wrap"><div class="field-label">Email</div><input class="modal-input" type="email" placeholder="user@example.com"></div>
+    <div class="field-wrap"><div class="field-label">Role</div>
+      <select class="modal-input"><option>student</option><option>teacher</option><option>admin</option></select></div>
+    <button class="btn-primary-sm" onclick="showAlert('User added!','success'); closeModal()">Add User</button>
+  `;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function editUser(email) { showAlert('Edit user: ' + email, 'info'); }
+function deleteUser(name) { if(confirm('Delete '+name+'?')) showAlert(name+' deleted.','success'); }
+function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
+
+// Reports
+function generateReport(type) {
+  const titles = { performance:'Performance Report', users:'User Activity Report', skills:'Skill Analysis Report', risk:'Risk Assessment Report' };
+  document.getElementById('report-preview').style.display = 'block';
+  document.getElementById('report-header').textContent = titles[type];
+  document.getElementById('report-content').innerHTML = `
+    <p style="color:var(--text-muted); margin:12px 0;">Generated: ${new Date().toLocaleString()}</p>
+    <div class="report-table">
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px;">
+        <div class="stat-card mini"><div class="stat-val">1,284</div><div class="stat-label">Total Users</div></div>
+        <div class="stat-card mini"><div class="stat-val">72.4%</div><div class="stat-label">Avg Accuracy</div></div>
+        <div class="stat-card mini"><div class="stat-val">9,421</div><div class="stat-label">Assessments</div></div>
+      </div>
+    </div>
+    <button class="report-btn" style="margin-top:12px;" onclick="showAlert('Report downloaded!','success')">⬇️ Download PDF</button>
+  `;
+  showAlert('Report generated!', 'success');
+}
+
+function logout() { sessionStorage.clear(); window.location.href = 'auth.html'; }
+
+function showAlert(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = (type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ') + msg;
+  t.className = `toast ${type}`;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+</script>
+</body>
+</html>

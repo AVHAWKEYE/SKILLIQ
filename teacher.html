@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillIQ — Teacher Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="css/glass.css">
+</head>
+<body class="dark-theme teacher-theme">
+<div class="bg-wrap">
+  <div class="bg-orb o1" style="background:#43E8D8;"></div>
+  <div class="bg-orb o2" style="background:#6C63FF;"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-mark" style="background:linear-gradient(135deg,#43E8D8,#6C63FF);">📚</div>
+    <div>
+      <div class="sidebar-title">Skill<span>IQ</span></div>
+      <div class="sidebar-role teacher-tag">Teacher</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item active" onclick="showSection('overview')">📊 My Classes</a>
+    <a class="nav-item" onclick="showSection('students')">👨‍🎓 Students</a>
+    <a class="nav-item" onclick="showSection('assignments')">📝 Assignments</a>
+    <a class="nav-item" onclick="showSection('questions')">❓ Question Bank</a>
+    <a class="nav-item" onclick="showSection('reports')">📄 Reports</a>
+    <a class="nav-item" onclick="showSection('alerts')">🔔 Risk Alerts</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar" style="background:linear-gradient(135deg,#43E8D8,#6C63FF);">T</div>
+      <div>
+        <div class="user-name" id="teacher-name">Teacher</div>
+        <div class="user-email" id="teacher-email">teacher@skilliq.com</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+</div>
+
+<div class="main-area">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="section-title">My Classes</div>
+      <div class="topbar-sub">Manage students and track progress</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-glass" onclick="showSection('assignments'); document.querySelectorAll('.nav-item')[2].classList.add('active')">+ New Assignment</button>
+      <button class="btn-glass" onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="section active" id="sec-overview">
+    <div class="stats-grid">
+      <div class="stat-card teacher-accent">
+        <div class="stat-icon">👨‍🎓</div>
+        <div class="stat-val">67</div>
+        <div class="stat-label">My Students</div>
+        <div class="stat-trend up">3 classes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-val">74.2%</div>
+        <div class="stat-label">Class Avg Score</div>
+        <div class="stat-trend up">+3.1% vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-val">8</div>
+        <div class="stat-label">At-Risk Students</div>
+        <div class="stat-trend down">Needs attention</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-val">3</div>
+        <div class="stat-label">Active Assignments</div>
+        <div class="stat-trend up">Due this week</div>
+      </div>
+    </div>
+
+    <div class="cards-row">
+      <div class="glass-card chart-card">
+        <div class="card-header">📈 Class Progress Over Time</div>
+        <canvas id="classProgressChart" height="180"></canvas>
+      </div>
+      <div class="glass-card">
+        <div class="card-header">🏆 Top Students</div>
+        <div id="top-students"></div>
+      </div>
+    </div>
+
+    <div class="cards-row">
+      <div class="glass-card">
+        <div class="card-header">📚 My Classes</div>
+        <div id="classes-list"></div>
+      </div>
+      <div class="glass-card">
+        <div class="card-header">🎯 Skill Coverage</div>
+        <canvas id="skillCoverChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENTS -->
+  <div class="section hidden" id="sec-students">
+    <div class="section-actions">
+      <input type="text" class="search-input" placeholder="🔍 Search students..." id="student-search" oninput="filterStudents(this.value)">
+      <div class="filter-pills">
+        <button class="pill active" onclick="filterStudentRisk('all',this)">All</button>
+        <button class="pill" onclick="filterStudentRisk('low',this)">🟢 On Track</button>
+        <button class="pill" onclick="filterStudentRisk('medium',this)">🟡 Needs Help</button>
+        <button class="pill" onclick="filterStudentRisk('high',this)">🔴 At Risk</button>
+      </div>
+    </div>
+    <div class="glass-card">
+      <table class="data-table">
+        <thead><tr><th>Student</th><th>Class</th><th>Score</th><th>Accuracy</th><th>Progress</th><th>Risk</th><th>Actions</th></tr></thead>
+        <tbody id="students-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ASSIGNMENTS -->
+  <div class="section hidden" id="sec-assignments">
+    <div class="section-actions">
+      <button class="btn-primary-sm" onclick="showCreateAssignment()">+ Create Assignment</button>
+    </div>
+    <div id="assignments-list"></div>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div class="section hidden" id="sec-questions">
+    <div class="section-actions">
+      <input type="text" class="search-input" placeholder="🔍 Search questions...">
+      <div class="filter-pills">
+        <button class="pill active">All</button>
+        <button class="pill">🧮 Math</button>
+        <button class="pill">🧠 Logic</button>
+        <button class="pill">⚡ Aptitude</button>
+        <button class="pill">🔧 Problem</button>
+      </div>
+      <button class="btn-primary-sm" onclick="showAlert('Question editor coming soon','info')">+ Add Question</button>
+    </div>
+    <div class="glass-card">
+      <table class="data-table">
+        <thead><tr><th>Question</th><th>Skill</th><th>Difficulty</th><th>Correct Rate</th><th>Actions</th></tr></thead>
+        <tbody id="questions-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="section hidden" id="sec-reports">
+    <div class="glass-card chart-card">
+      <div class="card-header">📊 Skill Performance by Class</div>
+      <canvas id="classSkillChart" height="200"></canvas>
+    </div>
+    <div class="cards-row">
+      <div class="glass-card">
+        <div class="card-header">📈 Improvement Trends</div>
+        <canvas id="improvementChart" height="200"></canvas>
+      </div>
+      <div class="glass-card">
+        <div class="card-header">📄 Export Reports</div>
+        <div class="report-btns">
+          <button class="report-btn" onclick="showAlert('Exported!','success')">⬇️ Student Progress CSV</button>
+          <button class="report-btn" onclick="showAlert('Exported!','success')">⬇️ Class Summary PDF</button>
+          <button class="report-btn" onclick="showAlert('Exported!','success')">⬇️ Risk Report PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RISK ALERTS -->
+  <div class="section hidden" id="sec-alerts">
+    <div class="glass-card">
+      <div class="card-header">⚠️ Students Needing Immediate Attention</div>
+      <div id="risk-alerts-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script src="js/glass-shared.js"></script>
+<script>
+const user = JSON.parse(sessionStorage.getItem('skilliq_user') || '{"name":"Prof. Williams","email":"teacher@skilliq.com"}');
+document.getElementById('teacher-name').textContent = user.name;
+document.getElementById('teacher-email').textContent = user.email;
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('sec-' + id).classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const titles = { overview:'My Classes', students:'Students', assignments:'Assignments', questions:'Question Bank', reports:'Reports', alerts:'Risk Alerts' };
+  document.getElementById('section-title').textContent = titles[id];
+}
+
+// Charts
+const chartOpts = {
+  plugins: { legend: { labels: { color: 'rgba(255,255,255,0.7)' } } },
+  scales: { x: { ticks:{color:'rgba(255,255,255,0.5)'}, grid:{color:'rgba(255,255,255,0.05)'} }, y: { ticks:{color:'rgba(255,255,255,0.5)'}, grid:{color:'rgba(255,255,255,0.05)'} } }
+};
+
+new Chart(document.getElementById('classProgressChart'), {
+  type: 'line',
+  data: {
+    labels: ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6'],
+    datasets: [
+      { label: 'Class A', data:[65,68,72,71,74,78], borderColor:'#43E8D8', tension:0.4, fill:false, pointBackgroundColor:'#43E8D8' },
+      { label: 'Class B', data:[58,62,64,68,70,73], borderColor:'#FF6B9D', tension:0.4, fill:false, pointBackgroundColor:'#FF6B9D' },
+      { label: 'Class C', data:[72,74,76,75,77,80], borderColor:'#6C63FF', tension:0.4, fill:false, pointBackgroundColor:'#6C63FF' },
+    ]
+  },
+  options: { ...chartOpts, responsive: true }
+});
+
+new Chart(document.getElementById('skillCoverChart'), {
+  type: 'radar',
+  data: {
+    labels: ['Math','Logic','Aptitude','Problem Solving'],
+    datasets: [{ data:[74,68,79,71], backgroundColor:'rgba(67,232,216,0.15)', borderColor:'#43E8D8', pointBackgroundColor:'#43E8D8' }]
+  },
+  options: { responsive: true, scales: { r: { ticks:{color:'rgba(255,255,255,0.4)'}, grid:{color:'rgba(255,255,255,0.1)'}, angleLines:{color:'rgba(255,255,255,0.1)'}, pointLabels:{color:'rgba(255,255,255,0.7)'} } }, plugins:{ legend:{display:false} } }
+});
+
+new Chart(document.getElementById('classSkillChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Mathematics','Logical Reasoning','Aptitude','Problem Solving'],
+    datasets: [
+      { label:'Class A', data:[74,68,79,71], backgroundColor:'rgba(67,232,216,0.7)', borderRadius:4 },
+      { label:'Class B', data:[64,72,65,68], backgroundColor:'rgba(255,107,157,0.7)', borderRadius:4 },
+      { label:'Class C', data:[80,76,82,77], backgroundColor:'rgba(108,99,255,0.7)', borderRadius:4 },
+    ]
+  },
+  options: { ...chartOpts, responsive: true }
+});
+
+new Chart(document.getElementById('improvementChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [{ label:'Avg Score', data:[62,65,68,70,72,74], borderColor:'#43E8D8', fill:true, backgroundColor:'rgba(67,232,216,0.1)', tension:0.4 }]
+  },
+  options: { ...chartOpts, responsive: true }
+});
+
+// Top students
+const topStudents = [
+  { name:'Priya Sharma', score:94, class:'A', badge:'🥇' },
+  { name:'Ahmed Hassan', score:91, class:'C', badge:'🥈' },
+  { name:'Emma Chen', score:89, class:'B', badge:'🥉' },
+  { name:'Fatima Al-Sayed', score:87, class:'A', badge:'⭐' },
+  { name:'Lucas Oliveira', score:85, class:'C', badge:'⭐' },
+];
+document.getElementById('top-students').innerHTML = topStudents.map(s =>
+  `<div class="leader-row"><span class="leader-badge">${s.badge}</span><span style="flex:1">${s.name} <small style="color:var(--text-muted)">Class ${s.class}</small></span><span class="score-pill">${s.score}</span></div>`
+).join('');
+
+// Classes
+document.getElementById('classes-list').innerHTML = [
+  { name:'Class A — Mathematics', students:24, avg:74, time:'Mon/Wed 10:00' },
+  { name:'Class B — Logical Reasoning', students:21, avg:70, time:'Tue/Thu 2:00' },
+  { name:'Class C — Mixed Skills', students:22, avg:77, time:'Fri 9:00' },
+].map(c => `
+  <div class="class-row">
+    <div class="class-info">
+      <div class="class-name">${c.name}</div>
+      <div class="class-meta">${c.students} students · ${c.time}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="mini-progress"><div class="mini-fill" style="width:${c.avg}%"></div></div>
+      <span class="score-pill">${c.avg}%</span>
+    </div>
+  </div>
+`).join('');
+
+// Students table
+const students = [
+  { name:'Priya Sharma', class:'A', score:94, acc:'91%', risk:'low' },
+  { name:'Ahmed Hassan', class:'C', score:91, acc:'88%', risk:'low' },
+  { name:'Emma Chen', class:'B', score:89, acc:'87%', risk:'low' },
+  { name:'Carlos Diaz', class:'A', score:48, acc:'52%', risk:'high' },
+  { name:'Yuki Tanaka', class:'B', score:63, acc:'65%', risk:'medium' },
+  { name:'Fatima Al-Sayed', class:'A', score:87, acc:'84%', risk:'low' },
+  { name:'Michael Brown', class:'C', score:55, acc:'58%', risk:'high' },
+  { name:'Sara Kim', class:'B', score:71, acc:'73%', risk:'medium' },
+];
+
+function renderStudents(data) {
+  document.getElementById('students-table').innerHTML = data.map(s => `
+    <tr>
+      <td>${s.name}</td>
+      <td>Class ${s.class}</td>
+      <td><strong>${s.score}</strong></td>
+      <td>${s.acc}</td>
+      <td><div class="mini-progress"><div class="mini-fill" style="width:${s.score}%; background:${s.risk==='high'?'#ff5c7c':s.risk==='medium'?'#f0c040':'#43E8D8'}"></div></div></td>
+      <td><span class="risk-badge ${s.risk}">${s.risk}</span></td>
+      <td><button class="btn-xs" onclick="viewStudent('${s.name}')">View</button> <button class="btn-xs" onclick="msgStudent('${s.name}')">Message</button></td>
+    </tr>
+  `).join('');
+}
+renderStudents(students);
+function filterStudents(q) { renderStudents(students.filter(s=>s.name.toLowerCase().includes(q.toLowerCase()))); }
+function filterStudentRisk(risk, el) {
+  document.querySelectorAll('.filter-pills .pill').forEach(p=>p.classList.remove('active')); el.classList.add('active');
+  renderStudents(risk==='all' ? students : students.filter(s=>s.risk===risk));
+}
+function viewStudent(name) { showAlert('Viewing ' + name + '\'s profile', 'info'); }
+function msgStudent(name) { showAlert('Message sent to ' + name, 'success'); }
+
+// Assignments
+const assignments = [
+  { title:'Math Fundamentals Quiz', due:'Mar 28, 2025', class:'A', submitted:18, total:24 },
+  { title:'Logic Patterns Assessment', due:'Apr 2, 2025', class:'B', submitted:12, total:21 },
+  { title:'Aptitude & Problem Solving', due:'Apr 5, 2025', class:'C', submitted:8, total:22 },
+];
+document.getElementById('assignments-list').innerHTML = assignments.map(a => `
+  <div class="glass-card assignment-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div class="card-header">${a.title}</div>
+        <div style="color:var(--text-muted);font-size:13px;margin-top:4px;">Class ${a.class} · Due: ${a.due}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:20px;font-weight:700;color:#43E8D8">${a.submitted}/${a.total}</div>
+        <div style="font-size:11px;color:var(--text-muted)">submitted</div>
+      </div>
+    </div>
+    <div class="mini-progress" style="margin-top:12px;height:6px"><div class="mini-fill" style="width:${Math.round(a.submitted/a.total*100)}%;background:#43E8D8"></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn-xs">View Submissions</button>
+      <button class="btn-xs">Grade All</button>
+      <button class="btn-xs danger" onclick="showAlert('Assignment deleted','success')">Delete</button>
+    </div>
+  </div>
+`).join('');
+
+function showCreateAssignment() {
+  showAlert('Assignment builder coming soon!', 'info');
+}
+
+// Questions
+const questions = [
+  { q:'If 2x + 5 = 13, find x', skill:'Math', diff:'Easy', rate:'82%' },
+  { q:'What comes next: 2, 6, 18, 54, ?', skill:'Logic', diff:'Medium', rate:'71%' },
+  { q:'A train travels 120km in 2hrs. Speed?', skill:'Aptitude', diff:'Easy', rate:'88%' },
+  { q:'John has 3 times more than Mary...', skill:'Problem', diff:'Hard', rate:'45%' },
+  { q:'Solve the quadratic: x²-5x+6=0', skill:'Math', diff:'Medium', rate:'63%' },
+];
+document.getElementById('questions-table').innerHTML = questions.map(q => `
+  <tr>
+    <td style="max-width:200px">${q.q}</td>
+    <td>${q.skill}</td>
+    <td><span class="diff-badge ${q.diff.toLowerCase()}">${q.diff}</span></td>
+    <td>${q.rate}</td>
+    <td><button class="btn-xs">Edit</button> <button class="btn-xs danger">Delete</button></td>
+  </tr>
+`).join('');
+
+// Risk alerts
+document.getElementById('risk-alerts-list').innerHTML = students.filter(s=>s.risk!=='low').map(s => `
+  <div class="risk-alert-row ${s.risk}">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:20px">${s.risk==='high'?'🔴':'🟡'}</span>
+      <div>
+        <div style="font-weight:600">${s.name} — Class ${s.class}</div>
+        <div style="color:var(--text-muted);font-size:12px">Score: ${s.score} · Accuracy: ${s.acc}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-xs" onclick="showAlert('Message sent to ${s.name}','success')">📧 Message</button>
+      <button class="btn-xs" onclick="showAlert('Plan assigned','success')">📋 Assign Plan</button>
+    </div>
+  </div>
+`).join('');
+
+function logout() { sessionStorage.clear(); window.location.href = 'auth.html'; }
+function showAlert(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = (type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ') + msg;
+  t.className = `toast ${type}`;
+  t.classList.remove('hidden');
+  setTimeout(()=>t.classList.add('hidden'), 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+skilliq.db
+app/model_artifacts/
