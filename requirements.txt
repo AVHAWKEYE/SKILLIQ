@@ -1,1 +1,10 @@
+# SkillIQ dependencies
+
+# Active web server runtime
 Flask==3.1.1
+
+# API stack used by app/ modules (optional on Python 3.14 until wheels are available)
+fastapi>=0.116.0,<1.0 ; python_version < "3.14"
+uvicorn>=0.35.0,<1.0 ; python_version < "3.14"
+SQLAlchemy>=2.0.0,<3.0 ; python_version < "3.14"
+pydantic>=2.11.0,<3.0 ; python_version < "3.14"
