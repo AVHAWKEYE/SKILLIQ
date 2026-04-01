@@ -16,6 +16,8 @@ PyJWT
 
 # Database
 python-multipart
+pymongo
+dnspython
 
 # Data processing
 pandas

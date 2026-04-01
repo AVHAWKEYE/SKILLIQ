@@ -13,8 +13,15 @@ from .auth import (
     create_access_token, hash_password, verify_password,
     get_current_user, get_current_teacher, get_current_admin, require_role
 )
-from .database import engine, get_db
+from .database import SessionLocal, engine, get_db
 from .insights import InsightsEngine
+from .mongo_sync import (
+    full_sync_from_sql,
+    ping_mongo,
+    safe_sync,
+    upsert_instance,
+    upsert_instances,
+)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -28,6 +35,16 @@ app.add_middleware(
 )
 
 STAFF_ROLES = {"admin", "teacher"}
+
+
+@app.on_event("startup")
+def startup_mongo_sync() -> None:
+    """On startup, mirror SQL data to MongoDB Atlas if reachable."""
+    db = SessionLocal()
+    try:
+        safe_sync(full_sync_from_sql, db)
+    finally:
+        db.close()
 
 
 # ========== AUTH ENDPOINTS ==========
@@ -54,6 +71,7 @@ def register(payload: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    safe_sync(upsert_instance, "users", user)
     return user
 
 
@@ -98,6 +116,7 @@ def update_profile(
     
     db.commit()
     db.refresh(current_user)
+    safe_sync(upsert_instance, "users", current_user)
     return current_user
 
 
@@ -105,6 +124,24 @@ def update_profile(
 @app.get("/api/health")
 def health():
     return {"status": "ok", "model_ready": ml.is_model_ready()}
+
+
+@app.get("/api/mongo/status")
+def mongo_status():
+    """Check MongoDB Atlas connectivity."""
+    return {"connected": ping_mongo()}
+
+
+@app.post("/api/mongo/sync")
+def mongo_full_sync(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_admin),
+):
+    """Manually force a full SQL->Mongo synchronization (admin only)."""
+    counts = safe_sync(full_sync_from_sql, db)
+    if counts is None:
+        raise HTTPException(status_code=503, detail="MongoDB Atlas is not reachable")
+    return {"message": "Mongo sync completed", "counts": counts}
 
 
 @app.post("/api/assessments", response_model=schemas.AssessmentRead)
@@ -124,6 +161,7 @@ def create_assessment(
     db.add(item)
     db.commit()
     db.refresh(item)
+    safe_sync(upsert_instance, "assessments", item)
     return item
 
 
@@ -142,6 +180,7 @@ def update_label(
     row.target_score = payload.target_score
     db.commit()
     db.refresh(row)
+    safe_sync(upsert_instance, "assessments", row)
     return row
 
 
@@ -219,6 +258,9 @@ def create_test(
     
     db.commit()
     db.refresh(test)
+    questions = db.query(models.TestQuestion).filter(models.TestQuestion.test_id == test.id).all()
+    safe_sync(upsert_instance, "tests", test)
+    safe_sync(upsert_instances, "test_questions", questions)
     return test
 
 
@@ -280,6 +322,7 @@ def update_test(
     
     db.commit()
     db.refresh(test)
+    safe_sync(upsert_instance, "tests", test)
     return test
 
 
@@ -301,6 +344,7 @@ def publish_test(
     test.is_published = True
     db.commit()
     db.refresh(test)
+    safe_sync(upsert_instance, "tests", test)
     
     return {"message": "Test published successfully", "test": test}
 
@@ -322,6 +366,7 @@ def delete_test(
     
     db.delete(test)
     db.commit()
+    safe_sync(full_sync_from_sql, db)
     
     return {"message": "Test deleted successfully"}
 
@@ -359,6 +404,7 @@ def start_test_attempt(
     db.add(attempt)
     db.commit()
     db.refresh(attempt)
+    safe_sync(upsert_instance, "test_attempts", attempt)
     
     return attempt
 
@@ -423,6 +469,11 @@ def submit_test_attempt(
     # Update performance metrics
     engine_insights = InsightsEngine(db)
     engine_insights.update_performance_metrics(current_user.id, test.id)
+    safe_sync(upsert_instance, "test_attempts", attempt)
+    metric_rows = db.query(models.PerformanceMetric).filter(
+        models.PerformanceMetric.user_id == current_user.id
+    ).all()
+    safe_sync(upsert_instances, "performance_metrics", metric_rows)
     
     return attempt
 
@@ -485,6 +536,7 @@ def create_learning_resource(
     db.add(resource)
     db.commit()
     db.refresh(resource)
+    safe_sync(upsert_instance, "learning_resources", resource)
     return resource
 
 
@@ -526,6 +578,7 @@ def update_learning_resource(
     
     db.commit()
     db.refresh(resource)
+    safe_sync(upsert_instance, "learning_resources", resource)
     return resource
 
 
@@ -545,6 +598,8 @@ def view_learning_resource(
     
     resource.views += 1
     db.commit()
+    db.refresh(resource)
+    safe_sync(upsert_instance, "learning_resources", resource)
     
     return {"message": "View recorded"}
 
@@ -585,6 +640,7 @@ def generate_insights(
         db.add(insight)
     
     db.commit()
+    safe_sync(full_sync_from_sql, db)
     
     return {"insights_generated": len(insights), "insights": [schemas.AIInsightRead.from_orm(i) for i in insights]}
 
@@ -626,6 +682,8 @@ def mark_insight_read(
     
     insight.is_read = True
     db.commit()
+    db.refresh(insight)
+    safe_sync(upsert_instance, "ai_insights", insight)
     
     return {"message": "Marked as read"}
 
