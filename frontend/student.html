@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillIQ — Student Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <link rel="stylesheet" href="css/glass.css">
+    <style>
+        :root {
+            --purple: #6C63FF;
+            --purple-d: #5550cc;
+            --teal: #43E8D8;
+            --pink: #FF6B9D;
+            --amber: #F59E0B;
+            --green: #10B981;
+            --coral: #EF4444;
+            --bg: #f2f0ff;
+            --text: #1a1a2e;
+            --muted: #6b7080;
+            --border: rgba(108, 99, 255, .15);
+            --glass: rgba(255, 255, 255, .62);
+            --glass-b: rgba(255, 255, 255, .88);
+            --glass-sh: 0 8px 32px rgba(108, 99, 255, .10);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--glass-b);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--glass-sh);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand span {
+            color: var(--purple);
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--muted);
+            font-family: inherit;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(108, 99, 255, .1);
+            color: var(--purple);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-b);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--glass-sh);
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-b);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--glass-sh);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 16px;
+        }
+
+        .test-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-b);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(108, 99, 255, .2);
+        }
+
+        .test-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .test-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--glass-b);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple), var(--purple-d));
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 20px rgba(108, 99, 255, .35);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 28px rgba(108, 99, 255, .45);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+        }
+
+        .insight-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-b);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--purple);
+        }
+
+        .insight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .insight-skill {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .insight-type {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: capitalize;
+        }
+
+        .insight-text {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .insight-actions {
+            display: flex;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .insight-actions a {
+            padding: 6px 12px;
+            background: rgba(108, 99, 255, .1);
+            color: var(--purple);
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .insight-actions a:hover {
+            background: rgba(108, 99, 255, .2);
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .resource-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-b);
+            border-radius: 14px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(108, 99, 255, .15);
+        }
+
+        .resource-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .resource-type {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 8px;
+            background: rgba(108, 99, 255, .1);
+            border-radius: 6px;
+            color: var(--purple);
+            margin-bottom: 12px;
+        }
+
+        .resource-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--purple);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="navbar-brand">
+            🎓 Skill<span>IQ</span> Student
+        </div>
+        <div class="navbar-menu">
+            <button class="nav-item active" onclick="showPage('dashboard')">📊 Dashboard</button>
+            <button class="nav-item" onclick="showPage('tests')">📋 Tests</button>
+            <button class="nav-item" onclick="showPage('insights')">💡 AI Insights</button>
+            <button class="nav-item" onclick="showPage('resources')">📚 Resources</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <span id="student-name" style="font-weight: 600;">Student</span>
+            <button class="btn btn-sm" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- DASHBOARD PAGE -->
+        <div id="dashboard" class="page active">
+            <h1 class="page-title">Welcome Back!</h1>
+            <p class="page-subtitle">Track your progress and performance</p>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Tests Attempted</div>
+                    <div class="metric-value" id="tests-attempted">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Average Score</div>
+                    <div class="metric-value" id="avg-score">0%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Assessments Done</div>
+                    <div class="metric-value" id="assessments-done">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Insights Available</div>
+                    <div class="metric-value" id="insights-count">0</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h2 style="margin-bottom: 20px; font-size: 18px; font-weight: 700;">Recommended Actions</h2>
+                <div id="recommendations" class="loading">
+                    <div class="spinner"></div>
+                    Loading recommendations...
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTS PAGE -->
+        <div id="tests" class="page">
+            <h1 class="page-title">Available Tests</h1>
+            <p class="page-subtitle">Complete tests assigned by your teachers</p>
+
+            <div class="test-grid" id="tests-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading tests...
+                </div>
+            </div>
+        </div>
+
+        <!-- AI INSIGHTS PAGE -->
+        <div id="insights" class="page">
+            <h1 class="page-title">AI-Powered Insights</h1>
+            <p class="page-subtitle">Personalized recommendations for skill improvement</p>
+
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="generateNewInsights()">🔄 Generate New Insights</button>
+            </div>
+
+            <div id="insights-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading insights...
+                </div>
+            </div>
+        </div>
+
+        <!-- RESOURCES PAGE -->
+        <div id="resources" class="page">
+            <h1 class="page-title">Learning Resources</h1>
+            <p class="page-subtitle">Videos, articles, and materials for improvement</p>
+
+            <div class="resource-grid" id="resources-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading resources...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let authToken = localStorage.getItem('authToken');
+        let currentUserId = null;
+
+        // Auth check
+        if (!authToken) {
+            window.location.href = 'auth.html';
+        }
+
+        const apiHeaders = {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+        };
+
+        // ===== PAGE NAVIGATION =====
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (id === 'dashboard') loadDashboard();
+            else if (id === 'tests') loadTests();
+            else if (id === 'insights') loadInsights();
+            else if (id === 'resources') loadResources();
+        }
+
+        // ===== DASHBOARD =====
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/analytics/student`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('tests-attempted').textContent = data.total_tests_attempted;
+                    document.getElementById('avg-score').textContent = data.average_test_score.toFixed(0) + '%';
+                    document.getElementById('assessments-done').textContent = data.total_assessments;
+                    document.getElementById('insights-count').textContent = data.recent_insights;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+
+            // Load recommendations
+            try {
+                const response = await fetch(`${API_BASE}/insights?unread_only=true`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const insights = await response.json();
+                    const container = document.getElementById('recommendations');
+
+                    if (insights.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: var(--muted);">No new recommendations. Keep up the good work!</p>';
+                        return;
+                    }
+
+                    container.innerHTML = insights.slice(0, 3).map(i => `
+                        <div style="background: rgba(108,99,255,.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--amber); margin-bottom: 12px;">
+                            <div style="font-weight: 600; color: var(--text); margin-bottom: 4px;">📌 ${i.skill_name}</div>
+                            <div style="font-size: 13px; color: var(--muted); line-height: 1.5;">${i.recommendation_text}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading recommendations:', error);
+            }
+        }
+
+        // ===== TESTS =====
+        async function loadTests() {
+            try {
+                const response = await fetch(`${API_BASE}/tests?published_only=true`, {
+                    headers: apiHeaders
+                });
+
+                if (!response.ok) throw new Error('Failed to load tests');
+
+                const tests = await response.json();
+                const container = document.getElementById('tests-list');
+
+                if (tests.length === 0) {
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px;">No tests available yet</p>';
+                    return;
+                }
+
+                container.innerHTML = tests.map(test => `
+                    <div class="test-card" onclick="startTest(${test.id})">
+                        <div class="test-title">${test.title}</div>
+                        <div class="test-meta">
+                            <span>⏱️ ${test.duration_minutes} min</span>
+                            <span>${test.test_type}</span>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <button class="btn btn-primary" style="width: 100%;" onclick="event.stopPropagation(); startTest(${test.id})">Start Test →</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading tests:', error);
+            }
+        }
+
+        async function startTest(testId) {
+            try {
+                const response = await fetch(`${API_BASE}/tests/${testId}/attempt/start`, {
+                    method: 'POST',
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const attempt = await response.json();
+                    window.location.href = `test-attempt.html?attemptId=${attempt.id}&testId=${testId}`;
+                } else {
+                    alert('Error starting test');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error starting test');
+            }
+        }
+
+        // ===== INSIGHTS =====
+        async function loadInsights() {
+            try {
+                const response = await fetch(`${API_BASE}/insights`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const insights = await response.json();
+                    const container = document.getElementById('insights-container');
+
+                    if (insights.length === 0) {
+                        container.innerHTML = '<div class="loading"><p>No insights yet. Complete some tests to get personalized recommendations!</p></div>';
+                        return;
+                    }
+
+                    container.innerHTML = insights.map(i => `
+                        <div class="insight-card" style="border-left-color: ${i.priority_level === 'high' ? '#EF4444' : i.priority_level === 'medium' ? '#F59E0B' : '#10B981'}">
+                            <div class="insight-header">
+                                <div>
+                                    <div class="insight-skill">${i.skill_name}</div>
+                                    <div class="insight-type">${i.insight_type}</div>
+                                </div>
+                                <span class="badge ${i.priority_level === 'high' ? 'badge-danger' : i.priority_level === 'medium' ? 'badge-pending' : 'badge-success'}">${i.priority_level.toUpperCase()}</span>
+                            </div>
+                            <div class="insight-text">${i.recommendation_text}</div>
+                            ${i.resource_id ? `
+                                <div class="insight-actions">
+                                    <a onclick="viewResource(${i.resource_id})">📚 View Resource</a>
+                                    <a onclick="markAsRead(${i.id})">✓ Mark Read</a>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading insights:', error);
+            }
+        }
+
+        async function generateNewInsights() {
+            try {
+                const response = await fetch(`${API_BASE}/insights/generate`, {
+                    method: 'POST',
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    alert('New insights generated!');
+                    loadInsights();
+                } else {
+                    alert('Error generating insights');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function markAsRead(insightId) {
+            try {
+                await fetch(`${API_BASE}/insights/${insightId}/read`, {
+                    method: 'PATCH',
+                    headers: apiHeaders
+                });
+                loadInsights();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== RESOURCES =====
+        async function loadResources() {
+            try {
+                const response = await fetch(`${API_BASE}/learning-resources`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const resources = await response.json();
+                    const container = document.getElementById('resources-container');
+
+                    if (resources.length === 0) {
+                        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px;">No resources available</p>';
+                        return;
+                    }
+
+                    container.innerHTML = resources.map(r => `
+                        <div class="resource-card">
+                            <div class="resource-title">${r.title}</div>
+                            <div class="resource-type">${r.resource_type}</div>
+                            <div class="resource-desc">${r.description || 'Quality learning material'}</div>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="${r.url}" target="_blank" class="btn btn-primary" style="flex: 1; text-align: center; text-decoration: none;">View →</a>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading resources:', error);
+            }
+        }
+
+        async function viewResource(resourceId) {
+            try {
+                await fetch(`${API_BASE}/learning-resources/${resourceId}/view`, {
+                    method: 'POST',
+                    headers: apiHeaders
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== AUTH =====
+        async function loadUserInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    currentUserId = user.id;
+                    document.getElementById('student-name').textContent = user.full_name || user.username;
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'auth.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

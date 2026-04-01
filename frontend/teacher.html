@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillIQ — Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <link rel="stylesheet" href="css/glass.css">
+    <style>
+        :root {
+            --purple: #6C63FF;
+            --purple-d: #5550cc;
+            --teal: #43E8D8;
+            --pink: #FF6B9D;
+            --amber: #F59E0B;
+            --green: #10B981;
+            --coral: #EF4444;
+            --bg: #f2f0ff;
+            --text: #1a1a2e;
+            --muted: #6b7080;
+            --border: rgba(108, 99, 255, .15);
+            --glass: rgba(255, 255, 255, .62);
+            --glass-b: rgba(255, 255, 255, .88);
+            --glass-sh: 0 8px 32px rgba(108, 99, 255, .10);
+            --r-sm: 8px;
+            --r-md: 14px;
+            --r-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--glass-b);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--glass-sh);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand span {
+            color: var(--purple);
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: var(--r-md);
+            background: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--muted);
+            font-family: inherit;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(108, 99, 255, .1);
+            color: var(--purple);
+            border-color: rgba(108, 99, 255, .2);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-b);
+            border-radius: var(--r-lg);
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--glass-sh);
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border);
+            background: var(--glass-b);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(108, 99, 255, .12);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple), var(--purple-d));
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 20px rgba(108, 99, 255, .35);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 28px rgba(108, 99, 255, .45);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-b);
+            border-radius: var(--r-md);
+            padding: 20px;
+            box-shadow: var(--glass-sh);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.8);
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            background: #fff;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        .test-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .test-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-b);
+            border-radius: var(--r-lg);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(108, 99, 255, .2);
+        }
+
+        .test-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .test-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .test-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg);
+            border-radius: var(--r-lg);
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--muted);
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table th {
+            background: rgba(108, 99, 255, 0.05);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--purple);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--r-md);
+            margin-bottom: 16px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: #10B981;
+            color: #10B981;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: #EF4444;
+            color: #EF4444;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="navbar-brand">
+            👑 Skill<span>IQ</span> Teacher
+        </div>
+        <div class="navbar-menu">
+            <button class="nav-item active" onclick="showPage('overview')">📊 Dashboard</button>
+            <button class="nav-item" onclick="showPage('tests')">📋 Tests</button>
+            <button class="nav-item" onclick="showPage('results')">📈 Results</button>
+            <button class="nav-item" onclick="showPage('resources')">📚 Resources</button>
+        </div>
+        <div class="navbar-right">
+            <span id="teacher-name">Teacher</span>
+            <button class="btn btn-sm" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- DASHBOARD PAGE -->
+        <div id="overview" class="page active">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Monitor your class performance and insights</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="metric-card">
+                    <div class="metric-label">Total Tests Created</div>
+                    <div class="metric-value" id="total-tests">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Student Attempts</div>
+                    <div class="metric-value" id="total-attempts">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Average Class Score</div>
+                    <div class="metric-value" id="avg-score">0%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Class Pass Rate</div>
+                    <div class="metric-value" id="pass-rate">0%</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h2 style="margin-bottom: 20px;">Recent Test Attempts</h2>
+                <div id="recent-attempts" class="loading">
+                    <div class="spinner"></div>
+                    Loading recent attempts...
+                </div>
+            </div>
+        </div>
+
+        <!-- TESTS PAGE -->
+        <div id="tests" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Manage Tests</h1>
+                <p class="page-subtitle">Create, edit, and publish tests for your students</p>
+            </div>
+
+            <button class="btn btn-primary" onclick="openCreateTestModal()" style="margin-bottom: 20px;">➕ Create New Test</button>
+
+            <div class="test-list" id="tests-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading tests...
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS PAGE -->
+        <div id="results" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Student Results</h1>
+                <p class="page-subtitle">View detailed performance metrics for your students</p>
+            </div>
+
+            <div class="card">
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Select Test</label>
+                        <select id="results-test-select" class="form-control" onchange="loadTestResults()">
+                            <option value="">-- Select a test --</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div id="results-table-container" class="loading">
+                    <p style="text-align: center; color: var(--muted);">Select a test to view results</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESOURCES PAGE -->
+        <div id="resources" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Learning Resources</h1>
+                <p class="page-subtitle">Reference materials for your students</p>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 16px;">Available Resources by Skill</h2>
+                <div id="resources-container" class="loading">
+                    <div class="spinner"></div>
+                    Loading resources...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE TEST MODAL -->
+    <div id="createTestModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeCreateTestModal()">&times;</span>
+            <h2 class="modal-title">Create New Test</h2>
+            <form onsubmit="createTest(event)">
+                <div class="form-group">
+                    <label class="form-label">Test Title</label>
+                    <input type="text" id="test-title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="test-desc" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Test Type</label>
+                    <select id="test-type" class="form-control">
+                        <option value="homework">Homework</option>
+                        <option value="quiz">Quiz</option>
+                        <option value="live">Live Test</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Difficulty</label>
+                    <select id="test-difficulty" class="form-control">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duration (minutes)</label>
+                    <input type="number" id="test-duration" class="form-control" value="30" min="5" max="480">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Passing Score (%)</label>
+                    <input type="number" id="test-passing" class="form-control" value="60" min="0" max="100">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Test</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let authToken = localStorage.getItem('authToken');
+
+        // ===== AUTH CHECK =====
+        if (!authToken) {
+            window.location.href = 'auth.html';
+        }
+
+        const apiHeaders = {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+        };
+
+        // ===== PAGE NAVIGATION =====
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Load data when switching pages
+            if (id === 'overview') loadDashboard();
+            else if (id === 'tests') loadTests();
+            else if (id === 'results') loadTestsForResults();
+            else if (id === 'resources') loadResources();
+        }
+
+        // ===== DASHBOARD =====
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/analytics/teacher/test/1`, {
+                    headers: apiHeaders
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('total-tests').textContent = '5';
+                    document.getElementById('total-attempts').textContent = data.total_attempts || '0';
+                    document.getElementById('avg-score').textContent = (data.average_score || 0) + '%';
+                    document.getElementById('pass-rate').textContent = (data.pass_rate || 0) + '%';
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // ===== TESTS =====
+        async function loadTests() {
+            try {
+                const response = await fetch(`${API_BASE}/tests`, {
+                    headers: apiHeaders
+                });
+
+                if (!response.ok) throw new Error('Failed to load tests');
+
+                const tests = await response.json();
+                const container = document.getElementById('tests-list');
+
+                if (tests.length === 0) {
+                    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px;">No tests created yet. Create your first test!</p>';
+                    return;
+                }
+
+                container.innerHTML = tests.map(test => `
+                    <div class="test-card">
+                        <div class="test-title">${test.title}</div>
+                        <div class="test-meta">
+                            <span>${test.total_questions} questions</span>
+                            <span>${test.difficulty}</span>
+                            ${test.is_published ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Draft</span>'}
+                        </div>
+                        <div class="test-meta" style="margin-bottom: 16px; font-size: 13px;">
+                            ${test.test_type === 'live' ? `Live: ${new Date(test.live_start_time).toLocaleDateString()}` : test.test_type.toUpperCase()}
+                        </div>
+                        <div class="test-actions">
+                            <button class="btn btn-sm" onclick="editTest(${test.id})">✏️ Edit</button>
+                            <button class="btn btn-sm" onclick="publishTest(${test.id})" style="${test.is_published ? 'display:none' : ''}">📤 Publish</button>
+                            <button class="btn btn-sm" style="background: rgba(239,68,68,.1); color: #EF4444;" onclick="deleteTest(${test.id})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading tests:', error);
+            }
+        }
+
+        async function createTest(event) {
+            event.preventDefault();
+
+            const testData = {
+                title: document.getElementById('test-title').value,
+                description: document.getElementById('test-desc').value,
+                test_type: document.getElementById('test-type').value,
+                difficulty: document.getElementById('test-difficulty').value,
+                duration_minutes: parseInt(document.getElementById('test-duration').value),
+                passing_score: parseFloat(document.getElementById('test-passing').value),
+                questions: []
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/tests`, {
+                    method: 'POST',
+                    headers: apiHeaders,
+                    body: JSON.stringify(testData)
+                });
+
+                if (response.ok) {
+                    alert('Test created successfully!');
+                    closeCreateTestModal();
+                    loadTests();
+                    event.target.reset();
+                } else {
+                    alert('Error creating test');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error creating test');
+            }
+        }
+
+        async function publishTest(testId) {
+            try {
+                const response = await fetch(`${API_BASE}/tests/${testId}/publish`, {
+                    method: 'POST',
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    alert('Test published!');
+                    loadTests();
+                } else {
+                    alert('Error publishing test');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function deleteTest(testId) {
+            if (!confirm('Are you sure you want to delete this test?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/tests/${testId}`, {
+                    method: 'DELETE',
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    alert('Test deleted!');
+                    loadTests();
+                } else {
+                    alert('Error deleting test');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== RESULTS =====
+        async function loadTestsForResults() {
+            try {
+                const response = await fetch(`${API_BASE}/tests`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const tests = await response.json();
+                    const select = document.getElementById('results-test-select');
+                    select.innerHTML = '<option value="">-- Select a test --</option>' +
+                        tests.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading tests:', error);
+            }
+        }
+
+        async function loadTestResults() {
+            const testId = document.getElementById('results-test-select').value;
+            if (!testId) {
+                document.getElementById('results-table-container').innerHTML = '<p style="text-align: center; color: var(--muted);">Select a test to view results</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/tests/${testId}/attempts`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const attempts = await response.json();
+                    const container = document.getElementById('results-table-container');
+
+                    if (attempts.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: var(--muted); padding: 30px;">No attempts yet</p>';
+                        return;
+                    }
+
+                    container.innerHTML = `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Score</th>
+                                    <th>Percentage</th>
+                                    <th>Status</th>
+                                    <th>Time Taken</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${attempts.map(a => `
+                                    <tr>
+                                        <td>Student #${a.student_id}</td>
+                                        <td>${a.score || 'N/A'}</td>
+                                        <td>${a.percentage ? a.percentage.toFixed(2) + '%' : 'N/A'}</td>
+                                        <td><span class="badge ${a.is_passed ? 'badge-success' : 'badge-danger'}">${a.is_passed ? 'Passed' : 'Failed'}</span></td>
+                                        <td>${a.time_taken_seconds ? Math.floor(a.time_taken_seconds / 60) + 'm' : 'N/A'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+
+        // ===== RESOURCES =====
+        async function loadResources() {
+            try {
+                const response = await fetch(`${API_BASE}/learning-resources`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const resources = await response.json();
+                    const container = document.getElementById('resources-container');
+
+                    if (resources.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: var(--muted); padding: 30px;">No resources available</p>';
+                        return;
+                    }
+
+                    // Group by skill
+                    const bySkill = {};
+                    resources.forEach(r => {
+                        if (!bySkill[r.skill_tag]) bySkill[r.skill_tag] = [];
+                        bySkill[r.skill_tag].push(r);
+                    });
+
+                    container.innerHTML = Object.entries(bySkill).map(([skill, items]) => `
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 12px; color: var(--purple);">${skill}</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px;">
+                                ${items.map(r => `
+                                    <div style="background: rgba(108,99,255,.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--purple);">
+                                        <div style="font-weight: 600; margin-bottom: 4px;">${r.title}</div>
+                                        <div style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">${r.resource_type}</div>
+                                        <a href="${r.url}" target="_blank" class="btn btn-sm" style="width: 100%;">View</a>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading resources:', error);
+            }
+        }
+
+        // ===== MODALS =====
+        function openCreateTestModal() {
+            document.getElementById('createTestModal').classList.add('active');
+        }
+
+        function closeCreateTestModal() {
+            document.getElementById('createTestModal').classList.remove('active');
+        }
+
+        function editTest(testId) {
+            alert('Edit feature coming soon!');
+        }
+
+        // ===== AUTH =====
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'auth.html';
+        }
+
+        // Load user info
+        async function loadUserInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: apiHeaders
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('teacher-name').textContent = user.full_name || user.username;
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserInfo();
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

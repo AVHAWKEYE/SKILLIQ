@@ -3,8 +3,25 @@
 # Active web server runtime
 Flask
 
-# API stack used by app/ modules (optional on Python 3.14 until wheels are available)
+# API stack used by app/ modules
 fastapi
 uvicorn
 SQLAlchemy
 pydantic
+pydantic[email]
+
+# Authentication & Security
+bcrypt
+PyJWT
+
+# Database
+python-multipart
+
+# Data processing
+pandas
+numpy
+scikit-learn
+
+# Additional utilities
+requests
+python-dateutil
