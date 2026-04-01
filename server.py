@@ -930,5 +930,7 @@ def import_kaggle_csv():
 
 
 if __name__ == "__main__":
-    init_db()
-    app.run(host="127.0.0.1", port=8000, debug=True)
+    # Keep backward compatibility with `python server.py` by launching FastAPI.
+    import uvicorn
+
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
