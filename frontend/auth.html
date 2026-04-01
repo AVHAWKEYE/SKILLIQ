@@ -542,15 +542,15 @@ input.error {
       <div class="demo-title">Demo Credentials</div>
       <div class="demo-grid">
         <div class="demo-item">
-          <span class="demo-label">Admin: admin_demo / Admin@123</span>
+          <span class="demo-label" id="demo-admin-label">Admin: admin_demo / Admin@123</span>
           <button type="button" class="demo-fill" onclick="fillDemo('admin')">Use</button>
         </div>
         <div class="demo-item">
-          <span class="demo-label">Teacher: teacher_demo / Teacher@123</span>
+          <span class="demo-label" id="demo-teacher-label">Teacher: teacher_demo / Teacher@123</span>
           <button type="button" class="demo-fill" onclick="fillDemo('teacher')">Use</button>
         </div>
         <div class="demo-item">
-          <span class="demo-label">Student: student_demo / Student@123</span>
+          <span class="demo-label" id="demo-student-label">Student: student_demo / Student@123</span>
           <button type="button" class="demo-fill" onclick="fillDemo('student')">Use</button>
         </div>
       </div>
@@ -871,6 +871,28 @@ async function checkBackendConnection() {
   }
 }
 
+async function loadDemoStatus() {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/demo-users-status`, {
+      method: 'GET',
+      cache: 'no-store'
+    });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (!Array.isArray(data.items)) return;
+
+    data.items.forEach(item => {
+      const label = document.getElementById(`demo-${item.role}-label`);
+      if (!label) return;
+      label.textContent = `${item.role.charAt(0).toUpperCase() + item.role.slice(1)}: ${item.username} / ${item.role === 'admin' ? 'Admin@123' : item.role === 'teacher' ? 'Teacher@123' : 'Student@123'} ${item.available ? '• available' : '• not seeded yet'}`;
+      label.style.opacity = item.available ? '1' : '0.6';
+    });
+  } catch (err) {
+    // Keep static labels when backend is unavailable.
+  }
+}
+
 async function handleLogin() {
   clearErrors(); clearAlert();
   const identifier = document.getElementById('login-email').value.trim();
@@ -1032,7 +1054,9 @@ function showForgot() {
 document.getElementById('login-email').value = '';
 document.getElementById('login-password').value = '';
 checkBackendConnection();
+loadDemoStatus();
 setInterval(checkBackendConnection, 15000);
+setInterval(loadDemoStatus, 20000);
 </script>
 </body>
 </html>

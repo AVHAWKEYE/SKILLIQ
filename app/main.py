@@ -156,6 +156,32 @@ def login(
     }
 
 
+@app.get("/api/auth/demo-users-status")
+def demo_users_status(db: Session = Depends(get_db)):
+    """Return availability status for seeded demo users (no password exposure)."""
+    targets = [
+        ("admin", "admin_demo", "admin.demo@skilliq.com"),
+        ("teacher", "teacher_demo", "teacher.demo@skilliq.com"),
+        ("student", "student_demo", "student.demo@skilliq.com"),
+    ]
+
+    items = []
+    for role, username, email in targets:
+        row = db.query(models.User).filter(
+            or_(models.User.username == username, models.User.email == email)
+        ).first()
+        items.append(
+            {
+                "role": role,
+                "username": username,
+                "email": email,
+                "available": row is not None,
+            }
+        )
+
+    return {"items": items}
+
+
 @app.get("/api/auth/me", response_model=schemas.UserRead)
 def get_me(current_user: models.User = Depends(get_current_user)):
     """Get current user information"""
