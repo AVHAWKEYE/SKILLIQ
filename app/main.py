@@ -3,10 +3,14 @@ from pathlib import Path
 from typing import List, Optional
 from datetime import datetime, timedelta
 
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
+
+load_dotenv()
 
 from . import ml, models, schemas
 from .auth import (
@@ -76,9 +80,20 @@ def register(payload: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/api/auth/login")
-def login(username: str, password: str, db: Session = Depends(get_db)):
+def login(
+    password: str,
+    username: Optional[str] = None,
+    email: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
     """Login user and return JWT token"""
-    user = db.query(models.User).filter(models.User.username == username).first()
+    identifier = (username or email or "").strip()
+    if not identifier:
+        raise HTTPException(status_code=400, detail="Username or email is required")
+
+    user = db.query(models.User).filter(
+        or_(models.User.username == identifier, models.User.email == identifier)
+    ).first()
     
     if not user or not verify_password(password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")

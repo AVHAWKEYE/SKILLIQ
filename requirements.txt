@@ -27,3 +27,4 @@ scikit-learn
 # Additional utilities
 requests
 python-dateutil
+python-dotenv

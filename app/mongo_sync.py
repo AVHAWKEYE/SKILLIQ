@@ -14,28 +14,35 @@ from . import models
 
 LOGGER = logging.getLogger(__name__)
 
-MONGODB_URI = os.getenv(
-    "MONGODB_URI",
-    "mongodb+srv://prat:1234@cluster0.mn8unfr.mongodb.net/?appName=Cluster0",
-)
-MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "skilliq")
-
 _mongo_client: Optional[MongoClient] = None
+
+
+def get_mongo_uri() -> Optional[str]:
+    return os.getenv("MONGODB_URI")
+
+
+def get_mongo_db_name() -> str:
+    return os.getenv("MONGODB_DB_NAME", "skilliq")
 
 
 def get_mongo_client() -> MongoClient:
     global _mongo_client
+    mongo_uri = get_mongo_uri()
+    if not mongo_uri:
+        raise RuntimeError("MongoDB is not configured. Set MONGODB_URI environment variable.")
     if _mongo_client is None:
-        _mongo_client = MongoClient(MONGODB_URI, server_api=ServerApi("1"))
+        _mongo_client = MongoClient(mongo_uri, server_api=ServerApi("1"))
     return _mongo_client
 
 
 def get_mongo_db():
-    return get_mongo_client()[MONGODB_DB_NAME]
+    return get_mongo_client()[get_mongo_db_name()]
 
 
 def ping_mongo() -> bool:
     try:
+        if not get_mongo_uri():
+            return False
         get_mongo_client().admin.command("ping")
         return True
     except Exception as exc:  # pragma: no cover - connectivity depends on runtime

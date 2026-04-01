@@ -32,9 +32,11 @@ body {
   background: #0a0a1a;
   color: var(--text);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 20px 0;
   position: relative;
 }
 
@@ -94,6 +96,41 @@ body {
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(30px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 12px 0;
+  }
+
+  .auth-container {
+    max-width: 560px;
+    padding: 12px;
+  }
+
+  .glass-card {
+    padding: 24px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 10px;
+  }
+
+  .glass-card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .role-selector {
+    gap: 6px;
+  }
+
+  .role-btn {
+    padding: 8px 6px;
+  }
 }
 
 /* Logo */
@@ -407,12 +444,12 @@ input.error {
     <!-- LOGIN FORM -->
     <div id="form-login">
       <div class="field-wrap">
-        <div class="field-label">Email Address</div>
+        <div class="field-label">Username or Email</div>
         <div class="input-group">
           <span class="input-icon">📧</span>
-          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+          <input type="text" id="login-email" placeholder="username or you@example.com" autocomplete="username">
         </div>
-        <div class="field-error" id="login-email-err">Please enter a valid email address.</div>
+        <div class="field-error" id="login-email-err">Please enter your username or email.</div>
       </div>
 
       <div class="field-wrap">
@@ -447,6 +484,15 @@ input.error {
           <input type="text" id="reg-name" placeholder="John Smith" autocomplete="name">
         </div>
         <div class="field-error" id="reg-name-err">Name must be at least 2 characters.</div>
+      </div>
+
+      <div class="field-wrap">
+        <div class="field-label">Username</div>
+        <div class="input-group">
+          <span class="input-icon">🆔</span>
+          <input type="text" id="reg-username" placeholder="Choose a username" autocomplete="username">
+        </div>
+        <div class="field-error" id="reg-username-err">Username must be at least 3 characters.</div>
       </div>
 
       <div class="field-wrap">
@@ -551,12 +597,7 @@ input.error {
 <script>
 let currentRole = 'student';
 let currentTab = 'login';
-
-const DEMO_ACCOUNTS = {
-  'admin@skilliq.com': { password: 'Admin@123', role: 'admin', name: 'System Admin' },
-  'teacher@skilliq.com': { password: 'Teacher@123', role: 'teacher', name: 'Prof. Williams' },
-  'student@skilliq.com': { password: 'Student@123', role: 'student', name: 'Alex Johnson' },
-};
+const API_BASE = '';
 
 function selectRole(role) {
   currentRole = role;
@@ -640,14 +681,30 @@ function clearErrors() {
 function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 function isValidPassword(p) { return p.length >= 8 && /[a-zA-Z]/.test(p) && /[0-9]/.test(p); }
 
-function handleLogin() {
+function redirectByRole(role) {
+  if (role === 'admin') {
+    window.location.href = 'admin.html';
+  } else if (role === 'teacher') {
+    window.location.href = 'teacher.html';
+  } else {
+    window.location.href = 'student.html';
+  }
+}
+
+function buildApiErrorMessage(result, fallback) {
+  if (!result) return fallback;
+  if (typeof result.detail === 'string') return result.detail;
+  return fallback;
+}
+
+async function handleLogin() {
   clearErrors(); clearAlert();
-  const email = document.getElementById('login-email').value.trim();
+  const identifier = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   let valid = true;
 
-  if (!isValidEmail(email)) {
-    showErr('login-email-err', 'Please enter a valid email address.');
+  if (!identifier) {
+    showErr('login-email-err', 'Please enter your username or email.');
     document.getElementById('login-email').classList.add('error');
     valid = false;
   }
@@ -663,29 +720,48 @@ function handleLogin() {
   btn.classList.add('loading');
   btn.innerHTML = '<span class="spinner"></span>Signing in...';
 
-  setTimeout(() => {
-    const account = DEMO_ACCOUNTS[email];
-    if (account && account.password === password && account.role === currentRole) {
-      // Store session
-      sessionStorage.setItem('skilliq_user', JSON.stringify({ name: account.name, email, role: currentRole }));
-      showAlert(`Welcome back, ${account.name}! Redirecting...`, 'success');
-      setTimeout(() => {
-        if (currentRole === 'admin') window.location.href = 'admin.html';
-        else if (currentRole === 'teacher') window.location.href = 'teacher.html';
-        else window.location.href = 'index.html';
-      }, 1200);
-    } else {
-      showAlert('Invalid credentials or role mismatch. Check demo accounts below.', 'error');
-      btn.classList.remove('loading');
-      btn.textContent = `Sign In as ${currentRole.charAt(0).toUpperCase() + currentRole.slice(1)}`;
+  try {
+    const url = `${API_BASE}/api/auth/login?username=${encodeURIComponent(identifier)}&password=${encodeURIComponent(password)}`;
+    const res = await fetch(url, { method: 'POST' });
+    const result = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      showAlert(buildApiErrorMessage(result, 'Unable to sign in with the provided details.'), 'error');
+      return;
     }
-  }, 900);
+
+    if (!result.user || result.user.role !== currentRole) {
+      showAlert(`This account is ${result.user?.role || 'a different role'}. Please pick the matching role and try again.`, 'error');
+      return;
+    }
+
+    localStorage.setItem('authToken', result.access_token);
+    localStorage.setItem('userRole', result.user.role);
+    localStorage.setItem('currentUser', JSON.stringify(result.user));
+    sessionStorage.setItem('skilliq_user', JSON.stringify({
+      name: result.user.full_name || result.user.username,
+      email: result.user.email,
+      role: result.user.role,
+      username: result.user.username,
+      token: result.access_token
+    }));
+
+    showAlert(`Welcome back, ${result.user.full_name || result.user.username}! Redirecting...`, 'success');
+    setTimeout(() => redirectByRole(result.user.role), 600);
+  } catch (err) {
+    showAlert('Network error while signing in. Please try again.', 'error');
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = `Sign In as ${currentRole.charAt(0).toUpperCase() + currentRole.slice(1)}`;
+  }
 }
 
-function handleRegister() {
+async function handleRegister() {
   clearErrors(); clearAlert();
   let valid = true;
   const name = document.getElementById('reg-name').value.trim();
+  const usernameEl = document.getElementById('reg-username');
+  const username = usernameEl.value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
   const confirm = document.getElementById('reg-confirm').value;
@@ -693,6 +769,9 @@ function handleRegister() {
 
   if (name.length < 2) {
     showErr('reg-name-err', 'Name must be at least 2 characters.'); document.getElementById('reg-name').classList.add('error'); valid = false;
+  }
+  if (username.length < 3) {
+    showErr('reg-username-err', 'Username must be at least 3 characters.'); usernameEl.classList.add('error'); valid = false;
   }
   if (!isValidEmail(email)) {
     showErr('reg-email-err', 'Please enter a valid email address.'); document.getElementById('reg-email').classList.add('error'); valid = false;
@@ -724,29 +803,50 @@ function handleRegister() {
   btn.classList.add('loading');
   btn.innerHTML = '<span class="spinner"></span>Creating account...';
 
-  setTimeout(() => {
-    sessionStorage.setItem('skilliq_user', JSON.stringify({ name, email, role: currentRole }));
-    showAlert(`Account created successfully! Welcome, ${name}!`, 'success');
-    setTimeout(() => {
-      if (currentRole === 'admin') window.location.href = 'admin.html';
-      else if (currentRole === 'teacher') window.location.href = 'teacher.html';
-      else window.location.href = 'index.html';
-    }, 1200);
-  }, 1100);
+  try {
+    const payload = {
+      username,
+      email,
+      full_name: name,
+      role: currentRole,
+      password
+    };
+
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      showAlert(buildApiErrorMessage(result, 'Unable to create account with the provided details.'), 'error');
+      return;
+    }
+
+    showAlert('Account created successfully. Please sign in with your username/email and password.', 'success');
+    switchTab('login');
+    document.getElementById('login-email').value = username;
+    document.getElementById('login-password').value = password;
+  } catch (err) {
+    showAlert('Network error while creating account. Please try again.', 'error');
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = `Create ${currentRole.charAt(0).toUpperCase() + currentRole.slice(1)} Account`;
+  }
 }
 
 function showForgot() {
-  const email = document.getElementById('login-email').value;
-  if (!isValidEmail(email)) {
-    showAlert('Enter your email address first, then click Forgot password.', 'error');
+  const identifier = document.getElementById('login-email').value.trim();
+  if (!identifier) {
+    showAlert('Enter your username or email first, then click Forgot password.', 'error');
     return;
   }
-  showAlert(`Password reset link sent to ${email}. (Demo only)`, 'success');
+  showAlert('Password reset is not enabled yet. Contact your admin for account reset.', 'success');
 }
 
-// Pre-fill with demo hint
-document.getElementById('login-email').value = 'student@skilliq.com';
-document.getElementById('login-password').value = 'Student@123';
+document.getElementById('login-email').value = '';
+document.getElementById('login-password').value = '';
 </script>
 </body>
 </html>
