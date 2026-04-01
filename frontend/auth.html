@@ -331,6 +331,100 @@ input.error {
 .alert.success { background: rgba(67,232,216,0.1); border: 1px solid rgba(67,232,216,0.25); color: var(--success); }
 .alert.error { background: rgba(255,92,124,0.1); border: 1px solid rgba(255,92,124,0.25); color: var(--error); }
 
+.server-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.status-retry {
+  margin-left: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.status-retry:hover {
+  border-color: rgba(108,99,255,0.45);
+  background: rgba(108,99,255,0.16);
+}
+
+.demo-credentials {
+  margin: 10px 0 14px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+}
+
+.demo-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.demo-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.demo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.demo-label {
+  color: var(--text);
+}
+
+.demo-fill {
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.demo-fill:hover {
+  background: rgba(108,99,255,0.18);
+  border-color: rgba(108,99,255,0.45);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #8b90a1;
+  box-shadow: 0 0 0 0 rgba(139, 144, 161, 0.35);
+}
+
+.status-dot.online {
+  background: #43E8D8;
+  box-shadow: 0 0 0 6px rgba(67, 232, 216, 0.18);
+}
+
+.status-dot.offline {
+  background: #ff5c7c;
+  box-shadow: 0 0 0 6px rgba(255, 92, 124, 0.16);
+}
+
 /* Switch text */
 .switch-text {
   text-align: center; margin-top: 20px;
@@ -436,6 +530,30 @@ input.error {
         <span class="role-icon">🎓</span>
         <span class="role-label">Student</span>
       </button>
+    </div>
+
+    <div class="server-status" id="server-status" aria-live="polite">
+      <span class="status-dot" id="server-status-dot"></span>
+      <span id="server-status-text">Checking server connection...</span>
+      <button type="button" class="status-retry" onclick="checkBackendConnection()">Retry now</button>
+    </div>
+
+    <div class="demo-credentials">
+      <div class="demo-title">Demo Credentials</div>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <span class="demo-label">Admin: admin_demo / Admin@123</span>
+          <button type="button" class="demo-fill" onclick="fillDemo('admin')">Use</button>
+        </div>
+        <div class="demo-item">
+          <span class="demo-label">Teacher: teacher_demo / Teacher@123</span>
+          <button type="button" class="demo-fill" onclick="fillDemo('teacher')">Use</button>
+        </div>
+        <div class="demo-item">
+          <span class="demo-label">Student: student_demo / Student@123</span>
+          <button type="button" class="demo-fill" onclick="fillDemo('student')">Use</button>
+        </div>
+      </div>
     </div>
 
     <!-- Alert -->
@@ -694,7 +812,63 @@ function redirectByRole(role) {
 function buildApiErrorMessage(result, fallback) {
   if (!result) return fallback;
   if (typeof result.detail === 'string') return result.detail;
+  if (Array.isArray(result.detail)) {
+    const first = result.detail[0];
+    if (first?.msg) return first.msg;
+  }
   return fallback;
+}
+
+function fillDemo(role) {
+  const demoMap = {
+    admin: { username: 'admin_demo', password: 'Admin@123' },
+    teacher: { username: 'teacher_demo', password: 'Teacher@123' },
+    student: { username: 'student_demo', password: 'Student@123' }
+  };
+  const selected = demoMap[role];
+  if (!selected) return;
+  selectRole(role);
+  document.getElementById('login-email').value = selected.username;
+  document.getElementById('login-password').value = selected.password;
+}
+
+async function checkBackendConnection() {
+  const statusDot = document.getElementById('server-status-dot');
+  const statusText = document.getElementById('server-status-text');
+  const retryBtn = document.querySelector('.status-retry');
+
+  if (retryBtn) {
+    retryBtn.disabled = true;
+    retryBtn.textContent = 'Checking...';
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(`${API_BASE}/api/health`, {
+      method: 'GET',
+      signal: controller.signal,
+      cache: 'no-store'
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      throw new Error('Health check failed');
+    }
+
+    statusDot.classList.remove('offline');
+    statusDot.classList.add('online');
+    statusText.textContent = 'Server online';
+  } catch (err) {
+    statusDot.classList.remove('online');
+    statusDot.classList.add('offline');
+    statusText.textContent = 'Server offline or unreachable';
+  } finally {
+    if (retryBtn) {
+      retryBtn.disabled = false;
+      retryBtn.textContent = 'Retry now';
+    }
+  }
 }
 
 async function handleLogin() {
@@ -726,13 +900,23 @@ async function handleLogin() {
     const result = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      showAlert(buildApiErrorMessage(result, 'Unable to sign in with the provided details.'), 'error');
+      const msg = buildApiErrorMessage(
+        result,
+        'Unable to sign in with the provided details. If this is a new account, register first.'
+      );
+      showAlert(msg, 'error');
       return;
     }
 
-    if (!result.user || result.user.role !== currentRole) {
-      showAlert(`This account is ${result.user?.role || 'a different role'}. Please pick the matching role and try again.`, 'error');
+    if (!result.user) {
+      showAlert('Login succeeded but user details were missing in response.', 'error');
       return;
+    }
+
+    if (result.user.role !== currentRole) {
+      currentRole = result.user.role;
+      selectRole(result.user.role);
+      showAlert(`Signed in as ${result.user.role}. Role selection was adjusted automatically.`, 'success');
     }
 
     localStorage.setItem('authToken', result.access_token);
@@ -847,6 +1031,8 @@ function showForgot() {
 
 document.getElementById('login-email').value = '';
 document.getElementById('login-password').value = '';
+checkBackendConnection();
+setInterval(checkBackendConnection, 15000);
 </script>
 </body>
 </html>

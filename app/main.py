@@ -41,11 +41,57 @@ app.add_middleware(
 STAFF_ROLES = {"admin", "teacher"}
 
 
+def seed_demo_users(db: Session) -> None:
+    """Create demo users for admin/teacher/student if they do not already exist."""
+    demo_users = [
+        {
+            "username": "admin_demo",
+            "email": "admin.demo@skilliq.com",
+            "full_name": "Demo Admin",
+            "role": "admin",
+            "password": "Admin@123",
+        },
+        {
+            "username": "teacher_demo",
+            "email": "teacher.demo@skilliq.com",
+            "full_name": "Demo Teacher",
+            "role": "teacher",
+            "password": "Teacher@123",
+        },
+        {
+            "username": "student_demo",
+            "email": "student.demo@skilliq.com",
+            "full_name": "Demo Student",
+            "role": "student",
+            "password": "Student@123",
+        },
+    ]
+
+    for item in demo_users:
+        existing = db.query(models.User).filter(
+            or_(models.User.username == item["username"], models.User.email == item["email"])
+        ).first()
+        if existing:
+            continue
+
+        db.add(models.User(
+            username=item["username"],
+            email=item["email"],
+            full_name=item["full_name"],
+            role=item["role"],
+            password_hash=hash_password(item["password"]),
+            is_active=True,
+        ))
+
+    db.commit()
+
+
 @app.on_event("startup")
 def startup_mongo_sync() -> None:
     """On startup, mirror SQL data to MongoDB Atlas if reachable."""
     db = SessionLocal()
     try:
+        seed_demo_users(db)
         safe_sync(full_sync_from_sql, db)
     finally:
         db.close()
