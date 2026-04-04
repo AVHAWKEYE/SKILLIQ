@@ -38,7 +38,7 @@ def create_access_token(user_id: int, username: str, role: str, expires_delta: O
 
     expire = datetime.utcnow() + expires_delta
     payload = {
-        "sub": user_id,
+        "sub": str(user_id),
         "username": username,
         "role": role,
         "exp": expire,
@@ -52,7 +52,8 @@ def decode_token(token: str):
     """Decode and validate JWT token"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub")
+        user_id_str = payload.get("sub")
+        user_id: int = int(user_id_str) if user_id_str else None
         username: str = payload.get("username")
         role: str = payload.get("role")
         
