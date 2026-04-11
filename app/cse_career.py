@@ -384,6 +384,58 @@ def parse_uploaded_document(filename: str, content: bytes) -> str:
     return content.decode("utf-8", errors="ignore")
 
 
+
+
+LANGUAGE_MAP = {
+    "government_jobs": [
+        {"name": "English", "level": "Required", "reason": "Official exam language for GATE, UPSC, SSC and interview rounds"},
+        {"name": "Hindi", "level": "Required", "reason": "Required for central government exams; many official communications in Hindi"},
+        {"name": "Regional Language", "level": "Helpful", "reason": "State PSC exams often conducted in regional language (Telugu, Tamil, Kannada etc.)"},
+    ],
+    "it_job": [
+        {"name": "English", "level": "Required", "reason": "Primary language for coding interviews, documentation, and team communication in IT companies"},
+        {"name": "Hindi", "level": "Helpful", "reason": "Useful in domestic IT companies and pan-India teams"},
+    ],
+    "study_abroad": [
+        {"name": "English", "level": "Required", "reason": "Mandatory — IELTS 7.0+ or TOEFL iBT 100+ for top universities (USA, UK, Canada, Australia)"},
+        {"name": "German", "level": "Required (Germany)", "reason": "Required for German public universities offering free tuition; TestDaF or DSH certificate needed"},
+        {"name": "French", "level": "Helpful", "reason": "Needed for French-medium programs in France, Belgium, Switzerland, and Quebec Canada"},
+        {"name": "Japanese", "level": "Helpful", "reason": "Japan MEXT scholarship programs; JLPT N3 helpful for research programs and daily life"},
+        {"name": "Dutch", "level": "Helpful", "reason": "Netherlands offers many English MS programs; Dutch helps with housing and daily communication"},
+        {"name": "Swedish/Danish/Norwegian", "level": "Helpful", "reason": "Nordic countries offer excellent CS programs with scholarships; local language for daily life"},
+        {"name": "Korean", "level": "Helpful", "reason": "South Korea KGSP scholarship; TOPIK basic level helps with research collaborations"},
+        {"name": "Mandarin Chinese", "level": "Helpful", "reason": "China and Taiwan offer growing scholarship programs for international CS students"},
+    ],
+}
+
+ACQUISITION_PLANS = {
+    "data structures": ["Solve 200+ problems on GeeksforGeeks with GATE/interview tags", "Study CLRS or Narasimha Karumanchi DSA book cover-to-cover", "Take NPTEL DSA course (IIT certified, 12 weeks, free)", "Solve 10 years GATE CSE papers on DS topics"],
+    "algorithms": ["Practice algorithm design patterns: divide-conquer, greedy, DP, backtracking", "Use CP-Algorithms.com as reference; implement each algorithm from scratch", "LeetCode medium/hard problems focusing on graph algorithms"],
+    "dbms": ["Study Navathe DBMS textbook (Chapters 1-12)", "Practice SQL on HackerRank SQL domain (50 problems)", "Implement a mini RDBMS project to solidify normalization concepts"],
+    "operating systems": ["Galvin OS book (Process, Memory, File System chapters)", "NPTEL Operating Systems course (IIT Bombay, free)", "Practice GATE OS previous year questions"],
+    "computer networks": ["Forouzan Data Communications & Networking textbook", "Practice CN GATE previous papers; focus on TCP/IP, subnetting", "Use Cisco Packet Tracer for hands-on networking labs (free)"],
+    "quantitative aptitude": ["RS Aggarwal Quantitative Aptitude — 1 chapter/day (45-day plan)", "Testbook or Unacademy mock tests weekly (SSC/GATE pattern)", "Focus: number theory, percentages, ratios, time & work"],
+    "reasoning": ["RS Aggarwal Verbal & Non-Verbal Reasoning book", "Daily 20 puzzles on IndiaBIX.com", "Focus: syllogisms, coding-decoding, blood relations, series"],
+    "english communication": ["Wren & Martin English Grammar for foundation", "Practice reading comprehension from SSC CGL/UPSC papers", "Daily English newspaper reading to improve vocabulary"],
+    "current affairs": ["The Hindu and PIB.gov.in daily (20 minutes morning routine)", "Monthly PDFs: Vision IAS, Drishti IAS (free download)", "Weekly quiz on PrepLadder for retention"],
+    "ielts/toefl": ["Magoosh TOEFL or British Council IELTS prep course (3 months)", "1 full mock test per week; focus on Academic Writing Task 2", "Record yourself speaking daily; summarize TED talks in 2 minutes"],
+    "gre": ["Target 320+ Quant+Verbal, AWA 4.0+ for competitive CS programs", "Magoosh GRE or ETS Official Prep (3-4 months, 2 hours/day)", "Anki flashcards for 500 high-frequency GRE vocabulary words"],
+    "sop writing": ["Structure: Research fit → Academic background → Projects → Career goals", "Get reviews from seniors admitted to your target universities", "Tailor each SOP to each university's specific research focus"],
+    "research methodology": ["Read 10+ papers in your target area on arXiv / Google Scholar", "Implement a published paper from scratch and publish on GitHub", "Email professors with specific research fit (not generic emails)"],
+    "oop": ["Build 3 projects using OOP principles (Java or Python)", "Study Head First Design Patterns book", "Practice OOP interview questions on GeeksforGeeks"],
+    "sql": ["Complete HackerRank SQL certification (Advanced level)", "Build a database schema for a real-world project", "Practice complex JOINs, subqueries, window functions on LeetCode"],
+    "git": ["Read Pro Git book free at git-scm.com", "Contribute to 2-3 open source projects on GitHub", "Set up GitHub Actions CI/CD for a personal project"],
+    "debugging": ["Practice debugging exercises on exercism.io", "Learn to use Chrome DevTools, Python pdb, Java debugger", "Analyze 5 real open-source bug reports and their fixes"],
+    "testing": ["Study Test-Driven Development (TDD) with pytest or JUnit", "Build a project with 80%+ test coverage", "Learn BDD with Cucumber or pytest-bdd"],
+    "system design": ["Read Designing Data-Intensive Applications by Kleppmann", "Watch Gaurav Sen + ByteByteGo YouTube channels", "Practice: Design URL shortener, Twitter feed, Netflix, Uber"],
+    "cloud fundamentals": ["AWS Cloud Practitioner (CLF-C02) — 2 months prep, free tier hands-on", "Stephane Maarek AWS courses on Udemy", "Build 3 AWS projects: EC2 web server, S3 file storage, Lambda function"],
+    "web development": ["freeCodeCamp Responsive Web Design certification (free)", "Build 3 full-stack projects: CRUD app, portfolio, API consumer", "Learn React basics through official docs tutorial"],
+    "api development": ["Build REST APIs with FastAPI (Python) or Express (Node.js)", "Study REST API best practices: versioning, auth, error handling", "Test APIs with Postman; document with Swagger/OpenAPI"],
+    "linux": ["Linux Command Line book by William Shotts (free online)", "Practice on OverTheWire Bandit wargame (free, beginner Linux)", "Set up Ubuntu dual boot or VM; use CLI for all daily tasks"],
+    "python": ["Python.org official tutorial + Automate the Boring Stuff (free)", "Complete 30 days of Python on GitHub (popular repo)", "Build 2 projects: data analysis + web scraper"],
+    "java": ["Head First Java book (beginner-friendly)", "Java Brains YouTube channel for Spring Boot basics", "Build a CRUD REST API with Spring Boot + MySQL"],
+}
+
 def analyze_cse_profile(raw_text: str, goal: str, target_role: Optional[str] = None) -> Dict:
     goal_key = _normalize_goal(goal)
     profile = CAREER_SKILL_MAP.get(goal_key)
@@ -421,6 +473,21 @@ def analyze_cse_profile(raw_text: str, goal: str, target_role: Optional[str] = N
     }
     role_options = sorted(list(profile.get("roles", {}).keys()))
 
+    # Build language requirements
+    languages = LANGUAGE_MAP.get(goal_key, [])
+
+    # Build acquisition plan for missing mandatory skills
+    acquisition_plan = []
+    for skill in missing_mandatory[:6]:
+        steps = ACQUISITION_PLANS.get(skill)
+        if not steps:
+            steps = [
+                f"Study {skill} fundamentals from a standard textbook",
+                f"Practice {skill} exercises on GeeksforGeeks or LeetCode",
+                f"Build a small project demonstrating {skill}",
+            ]
+        acquisition_plan.append({"skill": skill, "steps": steps})
+
     return {
         "goal": goal_key,
         "goal_label": profile["label"],
@@ -435,4 +502,6 @@ def analyze_cse_profile(raw_text: str, goal: str, target_role: Optional[str] = N
         "detected_subject_scores": subject_scores,
         "skill_proficiency": proficiency,
         "recommendations": build_recommendations(missing_mandatory, goal_key),
+        "languages_required": languages,
+        "acquisition_plan": acquisition_plan,
     }

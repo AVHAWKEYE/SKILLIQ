@@ -4,413 +4,384 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillIQ — CSE Career Intelligence</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --purple:#6C63FF;--purple-d:#5550cc;--teal:#43E8D8;--pink:#FF6B9D;
-  --amber:#F59E0B;--green:#10B981;--coral:#EF4444;
-  --bg:#f2f0ff;--text:#1a1a2e;--muted:#6b7080;
-  --border:rgba(108,99,255,.15);
-  --glass:rgba(255,255,255,.62);--glass-b:rgba(255,255,255,.88);
-  --glass-sh:0 8px 32px rgba(108,99,255,.10);
-  --r-sm:8px;--r-md:14px;--r-lg:20px;
+  --indigo:#5C6BC0;--indigo-d:#3949AB;--indigo-l:#7986CB;
+  --cyan:#00BCD4;--pink:#E91E63;--amber:#FFB300;--green:#00C853;--coral:#FF5252;
+  --text:#ffffff;--text-dim:rgba(255,255,255,0.78);--text-muted:rgba(255,255,255,0.5);
+  --glass:rgba(255,255,255,0.08);--glass-b:rgba(255,255,255,0.14);
+  --glass-hover:rgba(255,255,255,0.13);--glass-card:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.11);--border-hover:rgba(255,255,255,0.26);
+  --sh:0 8px 32px rgba(0,0,0,0.35);--sh-hover:0 20px 60px rgba(0,0,0,0.45);
+  --r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:32px;
+  --blur:blur(22px) saturate(180%);
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.55;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:-2;background:
-  radial-gradient(ellipse 70% 60% at 5% 5%,rgba(108,99,255,.13) 0%,transparent 65%),
-  radial-gradient(ellipse 60% 50% at 95% 95%,rgba(67,232,216,.11) 0%,transparent 65%),
-  radial-gradient(ellipse 40% 40% at 50% 50%,rgba(255,107,157,.06) 0%,transparent 65%),
-  linear-gradient(160deg,#f0eeff 0%,#f7f4ff 35%,#ecf9f7 70%,#fff0f7 100%)}
-body::after{content:'';position:fixed;inset:0;z-index:-1;
-  background-image:linear-gradient(rgba(108,99,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(108,99,255,.04) 1px,transparent 1px);
-  background-size:36px 36px}
+html{scroll-behavior:smooth}
+body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;overflow-x:hidden}
+.bg-scene{position:fixed;inset:0;z-index:-3;overflow:hidden}
+.bg-img{position:absolute;inset:0;background:url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80") center/cover no-repeat;opacity:.16;filter:saturate(1.5)}
+.bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(8,9,24,.94) 0%,rgba(14,18,48,.9) 45%,rgba(8,9,24,.94) 100%)}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(130px);pointer-events:none}
+.orb1{width:700px;height:700px;background:radial-gradient(circle,rgba(92,107,192,.38),transparent 70%);top:-200px;left:-200px;animation:orbF 13s ease-in-out infinite}
+.orb2{width:600px;height:600px;background:radial-gradient(circle,rgba(0,188,212,.22),transparent 70%);bottom:-200px;right:-200px;animation:orbF 11s ease-in-out infinite reverse}
+.orb3{width:400px;height:400px;background:radial-gradient(circle,rgba(233,30,99,.18),transparent 70%);top:45%;left:48%;animation:orbF3 9s ease-in-out infinite 2s}
+@keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-28px) scale(1.06)}}
+@keyframes orbF3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(calc(-50% + 22px),calc(-50% + 18px)) scale(1.07)}}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px}
+.bg-particles{position:absolute;inset:0;pointer-events:none}
+.star{position:absolute;border-radius:50%;background:rgba(255,255,255,.85);pointer-events:none;animation:starTwinkle ease-in-out infinite}
+@keyframes starTwinkle{0%,100%{opacity:.08;transform:scale(1)}50%{opacity:.75;transform:scale(1.5)}}
 
-/* NAV */
-.nav{display:flex;align-items:center;gap:4px;padding:10px 28px;
-  background:rgba(255,255,255,.78);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
-  border-bottom:1px solid rgba(255,255,255,.92);position:sticky;top:0;z-index:200;
-  box-shadow:0 2px 20px rgba(108,99,255,.08);flex-wrap:wrap}
-.nav-logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--text);
-  margin-right:6px;letter-spacing:-.5px;display:flex;align-items:center;gap:7px}
-.logo-icon{width:31px;height:31px;border-radius:8px;
-  background:linear-gradient(135deg,var(--purple),var(--pink));
-  display:flex;align-items:center;justify-content:center;font-size:15px;
-  box-shadow:0 4px 12px rgba(108,99,255,.32)}
-.nav-logo span{color:var(--purple)}
-.nav-tab{padding:7px 14px;border-radius:var(--r-sm);font-size:13px;cursor:pointer;
-  border:1px solid transparent;color:var(--muted);background:none;transition:all .2s;font-family:inherit;font-weight:500}
-.nav-tab:hover{background:rgba(108,99,255,.06);color:var(--text)}
-.nav-tab.active{background:rgba(108,99,255,.1);color:var(--purple);border-color:rgba(108,99,255,.2);font-weight:600}
+/* ===== NAV ===== */
+.nav{display:flex;align-items:center;gap:4px;padding:13px 32px;background:rgba(8,9,24,.65);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:0 4px 32px rgba(0,0,0,.35)}
+.nav-logo{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-right:8px;letter-spacing:-.5px;display:flex;align-items:center;gap:9px;flex-shrink:0}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--indigo),var(--pink));display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 20px rgba(92,107,192,.55);position:relative;overflow:hidden}
+.logo-icon::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent)}
+.nav-logo span{background:linear-gradient(135deg,var(--cyan),var(--indigo-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-tab{padding:8px 15px;border-radius:var(--r-sm);font-size:13px;cursor:pointer;border:1px solid transparent;color:var(--text-muted);background:none;transition:all .25s cubic-bezier(.22,1,.36,1);font-family:"DM Sans",sans-serif;font-weight:500;position:relative;will-change:transform}
+.nav-tab:hover{color:var(--text);border-color:var(--border);background:var(--glass);box-shadow:0 4px 16px rgba(92,107,192,.18);transform:translateY(-1px)}
+.nav-tab.active{background:var(--glass-b);color:var(--text);border-color:rgba(92,107,192,.4);font-weight:600;box-shadow:0 0 20px rgba(92,107,192,.18)}
 .nav-spacer{flex:1}
-.ai-badge{font-size:11px;padding:3px 10px;border-radius:20px;
-  background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(67,232,216,.1));
-  border:1px solid rgba(108,99,255,.2);color:var(--purple);font-weight:700;letter-spacing:.04em;margin-right:6px}
-.nav-user{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;
-  border-radius:20px;background:rgba(108,99,255,.07);border:1px solid rgba(108,99,255,.15)}
-.nav-uname{font-size:13px;font-weight:600;color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nav-avatar-sm{width:28px;height:28px;border-radius:50%;
-  background:linear-gradient(135deg,var(--purple),var(--pink));
-  color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(108,99,255,.3)}
-.nav-logout-btn{padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;
-  background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#dc4a4a;
-  cursor:pointer;font-family:inherit;transition:all .2s}
-.nav-logout-btn:hover{background:rgba(239,68,68,.18)}
-
-/* LAYOUT */
+.ai-badge{font-size:11px;padding:4px 12px;border-radius:20px;background:linear-gradient(135deg,rgba(92,107,192,.28),rgba(0,188,212,.18));border:1px solid rgba(92,107,192,.4);color:var(--cyan);font-weight:700;letter-spacing:.06em;box-shadow:0 0 20px rgba(0,188,212,.12)}
+.nav-user{display:flex;align-items:center;gap:8px;padding:5px 5px 5px 14px;border-radius:24px;background:var(--glass);border:1px solid var(--border)}
+.nav-uname{font-size:13px;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-avatar-sm{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(92,107,192,.4)}
+.nav-logout-btn{padding:5px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#FF8A80;cursor:pointer;font-family:inherit;transition:all .2s;will-change:transform}
+.nav-logout-btn:hover{background:rgba(255,82,82,.3);box-shadow:0 4px 16px rgba(255,82,82,.22);transform:translateY(-1px)}
 .app{width:100%}
-.page{display:none;padding:36px 28px;max-width:980px;margin:0 auto}
-.page.active{display:block;animation:pgIn .35s cubic-bezier(.22,1,.36,1)}
+.page{display:none;padding:48px 32px;max-width:1080px;margin:0 auto}
+.page.active{display:block;animation:pgIn .4s cubic-bezier(.22,1,.36,1)}
 .hidden{display:none !important}
-@keyframes pgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
-/* GLASS CARD */
-.card{background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  border:1px solid var(--glass-b);border-radius:var(--r-lg);padding:24px;margin-bottom:16px;
-  box-shadow:var(--glass-sh);transition:transform .2s,box-shadow .2s}
-.card:hover{transform:translateY(-1px);box-shadow:0 14px 40px rgba(108,99,255,.13)}
-.card-title{font-size:11px;font-weight:700;margin-bottom:18px;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.08em}
+/* ===== CARDS ===== */
+.card{background:var(--glass-card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;margin-bottom:18px;box-shadow:var(--sh);transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)}
+.card:hover{border-color:var(--border-hover);box-shadow:0 24px 64px rgba(0,0,0,.5),0 0 0 1px rgba(92,107,192,.12);transform:translateY(-4px);background:rgba(255,255,255,.09)}
+.card-title{font-size:11px;font-weight:700;margin-bottom:20px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+.card-title::after{content:"";flex:1;height:1px;background:var(--border)}
 
-/* HERO */
-.hero{text-align:center;padding:56px 0 48px;position:relative}
-.hero-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.35;pointer-events:none;
-  animation:hF 7s ease-in-out infinite}
-.hero-orb.h1{width:300px;height:300px;background:var(--purple);top:-80px;left:-80px}
-.hero-orb.h2{width:250px;height:250px;background:var(--teal);bottom:-60px;right:-60px;animation-delay:-3.5s}
-@keyframes hF{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-20px) scale(1.05)}}
-.hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--purple);font-weight:700;
-  margin-bottom:20px;letter-spacing:.08em;text-transform:uppercase;
-  background:rgba(108,99,255,.08);padding:6px 16px;border-radius:20px;border:1px solid rgba(108,99,255,.2)}
-.hero h1{font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:700;
-  margin-bottom:16px;line-height:1.15;color:var(--text);letter-spacing:-1px}
-.hero h1 .grad{background:linear-gradient(135deg,var(--purple),var(--pink));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 36px;line-height:1.7}
+/* ===== HERO ===== */
+.hero{text-align:center;padding:72px 0 56px;position:relative}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:24px;letter-spacing:.1em;text-transform:uppercase;background:rgba(0,188,212,.1);padding:8px 20px;border-radius:24px;border:1px solid rgba(0,188,212,.3);box-shadow:0 0 30px rgba(0,188,212,.1)}
+.tag-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:tagPulse 2s ease-in-out infinite;flex-shrink:0}
+@keyframes tagPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,188,212,.5)}50%{box-shadow:0 0 0 8px rgba(0,188,212,0)}}
+.hero h1{font-family:"Syne",sans-serif;font-size:56px;font-weight:800;margin-bottom:20px;line-height:1.1;color:var(--text);letter-spacing:-2px}
+.hero h1 .grad{background:linear-gradient(135deg,var(--cyan),var(--indigo-l),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradFlow 5s ease infinite}
+@keyframes gradFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero-sub{font-size:17px;color:var(--text-dim);max-width:560px;margin:0 auto 44px;line-height:1.8;font-weight:300}
+.hero-sub strong{color:var(--text);font-weight:600}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r-md);
-  border:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;
-  background:var(--glass-b);color:var(--text);transition:all .2s;font-family:inherit;text-decoration:none;
-  backdrop-filter:blur(8px)}
-.btn:hover{background:#fff;box-shadow:0 4px 16px rgba(108,99,255,.12);transform:translateY(-1px)}
-.btn:active{transform:scale(.98)}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple-d));
-  color:#fff;border:none;box-shadow:0 6px 20px rgba(108,99,255,.35)}
-.btn-primary:hover{background:linear-gradient(135deg,#7d74ff,var(--purple));
-  box-shadow:0 10px 28px rgba(108,99,255,.45);color:#fff}
-.btn-sm{padding:6px 14px;font-size:12px;border-radius:var(--r-sm)}
-.btn-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--r-md);border:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:var(--glass);color:var(--text);transition:all .25s cubic-bezier(.22,1,.36,1);font-family:"DM Sans",sans-serif;backdrop-filter:blur(10px);text-decoration:none;position:relative;overflow:hidden;will-change:transform;letter-spacing:.02em}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);opacity:0;transition:opacity .25s}
+.btn:hover::after{opacity:1}
+.btn:hover{border-color:var(--border-hover);box-shadow:0 12px 36px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.08);transform:translateY(-2px)}
+.btn:active{transform:scale(.96) !important;box-shadow:none !important}
+.btn-primary{background:linear-gradient(135deg,var(--indigo),var(--indigo-d));color:#fff;border:none;box-shadow:0 8px 28px rgba(92,107,192,.42)}
+.btn-primary:hover{box-shadow:0 18px 48px rgba(92,107,192,.65);filter:brightness(1.14);transform:translateY(-3px)}
+.btn-cyan{background:linear-gradient(135deg,rgba(0,188,212,.28),rgba(0,188,212,.14));border-color:rgba(0,188,212,.38);color:var(--cyan)}
+.btn-cyan:hover{background:linear-gradient(135deg,rgba(0,188,212,.45),rgba(0,188,212,.28));box-shadow:0 12px 36px rgba(0,188,212,.3);transform:translateY(-3px)}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:var(--r-sm)}
+.btn-row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
 
-.career-analyzer{background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.9);border-radius:var(--r-lg);padding:20px;box-shadow:var(--glass-sh)}
-.career-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
-.career-grid textarea{min-height:150px;resize:vertical;padding:10px 12px;border-radius:12px;border:1px solid rgba(108,99,255,.25);background:rgba(255,255,255,.82);font-family:inherit;font-size:13px;color:var(--text)}
-.career-grid select{padding:9px 12px;border-radius:10px;border:1px solid rgba(108,99,255,.25);background:rgba(255,255,255,.86);font-family:inherit}
-.career-result{margin-top:14px;padding:14px;border-radius:12px;background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.16);font-size:13px;line-height:1.65}
+/* ===== GRIDS ===== */
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
 
-.magnetic-ready{will-change:transform}
+/* ===== SMALL CARDS ===== */
+.card-sm{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
+.card-sm::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.04),transparent 65%)}
+.card-sm:hover{border-color:var(--border-hover);box-shadow:0 20px 56px rgba(0,0,0,.45);transform:translateY(-6px);background:rgba(255,255,255,.1)}
+.skill-icon-lg{font-size:32px;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(92,107,192,.4))}
+.card-sm-name{font-size:13px;font-weight:700;margin-bottom:6px;font-family:"Syne",sans-serif}
+.card-sm-desc{font-size:12px;color:var(--text-muted);line-height:1.6}
 
-/* GRIDS */
-.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px}
-.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+/* ===== CAREER PATH CARDS ===== */
+.career-paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:28px}
+.cpc{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;transition:all .35s cubic-bezier(.22,1,.36,1);cursor:pointer;position:relative;overflow:hidden;will-change:transform}
+.cpc::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.cpc.govt::before{background:linear-gradient(90deg,#FFB300,#FF9800)}
+.cpc.it::before{background:linear-gradient(90deg,#00BCD4,#0288D1)}
+.cpc.abroad::before{background:linear-gradient(90deg,#E91E63,#9C27B0)}
+.cpc:hover{border-color:var(--border-hover);box-shadow:0 24px 64px rgba(0,0,0,.5);transform:translateY(-6px)}
+.cpc .path-icon{font-size:40px;margin-bottom:14px;display:block}
+.cpc h3{font-family:"Syne",sans-serif;font-size:18px;font-weight:800;margin-bottom:8px}
+.cpc p{font-size:13px;color:var(--text-dim);line-height:1.65}
+.path-tag{display:inline-block;margin-top:14px;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;letter-spacing:.06em}
+.ptg{background:rgba(255,179,0,.15);color:#FFB300;border:1px solid rgba(255,179,0,.3)}
+.pti{background:rgba(0,188,212,.15);color:#00BCD4;border:1px solid rgba(0,188,212,.3)}
+.pta{background:rgba(233,30,99,.15);color:#E91E63;border:1px solid rgba(233,30,99,.3)}
 
-/* SKILL CARDS */
-.card-sm{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-b);
-  border-radius:var(--r-md);padding:20px;transition:all .2s;box-shadow:var(--glass-sh);text-align:center}
-.card-sm:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(108,99,255,.14)}
-.skill-icon-lg{font-size:28px;margin-bottom:10px}
-.card-sm-name{font-size:13px;font-weight:700;margin-bottom:4px;color:var(--text)}
-.card-sm-desc{font-size:12px;color:var(--muted);line-height:1.5}
+/* ===== METRICS ===== */
+.step-num{font-family:"Syne",sans-serif;font-size:42px;font-weight:800;background:linear-gradient(135deg,var(--indigo-l),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;line-height:1}
+.step-name{font-size:15px;font-weight:700;margin-bottom:8px;font-family:"Syne",sans-serif}
+.step-desc{font-size:13px;color:var(--text-muted);line-height:1.7}
+.metric{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-md);padding:22px 24px;transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
+.metric::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--indigo),var(--cyan));opacity:.7}
+.metric:hover{transform:translateY(-5px);box-shadow:0 20px 56px rgba(0,0,0,.45),0 0 0 1px rgba(92,107,192,.15);border-color:var(--border-hover)}
+.metric-label{font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.metric-val{font-family:"Syne",sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--text),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-sub{font-size:12px;color:var(--text-muted);margin-top:6px}
+.page-header{margin-bottom:32px}
+.section-tag{font-size:11px;color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.page-h2{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-.5px}
 
-/* HOW IT WORKS */
-.step-num{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;
-  background:linear-gradient(135deg,var(--purple),var(--teal));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;line-height:1}
-.step-name{font-size:14px;font-weight:700;margin-bottom:6px}
-.step-desc{font-size:13px;color:var(--muted);line-height:1.65}
+/* ===== SKILL PILLS & BADGES ===== */
+.skill-badge{padding:6px 16px;border-radius:24px;font-size:12px;font-weight:700;border:1px solid transparent}
+.skill-math{background:rgba(55,138,221,.2);color:#7EC8FF;border-color:rgba(55,138,221,.3)}
+.skill-logic{background:rgba(127,119,221,.2);color:#B0ABFF;border-color:rgba(127,119,221,.3)}
+.skill-aptitude{background:rgba(255,179,0,.2);color:#FFD54F;border-color:rgba(255,179,0,.3)}
+.skill-problem{background:rgba(0,200,83,.2);color:#69F0AE;border-color:rgba(0,200,83,.3)}
+.skill-pill{display:inline-block;padding:5px 13px;border-radius:24px;font-size:12px;font-weight:600;margin:3px;transition:all .2s;cursor:default}
+.skill-pill:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.sph{background:rgba(92,107,192,.18);color:#B0ABFF;border:1px solid rgba(92,107,192,.35)}
+.spm{background:rgba(255,82,82,.15);color:#FF8A80;border:1px solid rgba(255,82,82,.3)}
+.spo{background:rgba(0,188,212,.12);color:#80DEEA;border:1px solid rgba(0,188,212,.28)}
 
-/* METRICS */
-.metric{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-b);
-  border-radius:var(--r-md);padding:18px 20px;transition:all .2s;box-shadow:var(--glass-sh);
-  position:relative;overflow:hidden}
-.metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--purple),var(--teal));opacity:.5}
-.metric:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(108,99,255,.14)}
-.metric-label{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.07em}
-.metric-val{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;color:var(--text);letter-spacing:-1px}
-.metric-sub{font-size:12px;color:var(--muted);margin-top:4px}
+/* ===== CAREER ANALYZER ===== */
+.career-panel{animation:pgIn .35s ease}
+.career-analyzer{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;margin-top:18px}
+.career-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.career-grid textarea{width:100%;height:150px;padding:14px 16px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-size:13px;font-family:"DM Sans",sans-serif;resize:vertical;outline:none;transition:all .25s;line-height:1.65}
+.career-grid textarea:focus{border-color:rgba(92,107,192,.5);box-shadow:0 0 0 3px rgba(92,107,192,.1);background:rgba(255,255,255,.08)}
+.career-grid select{width:100%;margin-bottom:14px;padding:11px 14px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-family:"DM Sans",sans-serif;font-size:13px;outline:none;transition:all .2s}
+.career-grid select:focus{border-color:rgba(92,107,192,.5)}
+.section-title{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.career-result{background:rgba(92,107,192,.06);border:1px solid rgba(92,107,192,.15);border-radius:var(--r-md);padding:20px;font-size:13px;color:var(--text-muted);line-height:1.7;margin-top:8px}
+.career-result h4{font-size:13px;font-weight:700;color:var(--cyan);margin:18px 0 10px;text-transform:uppercase;letter-spacing:.05em}
+.career-result ul{padding-left:18px;margin:0 0 12px}
+.career-result ul li{margin-bottom:6px;color:var(--text-dim);line-height:1.65}
+.readiness-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.readiness-lbl{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.lang-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.lang-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;transition:all .3s;will-change:transform}
+.lang-card:hover{border-color:var(--border-hover);transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.3)}
+.lang-name{font-size:14px;font-weight:700;font-family:"Syne",sans-serif;margin-bottom:6px}
+.lang-desc{font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:8px}
+.lang-level{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px}
+.lang-req{background:rgba(233,30,99,.15);color:#F48FB1;border:1px solid rgba(233,30,99,.3)}
+.lang-hlp{background:rgba(255,179,0,.12);color:#FFD54F;border:1px solid rgba(255,179,0,.28)}
+.acquire-card{background:rgba(92,107,192,.07);border:1px solid rgba(92,107,192,.18);border-radius:var(--r-md);padding:18px;margin-bottom:14px;transition:all .3s;will-change:transform}
+.acquire-card:hover{background:rgba(92,107,192,.12);border-color:rgba(92,107,192,.35);transform:translateY(-2px);box-shadow:0 8px 28px rgba(92,107,192,.15)}
+.acq-skill{font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px;font-family:"Syne",sans-serif}
+.acq-steps{padding-left:18px;font-size:13px;color:var(--text-dim);line-height:1.8}
+.acq-steps li{margin-bottom:5px}
 
-/* SKILL SELECTOR */
-.page-header{margin-bottom:28px}
-.section-tag{font-size:11px;color:var(--purple);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.page-h2{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px}
-.skill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:28px}
-.skill-card{padding:24px;border-radius:var(--r-lg);border:1.5px solid rgba(108,99,255,.12);cursor:pointer;
-  transition:all .2s;background:var(--glass);backdrop-filter:blur(16px);box-shadow:var(--glass-sh);
-  position:relative;overflow:hidden}
-.skill-card:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 12px 32px rgba(108,99,255,.15)}
-.skill-card.selected-skill{border:2px solid var(--purple);background:rgba(108,99,255,.09);
-  box-shadow:0 0 0 4px rgba(108,99,255,.1),0 12px 32px rgba(108,99,255,.15)}
-.skill-check{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(135deg,var(--purple),var(--purple-d));display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:11px;opacity:0;transition:opacity .2s;box-shadow:0 2px 8px rgba(108,99,255,.3)}
-.skill-card.selected-skill .skill-check{opacity:1}
-.skill-name-lg{font-size:14px;font-weight:700;margin-bottom:5px}
-.skill-desc-sm{font-size:12px;color:var(--muted);line-height:1.55}
+/* ===== RESUME UPLOAD ZONE ===== */
+.upload-zone{border:2px dashed rgba(92,107,192,.35);border-radius:var(--r-lg);padding:32px;text-align:center;transition:all .3s;cursor:pointer;background:rgba(92,107,192,.04);position:relative}
+.upload-zone:hover,.upload-zone.drag-over{border-color:rgba(92,107,192,.7);background:rgba(92,107,192,.1);box-shadow:0 0 32px rgba(92,107,192,.15)}
+.upload-icon{font-size:48px;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(92,107,192,.4))}
+.upload-title{font-size:15px;font-weight:700;font-family:"Syne",sans-serif;margin-bottom:6px}
+.upload-sub{font-size:12px;color:var(--text-muted)}
+.upload-types{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.upload-type-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text-muted)}
+.file-input-hidden{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uploaded-file-info{background:rgba(0,200,83,.08);border:1px solid rgba(0,200,83,.25);border-radius:var(--r-md);padding:12px 16px;display:flex;align-items:center;gap:12px;margin-top:12px}
+.uploaded-file-info .file-icon{font-size:22px}
+.uploaded-file-info .file-name{flex:1;font-size:13px;font-weight:600;color:#69F0AE}
+.uploaded-file-info .file-clear{background:none;border:none;color:#FF8A80;cursor:pointer;font-size:16px;padding:4px}
 
-/* QUIZ */
-.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-.skill-badge{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;backdrop-filter:blur(8px)}
-.skill-math{background:rgba(55,138,221,.12);color:#185FA5;border:1px solid rgba(55,138,221,.25)}
-.skill-logic{background:rgba(127,119,221,.12);color:#534AB7;border:1px solid rgba(127,119,221,.25)}
-.skill-aptitude{background:rgba(245,158,11,.12);color:#92600A;border:1px solid rgba(245,158,11,.25)}
-.skill-problem{background:rgba(16,185,129,.12);color:#0B6E4F;border:1px solid rgba(16,185,129,.25)}
-.timer-row{display:flex;align-items:center;gap:8px}
-.timer-ring{width:48px;height:48px;position:relative;display:flex;align-items:center;justify-content:center}
-.timer-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
-.timer-ring circle{transition:stroke-dashoffset 1s linear}
-.timer-val{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--text);position:relative;z-index:1}
-.timer-urgent .timer-val{color:var(--coral)}
-.timer-urgent circle:last-child{stroke:var(--coral) !important}
-.progress-bar{height:5px;background:rgba(108,99,255,.1);border-radius:4px;margin-bottom:28px;overflow:hidden}
-.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--purple),var(--teal));transition:width .4s ease}
-.question-text{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;margin-bottom:22px;line-height:1.55;color:var(--text)}
-.options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.option{padding:14px 18px;border-radius:var(--r-md);border:1.5px solid rgba(108,99,255,.15);cursor:pointer;
-  font-size:14px;transition:all .2s;background:var(--glass);color:var(--text);text-align:left;
-  font-family:inherit;backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(108,99,255,.06);
-  display:flex;align-items:center;gap:12px}
-.option .opt-letter{width:28px;height:28px;border-radius:50%;background:rgba(108,99,255,.1);color:var(--purple);
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.option:hover:not(:disabled){background:rgba(108,99,255,.06);border-color:var(--purple);transform:translateX(4px);box-shadow:0 4px 16px rgba(108,99,255,.12)}
-.option.correct{border-color:var(--green);background:rgba(16,185,129,.08)}
-.option.correct .opt-letter{background:rgba(16,185,129,.2);color:var(--green)}
-.option.wrong{border-color:var(--coral);background:rgba(239,68,68,.06)}
-.option.wrong .opt-letter{background:rgba(239,68,68,.15);color:var(--coral)}
-.feedback-box{padding:14px 18px;border-radius:var(--r-md);margin-bottom:16px;font-size:13px;line-height:1.6;
-  display:flex;gap:10px;align-items:flex-start;backdrop-filter:blur(8px)}
-.fb-icon{font-size:18px;flex-shrink:0}
-.feedback-correct{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#066044}
-.feedback-wrong{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#8a2020}
-.step-indicator{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
-.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(108,99,255,.2);transition:all .3s}
-.step-dot.active{background:var(--purple);width:16px;border-radius:3px}
-.step-dot.done{background:rgba(67,232,216,.6)}
-.quiz-done-screen{text-align:center;padding:60px 0}
-.quiz-done-icon{font-size:56px;margin-bottom:18px;filter:drop-shadow(0 8px 20px rgba(108,99,255,.3))}
-.quiz-done-screen h2{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;margin-bottom:10px}
+/* ===== SKILL GAP BARS ===== */
+.gap-section{margin-bottom:24px}
+.gap-title{font-size:13px;font-weight:700;margin-bottom:14px;font-family:"Syne",sans-serif;display:flex;align-items:center;gap:8px}
+.skill-gap-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.skill-gap-row:last-child{border:none}
+.sgr-icon{font-size:18px;width:28px;flex-shrink:0;text-align:center}
+.sgr-name{flex:1;font-size:13px;font-weight:600}
+.sgr-status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px}
+.sgr-have{background:rgba(0,200,83,.15);color:#69F0AE;border:1px solid rgba(0,200,83,.3)}
+.sgr-missing{background:rgba(255,82,82,.15);color:#FF8A80;border:1px solid rgba(255,82,82,.3)}
+.sgr-partial{background:rgba(255,179,0,.15);color:#FFD54F;border:1px solid rgba(255,179,0,.3)}
 
-/* BREAKDOWN */
-.breakdown-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(108,99,255,.08)}
+/* ===== ARTICLE SUGGESTIONS ===== */
+.articles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px}
+.article-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;transition:all .35s cubic-bezier(.22,1,.36,1);cursor:pointer;text-decoration:none;display:block;will-change:transform}
+.article-card:hover{border-color:rgba(92,107,192,.45);transform:translateY(-4px);box-shadow:0 14px 44px rgba(92,107,192,.2);background:rgba(92,107,192,.08)}
+.article-tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(0,188,212,.15);color:var(--cyan);border:1px solid rgba(0,188,212,.25);display:inline-block;margin-bottom:10px}
+.article-title{font-size:13px;font-weight:700;font-family:"Syne",sans-serif;margin-bottom:6px;color:var(--text);line-height:1.5}
+.article-desc{font-size:12px;color:var(--text-muted);line-height:1.6}
+.article-arrow{font-size:16px;color:var(--indigo-l);margin-top:8px}
+
+/* ===== CAREER TAB BUTTONS ===== */
+.career-tab-btn{transition:all .3s cubic-bezier(.22,1,.36,1);will-change:transform}
+.career-tab-btn:hover{transform:translateY(-2px)}
+.career-tab-btn.ctab-active-govt{background:linear-gradient(135deg,rgba(255,179,0,.28),rgba(255,152,0,.18)) !important;border-color:rgba(255,179,0,.48) !important;color:#FFD54F !important}
+.career-tab-btn.ctab-active-it{background:linear-gradient(135deg,rgba(0,188,212,.28),rgba(2,136,209,.18)) !important;border-color:rgba(0,188,212,.48) !important;color:#80DEEA !important}
+.career-tab-btn.ctab-active-abroad{background:linear-gradient(135deg,rgba(233,30,99,.28),rgba(156,39,176,.18)) !important;border-color:rgba(233,30,99,.48) !important;color:#F48FB1 !important}
+.career-tab-btn.ctab-active-gate{background:linear-gradient(135deg,rgba(103,58,183,.35),rgba(63,81,181,.22)) !important;border-color:rgba(103,58,183,.55) !important;color:#CE93D8 !important}
+
+/* ===== DASHBOARD ===== */
+.breakdown-row{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.055)}
 .breakdown-row:last-child{border-bottom:none}
-.breakdown-label{width:120px;font-size:13px;color:var(--muted);flex-shrink:0;font-weight:500}
-.breakdown-bar-wrap{flex:1;height:8px;background:rgba(108,99,255,.08);border-radius:4px;overflow:hidden}
-.breakdown-bar-fill{height:100%;border-radius:4px;transition:width .9s ease}
-.breakdown-pct{width:38px;font-size:14px;font-weight:700;text-align:right;flex-shrink:0;color:var(--text)}
-
-/* CHARTS */
+.breakdown-label{width:130px;font-size:13px;color:var(--text-muted);flex-shrink:0;font-weight:500}
+.breakdown-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.breakdown-bar-fill{height:100%;border-radius:4px;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+.breakdown-pct{width:40px;font-size:15px;font-weight:700;text-align:right;flex-shrink:0;font-family:"Syne",sans-serif}
 .radar-wrap{position:relative;width:100%;max-width:300px;margin:0 auto}
 .chart-wrap{position:relative;width:100%;height:220px}
-
-/* DIFF TAGS */
-.diff{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.diff-hard{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2)}
-.diff-med{background:rgba(245,158,11,.1);color:#92600A;border:1px solid rgba(245,158,11,.2)}
-.diff-easy{background:rgba(16,185,129,.1);color:#059669;border:1px solid rgba(16,185,129,.2)}
-
-/* AI RESPONSE */
-.ai-response{background:rgba(108,99,255,.04);border-radius:var(--r-md);padding:20px 22px;
-  font-size:14px;line-height:1.8;color:var(--text);border:1px solid rgba(108,99,255,.1)}
-.ai-response h4{font-size:14px;font-weight:700;margin:16px 0 8px;color:var(--purple)}
-.ai-response h4:first-child{margin-top:0}
-.ai-response ul{padding-left:20px;margin-bottom:12px}
-.ai-response li{margin-bottom:7px;font-size:13px}
-.ai-response p{margin-bottom:12px}
-
-/* LOADING */
-.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(108,99,255,.2);
-  border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+.diff{display:inline-block;padding:3px 10px;border-radius:24px;font-size:11px;font-weight:700;border:1px solid transparent}
+.diff-hard{background:rgba(255,82,82,.15);color:#FF8A80;border-color:rgba(255,82,82,.3)}
+.diff-med{background:rgba(255,179,0,.15);color:#FFD54F;border-color:rgba(255,179,0,.3)}
+.diff-easy{background:rgba(0,200,83,.15);color:#69F0AE;border-color:rgba(0,200,83,.3)}
+.ai-response{background:rgba(92,107,192,.05);border-radius:var(--r-md);padding:24px 26px;font-size:14px;line-height:1.85;color:var(--text-dim);border:1px solid rgba(92,107,192,.18)}
+.ai-response h4{font-size:12px;font-weight:700;margin:18px 0 10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.06em}
+.ai-response p{margin-bottom:10px}
+.ai-response li{margin-left:18px;margin-bottom:6px}
+.loading-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--indigo-l);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.shimmer{background:linear-gradient(90deg,rgba(108,99,255,.06) 25%,rgba(108,99,255,.11) 50%,rgba(108,99,255,.06) 75%);
-  background-size:200% 100%;animation:sh 1.5s infinite;border-radius:8px;height:15px;margin-bottom:9px}
-@keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
 
-/* RECS */
-.recs-empty{text-align:center;padding:50px}
-
-/* PROFILE */
-.profile-card{text-align:center;padding:32px}
-.profile-avatar-lg{width:80px;height:80px;border-radius:50%;
-  background:linear-gradient(135deg,var(--purple),var(--pink));
-  display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;
-  margin:0 auto 16px;box-shadow:0 8px 24px rgba(108,99,255,.35)}
-.profile-name{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
-.profile-role{font-size:12px;color:var(--purple);font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
-.profile-email{font-size:13px;color:var(--muted);margin-top:6px}
-.profile-stats{display:flex;gap:24px;justify-content:center;margin-top:20px;padding-top:20px;border-top:1px solid rgba(108,99,255,.1)}
-.pstat{text-align:center}
-.pstat-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--purple)}
-.pstat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
-
-/* MODEL SECTION */
-.model-section{background:rgba(108,99,255,.04);border:1px solid rgba(108,99,255,.1);border-radius:var(--r-md);padding:18px 20px;margin-top:16px}
-.model-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
-input[type="number"],input[type="file"]{padding:8px 12px;border-radius:var(--r-sm);
-  background:rgba(255,255,255,.7);border:1px solid rgba(108,99,255,.2);color:var(--text);
-  font-size:13px;outline:none;font-family:inherit;backdrop-filter:blur(8px);transition:all .2s}
-input[type="number"]:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
-input[type="number"]{max-width:200px}
-
-/* UTILITIES */
-.muted{color:var(--muted);font-size:13px}
-.section-title{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-.mt-12{margin-top:12px}.mb-16{margin-bottom:16px}
-.flex-row{display:flex;align-items:center;gap:10px}
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;padding:14px 22px;border-radius:var(--r-md);background:rgba(22,24,48,.95);backdrop-filter:blur(20px);border:1px solid var(--border);font-size:13px;color:var(--text);opacity:0;pointer-events:none;transform:translateY(12px);transition:all .3s cubic-bezier(.22,1,.36,1)}
+.toast.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+.flex-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .flex-wrap{flex-wrap:wrap}
+.mb-16{margin-bottom:16px}
+.muted{color:var(--text-muted)}
+.mt-12{margin-top:12px}
+.model-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.model-row input[type="number"]{padding:8px 12px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:13px;width:160px;outline:none}
+.model-row input[type="file"]{font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:6px 0}
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:12px 20px;border-radius:14px;
-  background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border:1px solid rgba(108,99,255,.2);
-  box-shadow:0 8px 32px rgba(108,99,255,.15);font-size:13px;font-weight:600;color:var(--text);
-  display:none;animation:tIn .3s ease}
-.toast.show{display:flex;align-items:center;gap:8px}
-@keyframes tIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+/* ===== PROFILE & RECOMMENDATIONS ===== */
+.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));color:#fff;font-size:32px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 28px rgba(92,107,192,.4)}
+.profile-name{font-family:"Syne",sans-serif;font-size:20px;font-weight:800;margin-bottom:4px}
+.profile-role{font-size:13px;color:var(--text-muted);margin-bottom:4px}
+.profile-email{font-size:12px;color:var(--text-muted);margin-bottom:22px}
+.profile-stats{display:flex;gap:24px;justify-content:center;margin-bottom:6px}
+.pstat-val{font-family:"Syne",sans-serif;font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--indigo-l),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pstat-lbl{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.ach-green{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(0,200,83,.15);color:#69F0AE;border:1px solid rgba(0,200,83,.3)}
+.ach-amber{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(255,179,0,.15);color:#FFD54F;border:1px solid rgba(255,179,0,.3)}
+.ach-locked{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(255,255,255,.06);color:var(--text-muted);border:1px solid var(--border)}
+.ach-card{background:var(--glass-card);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;display:flex;gap:14px;align-items:center;transition:all .3s cubic-bezier(.22,1,.36,1);will-change:transform}
+.ach-card:hover{border-color:var(--border-hover);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.ach-card.unlocked{border-color:rgba(255,179,0,.35);background:rgba(255,179,0,.06)}
+.ach-card.locked{opacity:.5}
+.ach-icon-wrap{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ach-card.unlocked .ach-icon-wrap{background:rgba(255,179,0,.15)}
+.ach-name{font-size:13px;font-weight:700;font-family:"Syne",sans-serif}
+.ach-desc{font-size:12px;color:var(--text-muted);margin-top:3px}
+.ach-toast{position:fixed;top:80px;right:28px;z-index:9999;padding:16px 20px;border-radius:var(--r-md);background:linear-gradient(135deg,rgba(255,179,0,.18),rgba(92,107,192,.14));backdrop-filter:blur(20px);border:1px solid rgba(255,179,0,.4);box-shadow:0 12px 40px rgba(255,179,0,.18);font-size:13px;color:var(--text);display:none;min-width:240px;animation:achIn .4s cubic-bezier(.34,1.56,.64,1)}
+.ach-toast.show{display:flex;align-items:center;gap:12px}
+@keyframes achIn{from{opacity:0;transform:translateX(60px) scale(0.9)}to{opacity:1;transform:translateX(0) scale(1)}}
+.ach-toast-icon{font-size:26px}
+.ach-toast-text strong{display:block;font-weight:700;font-family:"Syne",sans-serif;margin-bottom:2px}
 
-/* RESPONSIVE */
-@media(max-width:640px){
-  .page{padding:20px 14px}.nav{padding:8px 14px}
-  .hero h1{font-size:26px}.grid-4{grid-template-columns:repeat(2,1fr)}
-  .metric-val{font-size:24px}.nav-uname{display:none}
-  .career-grid{grid-template-columns:1fr}
+/* ===== PROGRESS PAGE ===== */
+.progress-streak-ring{display:flex;flex-direction:column;align-items:center;gap:4px}
+.streak-num{font-family:"Syne",sans-serif;font-size:48px;font-weight:800;background:linear-gradient(135deg,#FFB300,#FF5722);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.streak-lbl{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.week-bar-grid{display:flex;gap:8px;align-items:flex-end;height:80px;margin:10px 0}
+.week-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.week-bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--indigo),var(--cyan));min-height:3px;transition:height .8s cubic-bezier(.22,1,.36,1)}
+.week-bar-day{font-size:10px;color:var(--text-muted);font-weight:600}
+.history-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.history-row:last-child{border:none}
+.history-score{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;min-width:40px;text-align:right}
+.history-meta{flex:1;font-size:12px;color:var(--text-muted)}
+.history-meta strong{color:var(--text);font-size:13px;display:block;margin-bottom:3px}
+.lb-row{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:var(--r-md);margin-bottom:8px;background:var(--glass-card);border:1px solid var(--border);transition:all .3s cubic-bezier(.22,1,.36,1);will-change:transform}
+.lb-row:hover{border-color:var(--border-hover);transform:translateX(4px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+
+/* ===== GATE PANEL SPECIFIC ===== */
+.gate-header-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(103,58,183,.3),rgba(63,81,181,.2));border:1px solid rgba(103,58,183,.45);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;color:#CE93D8;margin-bottom:16px}
+.gate-subject-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.gate-subject{background:rgba(103,58,183,.1);border:1px solid rgba(103,58,183,.25);border-radius:var(--r-md);padding:14px 16px;transition:all .3s;will-change:transform}
+.gate-subject:hover{border-color:rgba(103,58,183,.5);transform:translateY(-3px);box-shadow:0 8px 28px rgba(103,58,183,.2)}
+.gate-subject-name{font-size:13px;font-weight:700;font-family:"Syne",sans-serif;margin-bottom:4px}
+.gate-subject-marks{font-size:11px;color:var(--text-muted)}
+
+@keyframes tIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){
+  .page{padding:24px 16px}.nav{padding:10px 16px;gap:2px}
+  .hero h1{font-size:34px;letter-spacing:-1px}.hero-sub{font-size:15px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}.metric-val{font-size:28px}
+  .nav-uname{display:none}.career-grid{grid-template-columns:1fr}
+  .career-paths{grid-template-columns:1fr}.articles-grid{grid-template-columns:1fr}
+  .gate-subject-grid{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
-
+<div class="bg-scene">
+  <div class="bg-img"></div><div class="bg-overlay"></div>
+  <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+  <div class="bg-grid"></div><div class="bg-particles" id="bg-particles"></div>
+</div>
 <nav class="nav">
-  <div class="nav-logo"><div class="logo-icon">🧠</div>Skill<span>IQ</span></div>
-  <button class="nav-tab active" onclick="showPage('home')">Home</button>
-  <button class="nav-tab" onclick="showPage('quiz')">Assessment</button>
-  <button class="nav-tab" onclick="showPage('dashboard')">Dashboard</button>
-  <button class="nav-tab" onclick="showPage('recommendations')">Plan</button>
-  <button class="nav-tab" onclick="showPage('profile')">Profile</button>
+  <div class="nav-logo"><div class="logo-icon">&#129504;</div>Skill<span>IQ</span></div>
+  <button class="nav-tab active mag" onclick="showPage('home')">Home</button>
+  <button class="nav-tab mag" onclick="showPage('dashboard')">Dashboard</button>
+  <button class="nav-tab mag" onclick="showPage('career')">&#127919; Career Paths</button>
+  <button class="nav-tab mag" onclick="showPage('recommendations')">My Plan</button>
+  <button class="nav-tab mag" onclick="showPage('profile')">Profile</button>
+  <button class="nav-tab mag" onclick="showPage('progress')">&#128200; Progress</button>
   <div class="nav-spacer"></div>
-  <span class="ai-badge">✨ AI Powered</span>
+  <span class="ai-badge">&#10022; AI Powered</span>
   <div class="nav-user">
     <span class="nav-uname" id="nav-uname">Guest</span>
     <div class="nav-avatar-sm" id="nav-avatar">G</div>
-    <button class="nav-logout-btn" onclick="logoutUser()">Logout</button>
+    <button class="nav-logout-btn mag" onclick="logoutUser()">Logout</button>
   </div>
 </nav>
-
 <div class="app">
 
 <!-- HOME -->
 <div class="page active" id="page-home">
   <div class="hero">
-    <div class="hero-orb h1"></div><div class="hero-orb h2"></div>
-    <div class="hero-tag">✦ CSE Career Readiness Platform</div>
+    <div class="hero-tag"><span class="tag-dot"></span> CSE Career Intelligence Platform</div>
     <h1>Know exactly <span class="grad">where you stand.</span><br>Fix what holds you back.</h1>
-    <p class="hero-sub">AI-powered analysis of your Computer Science strengths, skill gaps, and career readiness for IT jobs, government roles, and study-abroad pathways.</p>
+    <p class="hero-sub">Upload your <strong>resume, marksheet or progress card</strong> and get AI-powered skill gap analysis for <strong>GATE</strong>, <strong>Government Jobs</strong>, and <strong>Study Abroad</strong>.</p>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="showPage('quiz');startFresh();">Start Assessment ↗</button>
-      <button class="btn" onclick="showPage('dashboard');loadDemoData();">View Demo Dashboard</button>
+      <button class="btn btn-primary mag" onclick="showPage('career')">&#128196; Upload &amp; Analyze</button>
+      <button class="btn btn-cyan mag" onclick="showPage('career')">&#127919; Explore Career Paths</button>
+      <button class="btn mag" onclick="showPage('dashboard');loadDemoData()">View Demo</button>
     </div>
   </div>
-
   <div class="grid-4 mb-16">
-    <div class="card-sm"><div class="skill-icon-lg">🧩</div><div class="card-sm-name">DSA Foundations</div><div class="card-sm-desc">Complexity, recursion, trees, graphs</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">🧠</div><div class="card-sm-name">Algorithmic Reasoning</div><div class="card-sm-desc">Tracing, optimization, edge cases</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">💾</div><div class="card-sm-name">CS Fundamentals</div><div class="card-sm-desc">DBMS, OS, CN, OOP concepts</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">🛠️</div><div class="card-sm-name">Debugging & Engineering</div><div class="card-sm-desc">Testing, practical coding, reliability</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">&#129513;</div><div class="card-sm-name">DSA Foundations</div><div class="card-sm-desc">Complexity, recursion, trees, graphs</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">&#129504;</div><div class="card-sm-name">Algorithmic Reasoning</div><div class="card-sm-desc">Tracing, optimization, edge cases</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">&#128190;</div><div class="card-sm-name">CS Fundamentals</div><div class="card-sm-desc">DBMS, OS, CN, OOP core concepts</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">&#128296;</div><div class="card-sm-name">Debugging &amp; Engineering</div><div class="card-sm-desc">Testing, debugging, practical coding</div></div>
   </div>
-
+  <div class="career-paths">
+    <div class="cpc govt mag" onclick="showPage('career');switchCareerTab('gate')">
+      <span class="path-icon">&#127979;</span>
+      <h3>GATE Examination</h3>
+      <p>Upload your marksheet — get your GATE-ready skills, gaps across all 13 subjects, and a personalized study plan.</p>
+      <span class="path-tag ptg">GATE CSE &middot; AIR &middot; PSU</span>
+    </div>
+    <div class="cpc it mag" onclick="showPage('career');switchCareerTab('government_jobs')">
+      <span class="path-icon">&#127963;&#65039;</span>
+      <h3>Government Jobs</h3>
+      <p>ISRO, DRDO, SSC-CGL IT &mdash; upload your resume and know your strengths, gaps, and improvement roadmap.</p>
+      <span class="path-tag pti">UPSC &middot; SSC &middot; ISRO</span>
+    </div>
+    <div class="cpc abroad mag" onclick="showPage('career');switchCareerTab('study_abroad')">
+      <span class="path-icon">&#127758;</span>
+      <h3>Study Abroad</h3>
+      <p>MS CS, Data Science, Research &mdash; discover IELTS/TOEFL requirements, GRE needs, and how to bridge your gaps.</p>
+      <span class="path-tag pta">MS &middot; PhD &middot; Research</span>
+    </div>
+  </div>
   <div class="card">
     <div class="card-title">How it works</div>
     <div class="grid-3">
-      <div><div class="step-num">01</div><div class="step-name">Take the CSE assessment</div><div class="step-desc">Answer 20 CSE-focused questions across DSA, reasoning, fundamentals, and debugging.</div></div>
-      <div><div class="step-num">02</div><div class="step-name">Upload your documents</div><div class="step-desc">Add resume, marksheet, or performance sheet to extract your practical skill profile.</div></div>
-      <div><div class="step-num">03</div><div class="step-name">Get goal-based gaps</div><div class="step-desc">See mandatory skills for your chosen goal and exactly what is still missing.</div></div>
+      <div><div class="step-num">01</div><div class="step-name">Upload Your Document</div><div class="step-desc">Drag and drop your resume, marksheet, or progress card. We accept PDF, DOCX, and TXT files.</div></div>
+      <div><div class="step-num">02</div><div class="step-name">Select Your Goal</div><div class="step-desc">Choose between GATE, Government Jobs, or Study Abroad to get targeted skill gap analysis.</div></div>
+      <div><div class="step-num">03</div><div class="step-name">Get Your Roadmap</div><div class="step-desc">See exactly which skills you have, what's missing, and get curated articles and resources to acquire them.</div></div>
     </div>
   </div>
-
-  <div class="grid-4 mb-16" style="margin-top:0">
-    <div class="metric"><div class="metric-label">Students Helped</div><div class="metric-val">12K+</div><div class="metric-sub">and growing</div></div>
-    <div class="metric"><div class="metric-label">Assessments</div><div class="metric-val">94K</div><div class="metric-sub">this month</div></div>
+  <div class="grid-4 mb-16">
+    <div class="metric"><div class="metric-label">Students Helped</div><div class="metric-val">12K+</div><div class="metric-sub">and growing daily</div></div>
+    <div class="metric"><div class="metric-label">Analyses Done</div><div class="metric-val">94K</div><div class="metric-sub">this month</div></div>
     <div class="metric"><div class="metric-label">Score Improvement</div><div class="metric-val">+23%</div><div class="metric-sub">avg after 4 weeks</div></div>
-    <div class="metric"><div class="metric-label">AI Accuracy</div><div class="metric-val">98.2%</div><div class="metric-sub">pattern detection</div></div>
-  </div>
-</div>
-
-<!-- QUIZ -->
-<div class="page" id="page-quiz">
-  <div id="quiz-select">
-    <div class="page-header">
-      <div class="section-tag">Step 1 of 2</div>
-      <h2 class="page-h2">Choose your skill domains</h2>
-      <p class="muted">Select one or more. We'll ask 5 questions per skill.</p>
-    </div>
-    <div class="skill-grid" id="skill-selector"></div>
-    <button class="btn btn-primary" onclick="beginQuiz()" id="start-btn" style="opacity:.4" disabled>Start Assessment ↗</button>
-  </div>
-
-  <div id="quiz-active" class="hidden">
-    <div class="quiz-header">
-      <div class="flex-row">
-        <span class="skill-badge" id="q-skill-badge"></span>
-        <span class="muted" id="q-counter"></span>
-      </div>
-      <div class="timer-row">
-        <div class="timer-ring" id="timer-ring">
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(108,99,255,.1)" stroke-width="3"/>
-            <circle id="timer-circle" cx="24" cy="24" r="20" fill="none" stroke="#6C63FF" stroke-width="3"
-              stroke-dasharray="125.66" stroke-dashoffset="0" stroke-linecap="round"/>
-          </svg>
-          <span class="timer-val" id="timer-display">30</span>
-        </div>
-      </div>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="q-progress" style="width:0%"></div></div>
-    <div class="question-text" id="q-text"></div>
-    <div class="options" id="q-options"></div>
-    <div id="q-feedback" class="hidden"></div>
-    <div class="flex-row" style="justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:16px">
-      <div class="step-indicator" id="q-dots"></div>
-      <button class="btn btn-primary btn-sm" id="q-next-btn" onclick="nextQuestion()" style="display:none">Next →</button>
-    </div>
-  </div>
-
-  <div id="quiz-done" class="hidden quiz-done-screen">
-    <div class="quiz-done-icon">🎯</div>
-    <h2>Assessment complete!</h2>
-    <p class="muted">Analyzing your performance patterns…</p>
-    <div class="card" id="model-actions-card" style="max-width:720px;margin:20px auto 0;text-align:left">
-      <div class="card-title">Model Data Actions</div>
-      <p class="muted" style="margin:-4px 0 14px">Your assessment is auto-saved. Add a target score to label the record.</p>
-      <div class="model-row">
-        <input id="target-score-input" type="number" min="0" max="100" step="0.1" placeholder="Target score (0–100)">
-        <button class="btn btn-sm" onclick="saveTargetLabel()">Save Label</button>
-        <button class="btn btn-sm" onclick="predictFromLatestAssessment()">Predict</button>
-        <button class="btn btn-sm" onclick="predictExternalModelsFromLatestAssessment()">External Predict</button>
-      </div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(108,99,255,.1)">
-        <div class="muted" style="margin-bottom:8px">Bulk import Kaggle CSV + mapping JSON</div>
-        <div class="model-row">
-          <input id="kaggle-csv-file" type="file" accept=".csv,text/csv">
-          <input id="kaggle-map-file" type="file" accept=".json,application/json">
-          <button class="btn btn-sm" onclick="importKaggleDataFromUI()">Import Data</button>
-        </div>
-      </div>
-      <div id="model-status" class="muted" style="margin-top:10px;font-size:12px;padding:8px 12px;background:rgba(108,99,255,.06);border-radius:8px">Waiting for assessment save…</div>
-    </div>
-    <div class="btn-row" style="margin-top:24px">
-      <button class="btn btn-primary" onclick="showPage('dashboard');buildDashboard()">See My Dashboard ↗</button>
-      <button class="btn" onclick="showPage('recommendations');buildRecommendations()">View My Plan ↗</button>
-    </div>
+    <div class="metric"><div class="metric-label">AI Accuracy</div><div class="metric-val">98.2%</div><div class="metric-sub">skill pattern detection</div></div>
   </div>
 </div>
 
@@ -418,29 +389,301 @@ input[type="number"]{max-width:200px}
 <div class="page" id="page-dashboard">
   <div class="flex-row mb-16 flex-wrap">
     <div style="flex:1"><div class="section-tag">Your Results</div><h2 class="page-h2" style="margin-bottom:0">Performance Dashboard</h2></div>
-    <button class="btn btn-sm" onclick="showPage('quiz');startFresh()">Retake Assessment</button>
+    <button class="btn btn-sm mag" onclick="showPage('career')">&#128196; Analyze Again</button>
   </div>
   <div class="grid-4 mb-16">
-    <div class="metric"><div class="metric-label">Overall Score</div><div class="metric-val" id="m-score">—</div><div class="metric-sub">out of 100</div></div>
-    <div class="metric"><div class="metric-label">Accuracy</div><div class="metric-val" id="m-acc">—</div><div class="metric-sub">correct answers</div></div>
-    <div class="metric"><div class="metric-label">Avg Response</div><div class="metric-val" id="m-time">—</div><div class="metric-sub">seconds/question</div></div>
-    <div class="metric"><div class="metric-label">Questions</div><div class="metric-val" id="m-qs">—</div><div class="metric-sub">answered total</div></div>
+    <div class="metric"><div class="metric-label">Overall Score</div><div class="metric-val" id="m-score">&#8212;</div><div class="metric-sub">out of 100</div></div>
+    <div class="metric"><div class="metric-label">Accuracy</div><div class="metric-val" id="m-acc">&#8212;</div><div class="metric-sub">correct answers</div></div>
+    <div class="metric"><div class="metric-label">Avg Response</div><div class="metric-val" id="m-time">&#8212;</div><div class="metric-sub">seconds/question</div></div>
+    <div class="metric"><div class="metric-label">Questions</div><div class="metric-val" id="m-qs">&#8212;</div><div class="metric-sub">answered total</div></div>
   </div>
   <div class="grid-2">
     <div class="card"><div class="card-title">Skill Scores</div><div id="skill-breakdown"></div></div>
     <div class="card" style="display:flex;flex-direction:column;align-items:center">
       <div class="card-title" style="align-self:flex-start">Skill Radar</div>
-      <div class="radar-wrap"><canvas id="radarChart" style="max-height:260px"></canvas></div>
+      <div class="radar-wrap"><canvas id="radarChart" style="max-height:280px"></canvas></div>
     </div>
   </div>
   <div class="card"><div class="card-title">Response Time by Question</div><div class="chart-wrap"><canvas id="timeChart"></canvas></div></div>
-  <div class="card"><div class="card-title">Error Pattern Analysis</div><div id="error-analysis"><p class="muted">Complete an assessment to see your error patterns.</p></div></div>
+  <div class="card"><div class="card-title">Error Pattern Analysis</div><div id="error-analysis"><p class="muted">Run an analysis to see error patterns.</p></div></div>
   <div class="card">
-    <div class="card-title" style="display:flex;align-items:center;gap:8px">
-      <span>AI Insights</span>
-      <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(108,99,255,.1);color:var(--purple);font-weight:700">Claude</span>
+    <div class="card-title">AI Insights <span style="font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(92,107,192,.14);color:var(--indigo-l);font-weight:700;border:1px solid rgba(92,107,192,.28)">Claude AI</span></div>
+    <div id="ai-insights-section"><p class="muted">Upload a document and run an analysis to get AI-generated insights.</p></div>
+  </div>
+</div>
+
+<!-- CAREER PATHS -->
+<div class="page" id="page-career">
+  <div class="page-header">
+    <div class="section-tag">Career Intelligence</div>
+    <h2 class="page-h2">Choose Your Career Goal</h2>
+    <p class="muted">Upload your resume, marksheet, or progress card. Select your goal to get a detailed skill gap analysis with resources.</p>
+  </div>
+
+  <!-- GLOBAL UPLOAD ZONE -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-title">&#128196; Upload Your Document</div>
+    <div class="upload-zone mag" id="global-upload-zone" onclick="document.getElementById('global-file-input').click()">
+      <input type="file" id="global-file-input" class="file-input-hidden" accept=".pdf,.docx,.txt,.csv" onchange="handleGlobalUpload(this)">
+      <div class="upload-icon">&#128196;</div>
+      <div class="upload-title">Drop your Resume, Marksheet or Progress Card</div>
+      <div class="upload-sub">Click to browse, or drag and drop your file here</div>
+      <div class="upload-types">
+        <span class="upload-type-badge">PDF</span>
+        <span class="upload-type-badge">DOCX</span>
+        <span class="upload-type-badge">TXT</span>
+        <span class="upload-type-badge">CSV</span>
+      </div>
     </div>
-    <div id="ai-insights-section"><p class="muted">Complete an assessment to get AI-generated insights.</p></div>
+    <div id="uploaded-file-display" style="display:none" class="uploaded-file-info">
+      <span class="file-icon">&#128196;</span>
+      <span class="file-name" id="uploaded-file-name">No file</span>
+      <button class="file-clear" onclick="clearUpload()" title="Remove file">&#10005;</button>
+    </div>
+    <div style="margin-top:14px">
+      <div class="section-title">Or paste your profile text directly</div>
+      <textarea id="global-text-input" style="width:100%;height:120px;padding:14px 16px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;transition:all .25s;line-height:1.65" placeholder="Paste your resume, marksheet details, grades, or profile here…&#10;&#10;Example:&#10;B.Tech CSE, CGPA: 8.5/10&#10;Subjects: DSA (A+), DBMS (B+), OS (A), Networks (B)&#10;Projects: E-commerce platform (React, Node), ML classifier (Python)&#10;Skills: Python, Java, C++, SQL, Git"></textarea>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
+    <button class="btn btn-sm career-tab-btn mag" id="tab-gate" onclick="switchCareerTab('gate')">&#127979; GATE</button>
+    <button class="btn btn-sm career-tab-btn mag" id="tab-govt" onclick="switchCareerTab('government_jobs')">&#127963;&#65039; Government Jobs</button>
+    <button class="btn btn-sm career-tab-btn mag" id="tab-abroad" onclick="switchCareerTab('study_abroad')">&#127758; Study Abroad</button>
+  </div>
+
+  <!-- GATE PANEL -->
+  <div class="career-panel hidden" id="panel-gate">
+    <div class="card" style="border-color:rgba(103,58,183,.25)">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div style="font-size:48px">&#127979;</div>
+        <div>
+          <div class="gate-header-badge">&#127775; GATE CSE 2025 &mdash; 100 Marks</div>
+          <h3 style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">GATE Computer Science</h3>
+          <p style="color:var(--text-muted);font-size:13px">All India Rank &middot; PSU Recruitment &middot; M.Tech Admission</p>
+        </div>
+      </div>
+      <div class="card-title">&#127775; All Mandatory Skills for GATE CSE</div>
+      <div class="gate-subject-grid">
+        <div class="gate-subject"><div class="gate-subject-name">&#9889; Engineering Mathematics</div><div class="gate-subject-marks">15 marks &mdash; Linear Algebra, Calculus, Probability</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#128202; Data Structures</div><div class="gate-subject-marks">10-12 marks &mdash; Arrays, Trees, Graphs, Heaps</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#129302; Algorithms</div><div class="gate-subject-marks">10-12 marks &mdash; Sorting, DP, Greedy, Complexity</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#128451; DBMS</div><div class="gate-subject-marks">8-10 marks &mdash; SQL, Normal Forms, Transactions</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#128187; Operating Systems</div><div class="gate-subject-marks">8-10 marks &mdash; Scheduling, Deadlock, Memory Mgmt</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#127760; Computer Networks</div><div class="gate-subject-marks">8-10 marks &mdash; TCP/IP, Routing, Protocols</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#129514; Theory of Computation</div><div class="gate-subject-marks">8-10 marks &mdash; Automata, Grammars, Turing Machines</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#128296; Compiler Design</div><div class="gate-subject-marks">6-8 marks &mdash; Lexical Analysis, Parsing, Code Gen</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#129522; Computer Organization</div><div class="gate-subject-marks">6-8 marks &mdash; CPU Design, Pipelining, Cache</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#128290;</div><div class="gate-subject-marks">Digital Logic &mdash; 4-6 marks</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#128028;</div><div class="gate-subject-marks">Programming in C &mdash; 4-6 marks</div></div>
+        <div class="gate-subject"><div class="gate-subject-name">&#129504;</div><div class="gate-subject-marks">Aptitude &amp; English &mdash; 15 marks</div></div>
+      </div>
+      <div class="card-title">&#128218; How to Acquire GATE Skills</div>
+      <div class="acquire-card"><div class="acq-skill">&#9889; Engineering Mathematics</div>
+        <ul class="acq-steps">
+          <li>NPTEL Engineering Mathematics course (IIT level, free) — 12 weeks</li>
+          <li>Solve last 10 years GATE Math questions on GATE Overflow</li>
+          <li>Focus: Linear Algebra (eigen values), Probability (Bayes, distributions)</li>
+          <li>Book: Higher Engineering Mathematics by B.S. Grewal</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#128202; DSA + Algorithms</div>
+        <ul class="acq-steps">
+          <li>Complete CLRS Introduction to Algorithms (core chapters)</li>
+          <li>Practice 200+ problems on GeeksforGeeks GATE tag</li>
+          <li>NPTEL DSA course by IIT Delhi (free, certificate available)</li>
+          <li>Solve GATE PYQs 2015-2024 on all DS + Algorithm topics</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#129514; Theory of Computation</div>
+        <ul class="acq-steps">
+          <li>Michael Sipser — Introduction to the Theory of Computation</li>
+          <li>NPTEL TOC course by IIT Chennai — highly rated</li>
+          <li>Practice: DFA minimization, PDA, Turing machines from GATE PYQs</li>
+          <li>GATE Overflow discussions for TOC are excellent reference</li>
+        </ul>
+      </div>
+      <div class="card-title">&#128240; Suggested Articles &amp; Resources for GATE</div>
+      <div class="articles-grid">
+        <a class="article-card" href="https://gate.iitk.ac.in" target="_blank"><span class="article-tag">Official</span><div class="article-title">GATE Official Website — IIT Kanpur</div><div class="article-desc">Official syllabus, previous papers, and notification for GATE CSE.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://gateoverflow.in" target="_blank"><span class="article-tag">PYQ Practice</span><div class="article-title">GATE Overflow — Community Q&amp;A</div><div class="article-desc">Best community for GATE CSE — explained solutions to all previous year questions.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://nptel.ac.in/courses/106106127" target="_blank"><span class="article-tag">NPTEL</span><div class="article-title">NPTEL DSA — IIT Delhi (Free)</div><div class="article-desc">IIT-certified Data Structures and Algorithms course, directly applicable to GATE.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.geeksforgeeks.org/gate-cs-notes-gq/" target="_blank"><span class="article-tag">Notes</span><div class="article-title">GFG GATE CS Notes</div><div class="article-desc">Topic-wise notes and quizzes for every GATE CSE subject — free.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://unacademy.com/goal/gate-cse" target="_blank"><span class="article-tag">Video Course</span><div class="article-title">Unacademy GATE CSE</div><div class="article-desc">Structured video lectures and mock tests aligned to latest GATE syllabus.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.youtube.com/c/GATESmashers" target="_blank"><span class="article-tag">YouTube</span><div class="article-title">GATE Smashers — YouTube</div><div class="article-desc">Free GATE video lectures on all CS subjects by experienced faculty.</div><div class="article-arrow">↗</div></a>
+      </div>
+    </div>
+    <div class="career-analyzer">
+      <div class="card-title" style="margin-bottom:16px">&#129302; GATE Skill Gap Analysis — from Your Document</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="flex:1;min-width:200px">
+          <div class="section-title">Target</div>
+          <select id="career-role-gate" style="width:100%;padding:11px 14px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+            <option value="">GATE CSE (General)</option>
+            <option value="gate_top100">GATE AIR Top 100</option>
+            <option value="gate_psu">GATE + PSU Jobs (BSNL/BEL/ONGC)</option>
+            <option value="mtech_iit">M.Tech at IIT/NIT</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary mag" onclick="analyzeCareerGap('gate')">Analyze GATE Gaps &#8599;</button>
+          <button class="btn mag" onclick="downloadCareerReport('gate')">&#8675; Report</button>
+        </div>
+      </div>
+      <div id="career-result-gate" class="career-result">Upload your marksheet or profile above, then click Analyze to see your GATE-ready skills, missing subjects, and a personalized study plan.</div>
+    </div>
+  </div>
+
+  <!-- GOVT PANEL -->
+  <div class="career-panel hidden" id="panel-government_jobs">
+    <div class="card" style="border-color:rgba(255,179,0,.2)">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div style="font-size:48px">&#127963;&#65039;</div>
+        <div><h3 style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">Government Jobs (CSE)</h3>
+        <p style="color:var(--text-muted);font-size:13px">GATE CSE &middot; ISRO/DRDO &middot; SSC-CGL IT &middot; UPSC Technical</p></div>
+      </div>
+      <div class="card-title">&#127775; All Required Skills for Government Jobs</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+        <span class="skill-pill sph">&#128202; Data Structures</span><span class="skill-pill sph">&#9889; Algorithms</span>
+        <span class="skill-pill sph">&#128451; DBMS</span><span class="skill-pill sph">&#128187; Operating Systems</span>
+        <span class="skill-pill sph">&#127760; Computer Networks</span><span class="skill-pill sph">&#129518; Quantitative Aptitude</span>
+        <span class="skill-pill sph">&#129513; Logical Reasoning</span><span class="skill-pill sph">&#128221; English Communication</span>
+        <span class="skill-pill sph">&#128240; Current Affairs / GK</span>
+        <span class="skill-pill spo">&#128024; Python/C++ (optional)</span><span class="skill-pill spo">&#128039; Linux (optional)</span>
+      </div>
+      <div class="card-title">&#128218; How to Acquire Government Job Skills</div>
+      <div class="acquire-card"><div class="acq-skill">&#128202; Data Structures &amp; Algorithms (GATE Focus)</div>
+        <ul class="acq-steps">
+          <li>Solve 200+ problems on GeeksforGeeks with GATE tag filter</li>
+          <li>Study CLRS or Narasimha Karumanchi DSA book (Chapter by chapter)</li>
+          <li>Take free NPTEL DSA course (IIT certified, 12 weeks)</li>
+          <li>Solve previous 10-year GATE CSE papers on DS + Algo topics</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#129518; Quantitative Aptitude &amp; Reasoning</div>
+        <ul class="acq-steps">
+          <li>RS Aggarwal Quantitative Aptitude — 1 chapter daily (45 days plan)</li>
+          <li>Testbook or Unacademy SSC/GATE mock tests weekly</li>
+          <li>Focus areas: Number theory, ratios, percentages, syllogisms, series</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#128240; Current Affairs &amp; General Knowledge</div>
+        <ul class="acq-steps">
+          <li>Read The Hindu / PIB.gov.in daily — 20 minutes morning routine</li>
+          <li>Monthly current affairs PDFs: Vision IAS, Drishti IAS (free download)</li>
+          <li>Weekly quiz on PrepLadder or Testbook for retention testing</li>
+        </ul>
+      </div>
+      <div class="card-title">&#128240; Suggested Articles &amp; Resources for Govt Jobs</div>
+      <div class="articles-grid">
+        <a class="article-card" href="https://www.geeksforgeeks.org/gate-cs-notes-gq/" target="_blank"><span class="article-tag">GATE Prep</span><div class="article-title">GFG GATE CS Notes</div><div class="article-desc">Comprehensive notes on every GATE CS topic for government job exams.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://testbook.com/blog/ssc-cgl-cpo-it-officer" target="_blank"><span class="article-tag">SSC</span><div class="article-title">SSC CGL IT Officer Guide</div><div class="article-desc">Complete syllabus and preparation strategy for SSC CGL IT roles.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.isro.gov.in/career.html" target="_blank"><span class="article-tag">ISRO</span><div class="article-title">ISRO Recruitment Portal</div><div class="article-desc">Official ISRO scientist/engineer recruitment — syllabus and eligibility.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://unacademy.com/goal/gate-cse" target="_blank"><span class="article-tag">Course</span><div class="article-title">Unacademy GATE CSE Course</div><div class="article-desc">Structured GATE prep with mock tests, live doubt solving, and mentorship.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.drishtiias.com/current-affairs-today" target="_blank"><span class="article-tag">Current Affairs</span><div class="article-title">Drishti IAS Current Affairs</div><div class="article-desc">Daily current affairs and GK updates relevant to SSC and UPSC exams.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://gateoverflow.in" target="_blank"><span class="article-tag">Practice</span><div class="article-title">GATE Overflow Community</div><div class="article-desc">Best forum for GATE CSE PYQ solutions and concept discussions.</div><div class="article-arrow">↗</div></a>
+      </div>
+    </div>
+    <div class="career-analyzer">
+      <div class="card-title" style="margin-bottom:16px">&#128196; Government Job Skill Gap Analysis</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="flex:1;min-width:200px">
+          <div class="section-title">Target Role</div>
+          <select id="career-role-govt" style="width:100%;padding:11px 14px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+            <option value="">All Government Roles</option>
+            <option value="gate_cse">GATE CSE</option>
+            <option value="isro_drdo_technical">ISRO / DRDO Technical</option>
+            <option value="ssc_cgl_it">SSC CGL IT</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary mag" onclick="analyzeCareerGap('government_jobs')">Analyze Skill Gap &#8599;</button>
+          <button class="btn mag" onclick="downloadCareerReport('government_jobs')">&#8675; Report</button>
+        </div>
+      </div>
+      <div id="career-result-govt" class="career-result">Upload your resume or marksheet above, then click Analyze to see which Government Job skills you already have, which are missing, and exactly how to acquire them.</div>
+    </div>
+  </div>
+
+  <!-- ABROAD PANEL -->
+  <div class="career-panel hidden" id="panel-study_abroad">
+    <div class="card" style="border-color:rgba(233,30,99,.2)">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div style="font-size:48px">&#127758;</div>
+        <div><h3 style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">Study Abroad (Higher Studies)</h3>
+        <p style="color:var(--text-muted);font-size:13px">MS CS &middot; MS Data Science &middot; PhD &middot; Research &middot; USA / UK / Germany / Canada / Australia</p></div>
+      </div>
+      <div class="card-title">&#127775; All Required Skills &amp; Tests for Study Abroad</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+        <span class="skill-pill sph">&#128221; IELTS / TOEFL</span><span class="skill-pill sph">&#127919; GRE (for USA)</span>
+        <span class="skill-pill sph">&#128196; SOP Writing</span><span class="skill-pill sph">&#128300; Research Methodology</span>
+        <span class="skill-pill sph">&#128202; Data Structures</span><span class="skill-pill sph">&#9889; Algorithms</span>
+        <span class="skill-pill sph">&#128451; DBMS</span><span class="skill-pill sph">&#128172; Academic English</span>
+        <span class="skill-pill spo">&#128024; Python / R</span><span class="skill-pill spo">&#129309; Teamwork &amp; Collaboration</span>
+      </div>
+      <div class="card-title">&#128483;&#65039; Languages Required for Studying Abroad</div>
+      <div class="lang-grid">
+        <div class="lang-card"><div class="lang-name">&#127482;&#127480; English</div><div class="lang-desc">Primary language in USA, UK, Canada, Australia. Mandatory for admission and daily communication.</div><span class="lang-level lang-req">REQUIRED — IELTS/TOEFL</span></div>
+        <div class="lang-card"><div class="lang-name">&#127465;&#127466; German</div><div class="lang-desc">Required for German public universities (free tuition). TestDaF or DSH exam for German-medium programs.</div><span class="lang-level lang-req">REQUIRED (Germany)</span></div>
+        <div class="lang-card"><div class="lang-name">&#127467;&#127479; French</div><div class="lang-desc">Needed for French-medium programs in France, Belgium, Switzerland, Quebec Canada.</div><span class="lang-level lang-hlp">Helpful (France/Canada)</span></div>
+        <div class="lang-card"><div class="lang-name">&#127471;&#127477; Japanese</div><div class="lang-desc">Japan MEXT scholarships available. JLPT N3 level helpful for daily life and research programs.</div><span class="lang-level lang-hlp">Helpful (Japan)</span></div>
+        <div class="lang-card"><div class="lang-name">&#127475;&#127473; Dutch / &#127480;&#127466; Swedish</div><div class="lang-desc">Netherlands and Scandinavia offer English programs. Local language helps with daily life.</div><span class="lang-level lang-hlp">Helpful (NL/Nordic)</span></div>
+        <div class="lang-card"><div class="lang-name">&#127472;&#127479; Korean / &#127462;&#127466; Arabic</div><div class="lang-desc">South Korea KGSP and UAE scholarships have growing CSE programs with local language advantages.</div><span class="lang-level lang-hlp">Helpful (Korea/UAE)</span></div>
+      </div>
+      <div class="card-title" style="margin-top:20px">&#128218; How to Acquire Study Abroad Skills</div>
+      <div class="acquire-card"><div class="acq-skill">&#128221; IELTS / TOEFL Preparation</div>
+        <ul class="acq-steps">
+          <li>Target: IELTS 7.0+ overall or TOEFL iBT 100+ for top universities</li>
+          <li>Magoosh TOEFL or British Council IELTS prep course (3 months intensive)</li>
+          <li>Practice 1 full mock test per week; focus on Academic Writing Task 2</li>
+          <li>Speaking: Record daily; summarize TED talks in 2 minutes</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#127919; GRE Preparation (USA)</div>
+        <ul class="acq-steps">
+          <li>Target: 320+ Quant+Verbal, AWA 4.0+ for competitive CS programs</li>
+          <li>Magoosh GRE or ETS Official Prep (3-4 months, 2 hours/day)</li>
+          <li>Quant: Strong for CSE — focus on Data Interpretation + Algebra</li>
+          <li>Verbal: Learn 500 high-frequency GRE words using Anki flashcards</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#128196; SOP / LOR Writing Strategy</div>
+        <ul class="acq-steps">
+          <li>SOP structure: Research fit → Academic background → Projects → Career goals</li>
+          <li>Get reviews from seniors admitted to target universities</li>
+          <li>LOR: Request from professors who know your project work directly</li>
+          <li>Avoid generic SOPs — tailor each SOP to each university's research focus</li>
+        </ul>
+      </div>
+      <div class="card-title">&#128240; Suggested Articles &amp; Resources for Study Abroad</div>
+      <div class="articles-grid">
+        <a class="article-card" href="https://www.ets.org/toefl" target="_blank"><span class="article-tag">Official</span><div class="article-title">ETS TOEFL Official Site</div><div class="article-desc">Official TOEFL registration, prep materials, and score reporting.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://magoosh.com/gre/" target="_blank"><span class="article-tag">GRE Prep</span><div class="article-title">Magoosh GRE Prep</div><div class="article-desc">Top-rated GRE preparation with video lessons and 1000+ practice questions.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.mastersportal.eu" target="_blank"><span class="article-tag">University Search</span><div class="article-title">MastersPortal — Find Programs</div><div class="article-desc">Search and compare MS programs worldwide — filter by country, fees, GRE requirement.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://gradcafe.com" target="_blank"><span class="article-tag">Community</span><div class="article-title">The GradCafe</div><div class="article-desc">Admission results, SOP examples, and community advice for grad school applications.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.daad.de/en/study-and-research-in-germany/" target="_blank"><span class="article-tag">Germany</span><div class="article-title">DAAD — Study in Germany</div><div class="article-desc">Official German Academic Exchange Service for scholarships and university programs.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.british-council.in/study-uk" target="_blank"><span class="article-tag">UK</span><div class="article-title">British Council — Study in UK</div><div class="article-desc">UK university guide, IELTS prep, and scholarship information from British Council India.</div><div class="article-arrow">↗</div></a>
+      </div>
+    </div>
+    <div class="career-analyzer">
+      <div class="card-title" style="margin-bottom:16px">&#128196; Study Abroad Skill Gap Analysis</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="flex:1;min-width:200px">
+          <div class="section-title">Target Program</div>
+          <select id="career-role-abroad" style="width:100%;padding:11px 14px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+            <option value="">All Study Abroad Programs</option>
+            <option value="ms_cs">MS Computer Science (USA/UK)</option>
+            <option value="ms_data_science">MS Data Science</option>
+            <option value="research_track">PhD / Research Track</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary mag" onclick="analyzeCareerGap('study_abroad')">Analyze Skill Gap &#8599;</button>
+          <button class="btn mag" onclick="downloadCareerReport('study_abroad')">&#8675; Report</button>
+        </div>
+      </div>
+      <div id="career-result-abroad" class="career-result">Upload your resume or marksheet above, then click Analyze to see your Study Abroad readiness, missing skills, language requirements, and how to prepare.</div>
+    </div>
   </div>
 </div>
 
@@ -448,53 +691,15 @@ input[type="number"]{max-width:200px}
 <div class="page" id="page-recommendations">
   <div class="flex-row mb-16 flex-wrap">
     <div style="flex:1"><div class="section-tag">Your Custom Plan</div><h2 class="page-h2" style="margin-bottom:0">Personalized Learning Path</h2></div>
-    <button class="btn btn-sm btn-primary" onclick="showPage('quiz');startFresh()">New Assessment ↗</button>
+    <button class="btn btn-sm btn-primary mag" onclick="showPage('career')">&#128196; New Analysis &#8599;</button>
   </div>
-  <div id="recs-empty" class="card recs-empty">
-    <div style="font-size:40px;margin-bottom:14px">📋</div>
-    <p class="muted">Take an assessment first to get your personalized improvement plan.</p>
-    <button class="btn btn-primary mt-12" onclick="showPage('quiz');startFresh()">Start Assessment ↗</button>
+  <div id="recs-empty" class="card" style="text-align:center;padding:56px">
+    <div style="font-size:48px;margin-bottom:16px">&#128200;</div>
+    <p class="muted" style="margin-bottom:22px;font-size:15px">Upload a document and run a career analysis to get your personalized improvement plan.</p>
+    <button class="btn btn-primary mt-12 mag" onclick="showPage('career')">Upload &amp; Analyze &#8599;</button>
   </div>
-  <div id="recs-content" class="hidden"><div id="recs-plan"></div></div>
-
-  <div class="career-analyzer" style="margin-top:16px">
-    <div class="card-title" style="margin-bottom:12px">CSE Career Skill Gap Analyzer</div>
-    <div class="career-grid">
-      <div>
-        <div class="section-title">Paste Resume/Marksheet/Performance Text</div>
-        <textarea id="career-text" placeholder="Paste content from resume, marksheet, grade sheet, or performance report..."></textarea>
-      </div>
-      <div>
-        <div class="section-title">Choose Career Goal</div>
-        <select id="career-goal" style="width:100%;margin-bottom:10px">
-          <option value="government_jobs">Government Jobs (CSE)</option>
-          <option value="study_abroad">Study Abroad (CSE)</option>
-          <option value="it_job">IT Job</option>
-        </select>
-        <div class="section-title">Target Role (Optional)</div>
-        <select id="career-role" style="width:100%;margin-bottom:10px">
-          <option value="">Auto / General</option>
-          <option value="gate_cse">GATE CSE</option>
-          <option value="isro_drdo_technical">ISRO/DRDO Technical</option>
-          <option value="ssc_cgl_it">SSC CGL IT</option>
-          <option value="ms_cs">MS CS</option>
-          <option value="ms_data_science">MS Data Science</option>
-          <option value="research_track">Research Track</option>
-          <option value="software_engineer">Software Engineer</option>
-          <option value="backend_developer">Backend Developer</option>
-          <option value="qa_automation">QA Automation</option>
-        </select>
-        <div class="section-title">Or Upload Document</div>
-        <input id="career-doc" type="file" accept=".txt,.csv,.pdf,.docx" style="width:100%;margin-bottom:10px">
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-primary" style="flex:1" onclick="analyzeCareerGap()">Analyze Skill Gap ↗</button>
-          <button class="btn" style="flex:1" onclick="downloadCareerReport()">Download Report</button>
-          <button class="btn" style="flex:1" onclick="downloadCareerPdfReport()">Download PDF</button>
-        </div>
-        <p class="muted" style="margin-top:8px">Supported: TXT, CSV, PDF, DOCX</p>
-      </div>
-    </div>
-    <div id="career-result" class="career-result">Choose a goal and submit a document or text to see required skills, existing skills, and missing mandatory skills.</div>
+  <div id="recs-content" class="hidden">
+    <div id="recs-plan"></div>
   </div>
 </div>
 
@@ -504,605 +709,479 @@ input[type="number"]{max-width:200px}
     <div style="flex:1"><div class="section-tag">Account</div><h2 class="page-h2" style="margin-bottom:0">My Profile</h2></div>
   </div>
   <div class="grid-2">
-    <div class="card profile-card">
+    <div class="card" style="text-align:center;padding:36px">
       <div class="profile-avatar-lg" id="prof-avatar">G</div>
       <div class="profile-name" id="prof-name">Guest User</div>
-      <div class="profile-role">🎓 Student</div>
+      <div class="profile-role">&#127891; CSE Student</div>
       <div class="profile-email" id="prof-email">Not signed in</div>
       <div class="profile-stats">
-        <div class="pstat"><div class="pstat-val" id="prof-assessments">0</div><div class="pstat-lbl">Assessments</div></div>
-        <div class="pstat"><div class="pstat-val" id="prof-score">—</div><div class="pstat-lbl">Best Score</div></div>
+        <div class="pstat"><div class="pstat-val" id="prof-assessments">0</div><div class="pstat-lbl">Analyses</div></div>
+        <div class="pstat"><div class="pstat-val" id="prof-score">&#8212;</div><div class="pstat-lbl">Best Score</div></div>
         <div class="pstat"><div class="pstat-val" id="prof-streak">0</div><div class="pstat-lbl">Day Streak</div></div>
       </div>
-      <div style="margin-top:20px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-sm btn-primary" onclick="showPage('quiz');startFresh()">Take Assessment</button>
-        <button class="btn btn-sm" onclick="logoutUser()">🚪 Sign Out</button>
+      <div style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary mag" onclick="showPage('career')">&#128196; Upload &amp; Analyze</button>
+        <button class="btn btn-sm mag" onclick="logoutUser()">&#128682; Sign Out</button>
       </div>
     </div>
     <div>
       <div class="card">
-        <div class="card-title">Recent Assessments</div>
-        <div id="profile-history"><p class="muted">No assessments yet. <a href="#" onclick="showPage('quiz');startFresh();return false" style="color:var(--purple)">Start one!</a></p></div>
+        <div class="card-title">Recent Analyses</div>
+        <div id="profile-history"><p class="muted">No analyses yet. <a href="#" onclick="showPage('career');return false" style="color:var(--indigo-l)">Upload a document!</a></p></div>
       </div>
       <div class="card">
         <div class="card-title">Achievements</div>
         <div style="display:flex;flex-wrap:wrap;gap:10px" id="achievements">
-          <div class="ach-locked">🔒 First Assessment</div>
-          <div class="ach-locked">🔒 Score 80+</div>
-          <div class="ach-locked">🔒 All 4 Skills</div>
-          <div class="ach-locked">🔒 5-Day Streak</div>
+          <div class="ach-locked">&#128274; First Analysis</div>
+          <div class="ach-locked">&#128274; GATE Ready</div>
+          <div class="ach-locked">&#128274; All Paths</div>
+          <div class="ach-locked">&#128274; 5-Day Streak</div>
         </div>
       </div>
     </div>
   </div>
-  <div class="card" id="prof-not-signed" style="text-align:center;padding:32px">
-    <div style="font-size:32px;margin-bottom:12px">🔐</div>
-    <p class="muted">Sign in to save your progress, track assessments over time, and earn achievements.</p>
-    <button class="btn btn-primary mt-12" onclick="window.location.href='auth.html'">Sign In / Register</button>
+  <div class="card" id="prof-not-signed" style="text-align:center;padding:36px">
+    <div style="font-size:36px;margin-bottom:14px">&#128272;</div>
+    <p class="muted">Sign in to save your progress, track analyses over time, and earn achievements.</p>
+    <button class="btn btn-primary mt-12 mag" onclick="window.location.href='auth.html'">Sign In / Register</button>
   </div>
 </div>
 
-</div><!-- .app -->
+<!-- PROGRESS PAGE -->
+<div class="page" id="page-progress">
+  <div class="page-header">
+    <div class="section-tag">Analytics</div>
+    <h2 class="page-h2">Your Progress</h2>
+  </div>
+  <div class="grid-4 mb-16" id="progress-metrics"></div>
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title">Weekly Score Trend</div>
+      <div id="weekly-chart-wrap" style="margin-bottom:8px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128293; Streak &amp; Activity</div>
+      <div style="text-align:center;padding:16px 0">
+        <div class="progress-streak-ring">
+          <div class="streak-num" id="prog-streak">0</div>
+          <div class="streak-lbl">Day Streak</div>
+        </div>
+        <p class="muted" style="margin-top:14px;font-size:13px" id="prog-streak-msg">Complete an analysis to start a streak!</p>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-title">Achievements</div>
+    <div id="achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Analysis History</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+</div><!-- end .app -->
+
+<div class="ach-toast" id="ach-toast"><div class="ach-toast-icon" id="ach-toast-icon">&#127942;</div><div class="ach-toast-text"><strong id="ach-toast-name">Achievement Unlocked!</strong><span id="ach-toast-desc"></span></div></div>
 <div class="toast" id="toast"></div>
-
-<style>
-.ach-locked{padding:8px 14px;border-radius:20px;background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);font-size:12px;font-weight:600;color:var(--purple)}
-.ach-unlocked-green{padding:8px 14px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);font-size:12px;font-weight:600;color:#059669}
-.ach-unlocked-amber{padding:8px 14px;border-radius:20px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);font-size:12px;font-weight:600;color:#92600A}
-</style>
-
 <script src="js/data.js"></script>
 <script>
-/* AUTH */
-const _u=(function(){try{return JSON.parse(sessionStorage.getItem('skilliq_user'))}catch(e){return null}})();
-const CAN_ACCESS_MODEL_ACTIONS = !!(_u && (_u.role === 'admin' || _u.role === 'teacher'));
+// ============ AUTH & INIT ============
+const _u=(function(){try{return JSON.parse(sessionStorage.getItem("skilliq_user"))}catch(e){return null}})();
+const CAN_ACCESS_MODEL_ACTIONS=!!(_u&&(_u.role==="admin"||_u.role==="teacher"));
 (function(){
   if(!_u)return;
-  if(_u.role==='admin'){location.href='admin.html';return}
-  if(_u.role==='teacher'){location.href='teacher.html';return}
-  const n=_u.name||'Student';
-  document.getElementById('nav-uname').textContent=n;
-  document.getElementById('nav-avatar').textContent=n[0].toUpperCase();
-  document.getElementById('prof-name').textContent=n;
-  document.getElementById('prof-email').textContent=_u.email||'';
-  document.getElementById('prof-avatar').textContent=n[0].toUpperCase();
-  document.getElementById('prof-not-signed').style.display='none';
-  document.getElementById('prof-streak').textContent=Math.floor(Math.random()*7)+1;
+  if(_u.role==="admin"){location.href="admin.html";return}
+  if(_u.role==="teacher"){location.href="teacher.html";return}
+  const n=_u.name||"Student";
+  document.getElementById("nav-uname").textContent=n;
+  document.getElementById("nav-avatar").textContent=n[0].toUpperCase();
+  document.getElementById("prof-name").textContent=n;
+  document.getElementById("prof-email").textContent=_u.email||"";
+  document.getElementById("prof-avatar").textContent=n[0].toUpperCase();
+  document.getElementById("prof-not-signed").style.display="none";
+  document.getElementById("prof-streak").textContent=Store.get().streak||0;
 })();
-function logoutUser(){sessionStorage.clear();location.href='auth.html'}
+function logoutUser(){sessionStorage.clear();location.href="auth.html"}
 
-function applyModelActionsVisibility(){
-  const card=document.getElementById('model-actions-card');
-  if(!card)return;
-  card.classList.toggle('hidden',!CAN_ACCESS_MODEL_ACTIONS);
+// ============ PARTICLES ============
+function createParticles(){
+  const container=document.getElementById("bg-particles");if(!container)return;
+  for(let i=0;i<65;i++){
+    const star=document.createElement("div");star.className="star";
+    const size=Math.random()*2.5+0.5;
+    star.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${Math.random()*4+3}s;animation-delay:-${Math.random()*7}s;`;
+    container.appendChild(star);
+  }
 }
+createParticles();
 
-function showToast(msg,type='info'){
-  const t=document.getElementById('toast');
-  t.innerHTML=(type==='success'?'✅':type==='error'?'❌':'💡')+' '+msg;
-  t.className='toast show';setTimeout(()=>t.className='toast',3000);
+// ============ MAGNETIC EFFECT ============
+function initMag(){
+  if(window.matchMedia("(pointer:coarse)").matches)return;
+  document.querySelectorAll(".mag,.nav-tab,.nav-logout-btn,.article-card,.lang-card,.acquire-card,.card-sm,.cpc,.metric,.ach-card").forEach(el=>{
+    if(el._magInit)return;
+    el._magInit=true;
+    el.addEventListener("mousemove",ev=>{
+      const rect=el.getBoundingClientRect();
+      const x=(ev.clientX-rect.left)/rect.width-0.5;
+      const y=(ev.clientY-rect.top)/rect.height-0.5;
+      const s=Math.min(rect.width,160)*0.09;
+      el.style.transform=`translate(${x*s}px,${y*s*0.7}px)`;
+    });
+    el.addEventListener("mouseleave",()=>{
+      el.style.transition="transform 0.55s cubic-bezier(.22,1,.36,1)";
+      el.style.transform="";
+      setTimeout(()=>{el.style.transition=""},570);
+    });
+    el.addEventListener("mouseenter",()=>{el.style.transition="transform 0.08s ease"});
+  });
 }
+setTimeout(initMag,300);
 
-/* STATE */
-let selectedSkills=[],quizQueue=[],qIdx=0,answers=[],timerInterval=null,
-    timeLeft=30,qStartTime=0,results=null,radarChart=null,timeChart=null,latestAssessmentId=null;
-const API_BASE='/api';
-const CAREER_ROLE_OPTIONS={
-  government_jobs:[
-    {value:'gate_cse',label:'GATE CSE'},
-    {value:'isro_drdo_technical',label:'ISRO/DRDO Technical'},
-    {value:'ssc_cgl_it',label:'SSC CGL IT'}
-  ],
-  study_abroad:[
-    {value:'ms_cs',label:'MS CS'},
-    {value:'ms_data_science',label:'MS Data Science'},
-    {value:'research_track',label:'Research Track'}
-  ],
-  it_job:[
-    {value:'software_engineer',label:'Software Engineer'},
-    {value:'backend_developer',label:'Backend Developer'},
-    {value:'qa_automation',label:'QA Automation'}
-  ]
-};
-
-/* NAV */
+// ============ NAVIGATION ============
 function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  const tabs=['home','quiz','dashboard','recommendations','profile'];
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+  const p=document.getElementById("page-"+id);if(p)p.classList.add("active");
+  const tabs=["home","dashboard","career","recommendations","profile","progress"];
   const idx=tabs.indexOf(id);
-  if(idx>=0)document.querySelectorAll('.nav-tab')[idx].classList.add('active');
-  window.scrollTo(0,0);
-  if(id==='profile')updateProfile();
+  if(idx>=0)document.querySelectorAll(".nav-tab")[idx].classList.add("active");
+  if(id==="progress")buildProgressPage();
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(id==="profile")updateProfile();
+  setTimeout(initMag,150);
 }
 
-function updateProfile(){
-  if(!results)return;
-  document.getElementById('prof-score').textContent=results.overallScore;
-  document.getElementById('prof-assessments').textContent='1';
-  document.getElementById('profile-history').innerHTML=`
-    <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
-      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:16px">🎯</div>
-      <div style="flex:1"><div style="font-weight:600;font-size:13px">Multi-Skill Assessment</div><div class="muted" style="font-size:11px">Just now</div></div>
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--purple)">${results.overallScore}</div>
-    </div>`;
-  const k=Object.keys(results.skillScores).length;
-  document.getElementById('achievements').innerHTML=`
-    <div class="ach-unlocked-green">🏆 First Assessment</div>
-    ${results.overallScore>=80?'<div class="ach-unlocked-amber">⭐ Score 80+</div>':'<div class="ach-locked">🔒 Score 80+</div>'}
-    ${k===4?'<div class="ach-unlocked-green">🎯 All 4 Skills</div>':'<div class="ach-locked">🔒 All 4 Skills</div>'}
-    <div class="ach-locked">🔒 5-Day Streak</div>`;
+// ============ TOAST ============
+function showToast(msg,type){
+  const t=document.getElementById("toast");
+  t.innerHTML=(type==="success"?"✅":type==="error"?"❌":"💡")+" "+msg;
+  t.className="toast show";setTimeout(()=>t.className="toast",3500);
 }
 
-/* SKILL SELECTOR */
-function renderSkillSelector(){
-  document.getElementById('skill-selector').innerHTML=SKILLS.map(s=>`
-    <div class="skill-card" id="sc-${s.id}" onclick="toggleSkill('${s.id}')">
-      <div class="skill-check">✓</div>
-      <div class="skill-icon-lg">${s.icon}</div>
-      <div class="skill-name-lg">${s.name}</div>
-      <div class="skill-desc-sm">${s.desc}</div>
-    </div>`).join('');
-}
-function toggleSkill(id){
-  const i=selectedSkills.indexOf(id);
-  if(i>=0)selectedSkills.splice(i,1);else selectedSkills.push(id);
-  document.querySelectorAll('.skill-card').forEach(c=>c.classList.remove('selected-skill'));
-  selectedSkills.forEach(s=>document.getElementById('sc-'+s).classList.add('selected-skill'));
-  const b=document.getElementById('start-btn');
-  b.disabled=!selectedSkills.length;b.style.opacity=selectedSkills.length?'1':'.4';
-}
-function startFresh(){
-  selectedSkills=[];quizQueue=[];qIdx=0;answers=[];
-  document.getElementById('quiz-select').classList.remove('hidden');
-  document.getElementById('quiz-active').classList.add('hidden');
-  document.getElementById('quiz-done').classList.add('hidden');
-  renderSkillSelector();
+// ============ UPLOAD HANDLING ============
+let globalUploadedFile=null;
+let globalUploadedText="";
+
+function handleGlobalUpload(input){
+  const file=input.files[0];
+  if(!file)return;
+  globalUploadedFile=file;
+  document.getElementById("uploaded-file-display").style.display="flex";
+  document.getElementById("uploaded-file-name").textContent=file.name+" ("+Math.round(file.size/1024)+" KB)";
+  document.getElementById("global-upload-zone").style.display="none";
+  // Try to read file text
+  const reader=new FileReader();
+  reader.onload=function(e){
+    globalUploadedText=e.target.result||"";
+    // Also populate text area
+    if(globalUploadedText&&!document.getElementById("global-text-input").value){
+      document.getElementById("global-text-input").value=globalUploadedText.substring(0,3000);
+    }
+  };
+  reader.onerror=function(){globalUploadedText="";};
+  reader.readAsText(file);
+  showToast("File uploaded: "+file.name,"success");
 }
 
-/* QUIZ */
-function beginQuiz(){
-  if(!selectedSkills.length)return;
-  quizQueue=[];
-  selectedSkills.forEach(s=>QUESTIONS[s].forEach((q,i)=>quizQueue.push({...q,skill:s,localIdx:i})));
-  qIdx=0;answers=[];
-  document.getElementById('quiz-select').classList.add('hidden');
-  document.getElementById('quiz-active').classList.remove('hidden');
-  renderQuestion();
+function clearUpload(){
+  globalUploadedFile=null;
+  globalUploadedText="";
+  document.getElementById("global-file-input").value="";
+  document.getElementById("uploaded-file-display").style.display="none";
+  document.getElementById("global-upload-zone").style.display="block";
+  showToast("File removed","info");
 }
-function renderQuestion(){
-  if(qIdx>=quizQueue.length){endQuiz();return}
-  const q=quizQueue[qIdx],sk=SKILLS.find(s=>s.id===q.skill);
-  document.getElementById('q-skill-badge').textContent=sk.name;
-  document.getElementById('q-skill-badge').className='skill-badge '+sk.badgeClass;
-  document.getElementById('q-counter').textContent=`Q${qIdx+1} of ${quizQueue.length}`;
-  document.getElementById('q-progress').style.width=Math.round(qIdx/quizQueue.length*100)+'%';
-  document.getElementById('q-text').textContent=q.q;
-  const ltrs=['A','B','C','D'];
-  document.getElementById('q-options').innerHTML=q.opts.map((o,i)=>
-    `<button class="option" onclick="selectAnswer(${i})"><span class="opt-letter">${ltrs[i]}</span>${o}</button>`).join('');
-  document.getElementById('q-feedback').classList.add('hidden');
-  document.getElementById('q-next-btn').style.display='none';
-  document.getElementById('q-dots').innerHTML=quizQueue.map((_,i)=>
-    `<div class="step-dot${i===qIdx?' active':i<qIdx?' done':''}"></div>`).join('');
-  clearInterval(timerInterval);timeLeft=30;qStartTime=Date.now();
-  updateTimer();
-  timerInterval=setInterval(()=>{timeLeft--;updateTimer();if(timeLeft<=0){clearInterval(timerInterval);autoTimeout()}},1000);
-}
-function updateTimer(){
-  const c=125.66,off=c*(1-timeLeft/30);
-  document.getElementById('timer-circle').style.strokeDashoffset=off;
-  document.getElementById('timer-display').textContent=timeLeft;
-  document.getElementById('timer-ring').classList.toggle('timer-urgent',timeLeft<=8);
-}
-function autoTimeout(){
-  const el=Math.round((Date.now()-qStartTime)/1000);
-  answers.push({qIdx,skill:quizQueue[qIdx].skill,selected:-1,correct:false,time:el,diff:quizQueue[qIdx].diff});
-  showFeedback(-1);
-}
-function selectAnswer(i){
-  clearInterval(timerInterval);
-  const el=Math.round((Date.now()-qStartTime)/1000),q=quizQueue[qIdx],ok=i===q.ans;
-  answers.push({qIdx,skill:q.skill,selected:i,correct:ok,time:el,diff:q.diff});
-  document.querySelectorAll('.option').forEach((o,idx)=>{
-    o.disabled=true;
-    if(idx===q.ans)o.classList.add('correct');
-    if(idx===i&&!ok)o.classList.add('wrong');
+
+// Drag & drop for upload zone
+(function(){
+  const zone=document.getElementById("global-upload-zone");
+  if(!zone)return;
+  zone.addEventListener("dragover",e=>{e.preventDefault();zone.classList.add("drag-over")});
+  zone.addEventListener("dragleave",()=>zone.classList.remove("drag-over"));
+  zone.addEventListener("drop",e=>{
+    e.preventDefault();zone.classList.remove("drag-over");
+    const file=e.dataTransfer.files[0];
+    if(file){
+      const inp=document.getElementById("global-file-input");
+      const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;
+      handleGlobalUpload(inp);
+    }
   });
-  showFeedback(i);
-}
-function showFeedback(sel){
-  const q=quizQueue[qIdx],ok=sel===q.ans,fb=document.getElementById('q-feedback');
-  fb.className='feedback-box '+(ok?'feedback-correct':'feedback-wrong');
-  const icon=ok?'✅':sel===-1?'⏱️':'❌',lbl=ok?'Correct!':sel===-1?'Time up.':'Incorrect.';
-  fb.innerHTML=`<span class="fb-icon">${icon}</span><span><strong>${lbl}</strong> ${q.exp}</span>`;
-  fb.classList.remove('hidden');
-  document.getElementById('q-next-btn').style.display='flex';
-}
-function nextQuestion(){qIdx++;if(qIdx>=quizQueue.length)endQuiz();else renderQuestion()}
-function endQuiz(){
-  clearInterval(timerInterval);results=computeResults();
-  document.getElementById('quiz-active').classList.add('hidden');
-  document.getElementById('quiz-done').classList.remove('hidden');
-  autoSaveAssessmentRecord();
-}
+})();
 
-/* COMPUTE */
-function computeResults(){
-  const by={};SKILLS.forEach(s=>{by[s.id]={correct:0,total:0,times:[],errors:{easy:0,med:0,hard:0}}});
-  answers.forEach(a=>{const sk=by[a.skill];sk.total++;if(a.correct)sk.correct++;else sk.errors[a.diff]++;sk.times.push(a.time)});
-  const sc={};
-  Object.keys(by).forEach(id=>{
-    const sk=by[id];if(!sk.total)return;
-    const acc=sk.correct/sk.total,avg=sk.times.reduce((a,b)=>a+b,0)/sk.times.length,ts=Math.max(0,1-avg/25);
-    sc[id]={acc:Math.round(acc*100),avgTime:Math.round(avg),score:Math.round((acc*.7+ts*.3)*100),errors:sk.errors,total:sk.total,correct:sk.correct};
+// ============ CAREER TABS ============
+function switchCareerTab(goal){
+  document.querySelectorAll(".career-panel").forEach(p=>p.classList.add("hidden"));
+  document.querySelectorAll(".career-tab-btn").forEach(b=>{
+    b.classList.remove("ctab-active-govt","ctab-active-it","ctab-active-abroad","ctab-active-gate");
+    b.style.cssText="";
   });
-  const ov=Object.values(sc);
-  return{skillScores:sc,overallScore:ov.length?Math.round(ov.reduce((a,b)=>a+b.score,0)/ov.length):0,
-    totalCorrect:answers.filter(a=>a.correct).length,totalAns:answers.length,
-    avgTime:answers.length?Math.round(answers.reduce((a,b)=>a+b.time,0)/answers.length):0,answers};
+  const p=document.getElementById("panel-"+goal);if(p)p.classList.remove("hidden");
+  const map={gate:"gate",government_jobs:"govt",study_abroad:"abroad"};
+  const btn=document.getElementById("tab-"+map[goal]);
+  if(btn){
+    if(goal==="gate")btn.classList.add("ctab-active-gate");
+    else if(goal==="government_jobs")btn.classList.add("ctab-active-govt");
+    else if(goal==="study_abroad")btn.classList.add("ctab-active-abroad");
+  }
+  setTimeout(initMag,150);
 }
 
-/* DASHBOARD */
+// ============ CAREER GAP ANALYSIS ============
+const API_BASE="/api";
+async function analyzeCareerGap(goal){
+  const sfxMap={gate:"gate",government_jobs:"govt",study_abroad:"abroad"};
+  const sfx=sfxMap[goal];
+  const resultEl=document.getElementById("career-result-"+sfx);
+  const role=document.getElementById("career-role-"+sfx)?.value||"";
+  // Get text from global input or file
+  let text=document.getElementById("global-text-input")?.value.trim()||"";
+  const file=globalUploadedFile;
+  if(!text&&globalUploadedText)text=globalUploadedText;
+  if(!text&&!file){
+    resultEl.innerHTML="<p style='color:#FF8A80'>⚠️ Please upload a document or paste your profile text above before analyzing.</p>";
+    showToast("Upload or paste your profile first","error");
+    return;
+  }
+  resultEl.innerHTML='<span class="loading-spinner"></span> Analyzing your CSE profile with AI…';
+  // Try backend first
+  try{
+    const form=new FormData();
+    form.append("career_goal",goal);
+    if(role)form.append("target_role",role);
+    if(text)form.append("resume_text",text);
+    if(file)form.append("document",file);
+    const resp=await fetch(`${API_BASE}/cse/skill-gap/analyze`,{method:"POST",body:form});
+    if(resp.ok){renderCareerResult(resultEl,await resp.json(),goal);return}
+  }catch(e){console.log("Backend unavailable, using Claude directly")}
+  // Fallback: use Claude directly
+  let docText=text;
+  if(file&&!text){try{docText=await file.text()}catch(e){docText="Document uploaded but could not read as text."}}
+  await analyzeWithClaude(docText,goal,role,resultEl);
+  const newAch=Store.recordCareerAnalysis(goal);
+  newAch.forEach((a,i)=>setTimeout(()=>showAchToast(a),i*1600+400));
+  // Trigger recommendations
+  if(docText){
+    document.getElementById("recs-empty").classList.add("hidden");
+    document.getElementById("recs-content").classList.remove("hidden");
+    buildPlanFromAnalysis(docText,goal,role);
+  }
+}
+
+async function analyzeWithClaude(docText,goal,role,resultEl){
+  const labels={gate:"GATE CSE Examination",government_jobs:"Government Jobs (GATE/ISRO/SSC)",study_abroad:"Study Abroad (MS/PhD Programs)"};
+  const gateSkills="Engineering Mathematics, Data Structures, Algorithms, Theory of Computation, Compiler Design, Computer Organization, Digital Logic, Programming in C, DBMS, Operating Systems, Computer Networks, General Aptitude";
+  const govtSkills="Data Structures, Algorithms, DBMS, Operating Systems, Computer Networks, Quantitative Aptitude, Logical Reasoning, English Communication, Current Affairs/GK";
+  const abroadSkills="IELTS/TOEFL, GRE, SOP Writing, Research Methodology, Data Structures, Algorithms, DBMS, Academic English, Python/R, Project Portfolio";
+  const requiredSkills=goal==="gate"?gateSkills:goal==="government_jobs"?govtSkills:abroadSkills;
+  const prompt=`You are an expert CSE career counselor for Indian students. Analyze this student profile for: ${labels[goal]}${role?` (Target: ${role})`:""}.\n\nStudent Profile:\n${docText}\n\nRequired skills for ${labels[goal]}: ${requiredSkills}\n\nRespond ONLY with valid JSON (no markdown, no backticks, no preamble):\n{"goal_label":"${labels[goal]}","target_role":"${role||"General"}","readiness_percentage":<0-100 integer>,"skills_detected":["skill1","skill2"],"required_mandatory_skills":["skill1","skill2"],"missing_mandatory_skills":["skill1","skill2"],"good_to_have_skills":["skill1","skill2"],"recommendations":["action1","action2","action3","action4","action5"],"languages_required":[{"name":"English","level":"Required","reason":"Primary language of instruction"}],"acquisition_plan":[{"skill":"skill_name","steps":["step1","step2","step3"],"articles":[{"title":"Article Title","url":"https://example.com","tag":"Free Course"}]}]}\n\nFor acquisition_plan articles, provide real, relevant learning resources (GFG, NPTEL, Coursera, YouTube, official sites). Include 2-3 articles per skill.`;
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    const raw=d.content?.map(b=>b.text||"").join("")||"";
+    const clean=raw.replace(/```json|```/g,"").trim();
+    renderCareerResult(resultEl,JSON.parse(clean),goal);
+  }catch(e){
+    resultEl.innerHTML=`<p style="color:#FF8A80">⚠️ Analysis failed: ${e.message}. Please ensure Anthropic API access is configured.</p>`;
+  }
+}
+
+function renderCareerResult(el,data,goal){
+  const pct=data.readiness_percentage||0;
+  const circ=2*Math.PI*42;const fill=circ*(pct/100);
+  const color=pct>=70?"#69F0AE":pct>=40?"#FFD54F":"#FF8A80";
+  const have=(data.skills_detected||[]).map(s=>`<span class="skill-pill sph">✓ ${s}</span>`).join(" ");
+  const mandatory=(data.required_mandatory_skills||[]).map(s=>`<span class="skill-pill sph">● ${s}</span>`).join(" ");
+  const missing=(data.missing_mandatory_skills||[]).map(s=>`<span class="skill-pill spm">✗ ${s}</span>`).join(" ");
+  const optional=(data.good_to_have_skills||[]).map(s=>`<span class="skill-pill spo">○ ${s}</span>`).join(" ");
+  const recs=(data.recommendations||[]).map(r=>`<li>${r}</li>`).join("");
+  const langs=(data.languages_required||[]).map(l=>`<div class="lang-card"><div class="lang-name">${l.name}</div><div class="lang-desc">${l.reason||""}</div><span class="lang-level ${l.level==="Required"?"lang-req":"lang-hlp"}">${l.level}</span></div>`).join("");
+  const acquire=(data.acquisition_plan||[]).slice(0,6).map(a=>{
+    const arts=(a.articles||[]).map(art=>`<a class="article-card" href="${art.url||'#'}" target="_blank" style="margin-top:0"><span class="article-tag">${art.tag||'Resource'}</span><div class="article-title">${art.title}</div><div class="article-arrow">↗</div></a>`).join("");
+    return`<div class="acquire-card"><div class="acq-skill">${a.skill}</div><ul class="acq-steps">${(a.steps||[]).map(s=>`<li>${s}</li>`).join("")}</ul>${arts?`<div class="articles-grid" style="margin-top:12px">${arts}</div>`:""}</div>`;
+  }).join("");
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.07)">
+      <div class="readiness-wrap">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="42" fill="none" stroke="${color}" stroke-width="8" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${(circ-fill).toFixed(2)}" stroke-linecap="round" transform="rotate(-90 50 50)" style="transition:stroke-dashoffset 1.2s ease"/>
+          <text x="50" y="56" text-anchor="middle" font-family="Syne,sans-serif" font-size="18" font-weight="800" fill="${color}">${pct}%</text>
+        </svg>
+        <div class="readiness-lbl">Readiness</div>
+      </div>
+      <div>
+        <div style="font-family:Syne,sans-serif;font-size:18px;font-weight:800;margin-bottom:6px">${data.goal_label||""}</div>
+        <div style="font-size:13px;color:var(--text-muted)">Target: ${data.target_role||"General"}</div>
+        <div style="margin-top:8px;font-size:13px;font-weight:600;color:${color}">${pct>=70?"✅ Strong profile — keep going!":pct>=40?"🎯 Good start — close the gaps":"📚 More preparation needed"}</div>
+      </div>
+    </div>
+    <h4>✅ Skills You Already Have</h4><div style="margin-bottom:16px">${have||'<span class="muted">No matching skills detected — add more detail to your profile.</span>'}</div>
+    <h4>🎯 All Required Mandatory Skills</h4><div style="margin-bottom:16px">${mandatory||'<span class="muted">None defined.</span>'}</div>
+    <h4>❌ Missing / Weak Skills (Your Gaps)</h4><div style="margin-bottom:16px">${missing||'<span style="color:#69F0AE;font-weight:600">✨ No mandatory gaps detected — excellent!</span>'}</div>
+    ${optional?`<h4>💡 Good-to-Have Skills</h4><div style="margin-bottom:16px">${optional}</div>`:""}
+    ${goal==="study_abroad"&&langs?`<h4>🗣️ Language Requirements</h4><div class="lang-grid" style="margin-bottom:16px">${langs}</div>`:""}
+    <h4>🚀 How to Acquire Missing Skills + Resources</h4>${acquire||'<p class="muted">No acquisition plan generated.</p>'}
+    <h4>📋 Your Immediate Next Steps</h4><ul style="padding-left:18px;font-size:13px;color:var(--text-dim);line-height:1.8">${recs||"<li>Continue building on your existing strengths.</li>"}</ul>`;
+  setTimeout(initMag,100);
+}
+
+async function downloadCareerReport(goal){
+  const sfxMap={gate:"gate",government_jobs:"govt",study_abroad:"abroad"};
+  const sfx=sfxMap[goal];
+  const resultEl=document.getElementById("career-result-"+sfx);
+  let text=document.getElementById("global-text-input")?.value.trim()||"";
+  if(!text&&globalUploadedText)text=globalUploadedText;
+  const file=globalUploadedFile;
+  if(!text&&!file){resultEl.innerHTML="<p style='color:#FF8A80'>Please upload or paste your profile first.</p>";return}
+  try{
+    const form=new FormData();
+    form.append("career_goal",goal);
+    const role=document.getElementById("career-role-"+sfx)?.value||"";
+    if(role)form.append("target_role",role);
+    if(text)form.append("resume_text",text);
+    if(file)form.append("document",file);
+    const resp=await fetch(`${API_BASE}/cse/skill-gap/report`,{method:"POST",body:form});
+    if(!resp.ok)throw new Error("Report generation failed.");
+    const blob=await resp.blob();const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=`skilliq_${goal}_report.txt`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  }catch(e){showToast("Download failed: "+e.message,"error")}
+}
+
+// ============ RECOMMENDATIONS ============
+function buildPlanFromAnalysis(docText,goal,role){
+  const el=document.getElementById("recs-plan");
+  el.innerHTML=`<div class="card" style="text-align:center;padding:48px"><span class="loading-spinner"></span><span class="muted"> Claude is building your personalized plan…</span></div>`;
+  const labels={gate:"GATE CSE",government_jobs:"Government Jobs",study_abroad:"Study Abroad"};
+  const prompt=`You are an expert CSE learning coach. Based on this student profile:\n\n${docText.substring(0,1500)}\n\nGoal: ${labels[goal]}${role?" ("+role+")":""}\n\nCreate a structured 6-week improvement plan with the most critical skills first. For each skill: 2-3 specific exercises/resources, daily time allocation, specific topics to focus on, and 1-2 free online resources. Add a final motivating summary section. Format with skill names as section headers, practical short bullets. Max 500 words.`;
+  callClaude(prompt,t=>{el.innerHTML=`<div class="card"><div class="ai-response">${fmt(t)}</div></div>`},()=>{el.innerHTML=`<div class="card" style="text-align:center;padding:48px"><p class="muted">Could not generate plan. Please check API configuration.</p></div>`});
+}
+
+// ============ DEMO / DASHBOARD ============
+let results=null,radarChart=null,timeChart=null;
+const SKILLS_LOCAL=typeof SKILLS!=="undefined"?SKILLS:[];
+function loadDemoData(){
+  results={skillScores:{math:{score:72,acc:80,avgTime:18,errors:{easy:0,med:1,hard:0},total:5,correct:4},logic:{score:55,acc:60,avgTime:22,errors:{easy:1,med:1,hard:0},total:5,correct:3},aptitude:{score:84,acc:80,avgTime:14,errors:{easy:0,med:1,hard:0},total:5,correct:4},problem:{score:48,acc:40,avgTime:26,errors:{easy:1,med:1,hard:1},total:5,correct:2}},overallScore:65,totalCorrect:13,totalAns:20,avgTime:20};
+  buildDashboard();
+}
 function buildDashboard(){
-  if(!results){loadDemoData();return}
-  const r=results;
-  document.getElementById('m-score').textContent=r.overallScore;
-  document.getElementById('m-acc').textContent=Math.round(r.totalCorrect/r.totalAns*100)+'%';
-  document.getElementById('m-time').textContent=r.avgTime+'s';
-  document.getElementById('m-qs').textContent=r.totalAns;
-  buildSkillBreakdown(r.skillScores);buildRadar(r.skillScores);buildTimeChart(r.answers);
-  buildErrorAnalysis(r.skillScores);buildAIInsights(r);
-}
-function buildSkillBreakdown(sc){
-  const cols={math:'#378ADD',logic:'#7F77DD',aptitude:'#F59E0B',problem:'#10B981'};
-  document.getElementById('skill-breakdown').innerHTML=Object.entries(sc).map(([id,s])=>{
-    const sk=SKILLS.find(x=>x.id===id);
-    return`<div class="breakdown-row">
-      <div class="breakdown-label">${sk.icon} ${sk.name.split(' ')[0]}</div>
-      <div class="breakdown-bar-wrap"><div class="breakdown-bar-fill" style="width:${s.score}%;background:${cols[id]}"></div></div>
-      <div class="breakdown-pct">${s.score}</div></div>`;
-  }).join('');
-}
-function buildRadar(sc){
-  if(radarChart){radarChart.destroy();radarChart=null}
-  const ctx=document.getElementById('radarChart');if(!ctx)return;
-  radarChart=new Chart(ctx,{type:'radar',
-    data:{labels:Object.keys(sc).map(id=>SKILLS.find(s=>s.id===id).name.split(' ')[0]),
-      datasets:[{label:'Score',data:Object.values(sc).map(s=>s.score),
-        backgroundColor:'rgba(108,99,255,.12)',borderColor:'#6C63FF',pointBackgroundColor:'#6C63FF',pointRadius:5,pointHoverRadius:7}]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},
-      scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:10}},pointLabels:{font:{size:12,weight:'600'}}}}}});
-}
-function buildTimeChart(ans){
-  if(timeChart){timeChart.destroy();timeChart=null}
-  const ctx=document.getElementById('timeChart');if(!ctx)return;
-  const cols={math:'#378ADD',logic:'#7F77DD',aptitude:'#F59E0B',problem:'#10B981'};
-  timeChart=new Chart(ctx,{type:'bar',
-    data:{labels:ans.map((_,i)=>'Q'+(i+1)),
-      datasets:[{label:'Time (s)',data:ans.map(a=>a.time),backgroundColor:ans.map(a=>cols[a.skill]+'BB'),borderRadius:5,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{y:{beginAtZero:true,max:32,ticks:{callback:v=>v+'s',font:{size:11}}},
-        x:{ticks:{font:{size:10},autoSkip:false,maxRotation:0}}}}});
-}
-function buildErrorAnalysis(sc){
-  document.getElementById('error-analysis').innerHTML=Object.entries(sc).map(([id,s])=>{
-    const sk=SKILLS.find(x=>x.id===id),tot=s.errors.easy+s.errors.med+s.errors.hard;
-    if(!tot)return`<div class="breakdown-row"><span class="muted">${sk.icon} ${sk.name}: <strong style="color:var(--green)">No errors — perfect!</strong></span></div>`;
-    return`<div class="breakdown-row">
-      <div class="breakdown-label">${sk.icon} ${sk.name.split(' ')[0]}</div>
-      <div style="flex:1;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-        ${s.errors.easy?`<span class="diff diff-easy">${s.errors.easy} easy</span>`:''}
-        ${s.errors.med?`<span class="diff diff-med">${s.errors.med} medium</span>`:''}
-        ${s.errors.hard?`<span class="diff diff-hard">${s.errors.hard} hard</span>`:''}
-        <span class="muted">(${s.correct}/${s.total} correct)</span>
-      </div></div>`;
-  }).join('');
-}
-function buildAIInsights(r){
-  const el=document.getElementById('ai-insights-section');
-  el.innerHTML=`<div style="padding:12px 0;display:flex;align-items:center;gap:10px">
-    <span class="loading-spinner"></span><span class="muted">Claude is analyzing your performance…</span></div>
-    <div>${[1,2,3].map(()=>`<div class="shimmer" style="width:${80+Math.random()*20}%"></div>`).join('')}</div>`;
-  callClaude(buildInsightPrompt(r),t=>{el.innerHTML=`<div class="ai-response">${fmt(t)}</div>`},
-    ()=>{el.innerHTML=`<div class="ai-response"><p class="muted">AI insights unavailable. Configure a valid Anthropic API key on the server.</p></div>`});
-}
-
-/* RECS */
-function buildRecommendations(){
   if(!results)return;
-  document.getElementById('recs-empty').classList.add('hidden');
-  document.getElementById('recs-content').classList.remove('hidden');
-  const el=document.getElementById('recs-plan');
-  el.innerHTML=`<div class="card" style="text-align:center;padding:40px">
-    <span class="loading-spinner"></span><span class="muted"> Claude is building your personalized plan…</span></div>`;
-  callClaude(buildPlanPrompt(results),t=>{el.innerHTML=`<div class="card"><div class="ai-response">${fmt(t)}</div></div>`},
-    ()=>{el.innerHTML=`<div class="card" style="text-align:center;padding:40px"><p class="muted">Could not generate plan. Please check your API key.</p></div>`});
+  const r=results;
+  document.getElementById("m-score").textContent=r.overallScore;
+  document.getElementById("m-acc").textContent=Math.round(r.totalCorrect/r.totalAns*100)+"%";
+  document.getElementById("m-time").textContent=r.avgTime+"s";
+  document.getElementById("m-qs").textContent=r.totalAns;
+  // Skill breakdown
+  const bd=document.getElementById("skill-breakdown");
+  bd.innerHTML=Object.entries(r.skillScores).map(([id,s])=>{
+    const sk=(SKILLS_LOCAL||[]).find(x=>x.id===id)||{name:id,color:"#7986CB"};
+    return`<div class="breakdown-row"><div class="breakdown-label">${sk.name||id}</div><div class="breakdown-bar-wrap"><div class="breakdown-bar-fill" style="width:${s.score}%;background:${sk.color||"#7986CB"}"></div></div><div class="breakdown-pct">${s.score}</div></div>`;
+  }).join("");
+  // Radar chart
+  if(radarChart)radarChart.destroy();
+  const rCtx=document.getElementById("radarChart")?.getContext("2d");
+  if(rCtx){
+    radarChart=new Chart(rCtx,{type:"radar",data:{labels:Object.keys(r.skillScores).map(id=>{const sk=(SKILLS_LOCAL||[]).find(x=>x.id===id);return sk?sk.name:id}),datasets:[{label:"Score",data:Object.values(r.skillScores).map(s=>s.score),borderColor:"rgba(121,134,203,.9)",backgroundColor:"rgba(92,107,192,.18)",pointBackgroundColor:"#7986CB",pointRadius:5}]},options:{scales:{r:{beginAtZero:true,max:100,ticks:{display:false},grid:{color:"rgba(255,255,255,.06)"},angleLines:{color:"rgba(255,255,255,.06)"},pointLabels:{color:"rgba(255,255,255,.6)",font:{size:11}}}},plugins:{legend:{display:false}}}});
+  }
+  // Error analysis
+  const ea=document.getElementById("error-analysis");
+  ea.innerHTML=Object.entries(r.skillScores).map(([id,s])=>{
+    const sk=(SKILLS_LOCAL||[]).find(x=>x.id===id)||{name:id};
+    const total=s.errors.easy+s.errors.med+s.errors.hard;
+    if(!total)return`<div style="padding:8px 0;font-size:13px;color:var(--text-muted)">✅ ${sk.name} — No errors</div>`;
+    return`<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)"><strong style="font-size:13px">${sk.name}</strong><div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap"><span class="diff diff-easy">Easy: ${s.errors.easy}</span><span class="diff diff-med">Med: ${s.errors.med}</span><span class="diff diff-hard">Hard: ${s.errors.hard}</span></div></div>`;
+  }).join("");
+  showPage("dashboard");
 }
 
-/* CLAUDE */
-function buildInsightPrompt(r){
-  const d=Object.entries(r.skillScores).map(([id,s])=>{
-    const sk=SKILLS.find(x=>x.id===id);
-    return`${sk.name}: score=${s.score}/100, accuracy=${s.acc}%, avg_time=${s.avgTime}s, errors_easy=${s.errors.easy}, errors_med=${s.errors.med}, errors_hard=${s.errors.hard}`;
-  }).join('\n');
-  return`You are an expert academic performance analyst. Student results:\n\n${d}\n\nOverall: ${r.overallScore}/100, Accuracy: ${Math.round(r.totalCorrect/r.totalAns*100)}%, Avg time: ${r.avgTime}s\n\nProvide a concise analysis (3-4 paragraphs) covering: strongest/weakest areas, what error patterns reveal about knowledge gaps vs strategy, response time patterns, one key insight. Be specific, encouraging, actionable. No markdown headers — flowing paragraphs.`;
-}
-function buildPlanPrompt(r){
-  const d=Object.entries(r.skillScores).map(([id,s])=>{
-    const sk=SKILLS.find(x=>x.id===id);
-    return`${sk.name}: score=${s.score}/100, accuracy=${s.acc}%, errors_easy=${s.errors.easy}, errors_med=${s.errors.med}, errors_hard=${s.errors.hard}`;
-  }).join('\n');
-  return`You are an expert learning coach. Student results:\n\n${d}\n\nCreate a structured 4-week improvement plan. Worst-performing skills first. For each skill: 2-3 specific exercises/techniques, daily time, specific topics from error types, 1 resource type. Final section: 3 general study strategies. Format with skill names as labels, short bullets, practical advice. Motivating. Max 400 words.`;
-}
+// ============ CLAUDE API ============
 async function callClaude(prompt,onOk,onErr){
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    const d=await r.json();
-    const t=d.content?.map(b=>b.text||'').join('')||'';
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();const t=d.content?.map(b=>b.text||"").join("")||"";
     if(t)onOk(t);else onErr();
   }catch(e){console.error(e);onErr()}
 }
 function fmt(text){
-  return text.split('\n').filter(l=>l.trim()).map(l=>{
+  return text.split("\n").filter(l=>l.trim()).map(l=>{
     const t=l.trim();
-    if(t.startsWith('- ')||t.startsWith('• '))return`<li>${t.slice(2)}</li>`;
-    if(t.endsWith(':')&&t.length<60)return`<h4>${t}</h4>`;
+    if(t.startsWith("- ")||t.startsWith("• "))return`<li>${t.slice(2)}</li>`;
+    if(t.endsWith(":")&&t.length<70)return`<h4>${t}</h4>`;
     return`<p>${t}</p>`;
-  }).join('');
+  }).join("");
 }
 
-/* DEMO */
-function loadDemoData(){
-  results={
-    skillScores:{
-      math:{score:72,acc:80,avgTime:18,errors:{easy:0,med:1,hard:0},total:5,correct:4},
-      logic:{score:55,acc:60,avgTime:22,errors:{easy:1,med:1,hard:0},total:5,correct:3},
-      aptitude:{score:84,acc:80,avgTime:14,errors:{easy:0,med:1,hard:0},total:5,correct:4},
-      problem:{score:48,acc:40,avgTime:26,errors:{easy:1,med:1,hard:1},total:5,correct:2}
-    },
-    overallScore:65,totalCorrect:13,totalAns:20,avgTime:20,
-    answers:Array.from({length:20},(_,i)=>({
-      skill:['math','math','math','math','math','logic','logic','logic','logic','logic','aptitude','aptitude','aptitude','aptitude','aptitude','problem','problem','problem','problem','problem'][i],
-      correct:i%3!==2,time:12+Math.round(Math.random()*18),diff:['easy','med','hard'][i%3]
-    }))};
-  buildDashboard();
-}
-
-/* BACKEND */
-function getModelStatusEl(){return document.getElementById('model-status')}
-function buildBackendPayload(r,ts=null){
-  const sc=r.skillScores||{};
-  return{selected_skills_count:selectedSkills.length||Object.keys(sc).length||1,
-    total_questions:r.totalAns,total_correct:r.totalCorrect,
-    accuracy_pct:r.totalAns?Math.round(r.totalCorrect/r.totalAns*1000)/10:0,
-    avg_time_sec:r.avgTime,overall_score:r.overallScore,
-    math_score:sc.math?.score||0,logic_score:sc.logic?.score||0,
-    aptitude_score:sc.aptitude?.score||0,problem_score:sc.problem?.score||0,target_score:ts};
-}
-async function autoSaveAssessmentRecord(){
-  if(!CAN_ACCESS_MODEL_ACTIONS)return;
-  const el=getModelStatusEl();if(!el||!results)return;
-  el.textContent='Saving assessment record…';
-  try{
-    const r=await fetch(`${API_BASE}/assessments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildBackendPayload(results,null))});
-    const b=await r.json();if(!r.ok)throw new Error(b.detail||'Save failed.');
-    latestAssessmentId=b.id;el.textContent=`✅ Saved as record #${b.id}. Add a target score to label it.`;
-  }catch(e){el.textContent=`Backend save failed: ${e.message}`}
-}
-async function saveTargetLabel(){
-  if(!CAN_ACCESS_MODEL_ACTIONS)return;
-  const el=getModelStatusEl();if(!latestAssessmentId){if(el)el.textContent='No saved record found.';return}
-  const v=Number(document.getElementById('target-score-input').value);
-  if(isNaN(v)||v<0||v>100){if(el)el.textContent='Enter a valid score 0–100.';return}
-  el.textContent='Saving label…';
-  try{
-    const r=await fetch(`${API_BASE}/assessments/${latestAssessmentId}/label`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_score:v})});
-    const b=await r.json();if(!r.ok)throw new Error(b.detail||'Label save failed.');
-    el.textContent=`✅ Label saved for #${b.id}.`;
-  }catch(e){el.textContent=`Label save failed: ${e.message}`}
-}
-async function predictFromLatestAssessment(){
-  if(!CAN_ACCESS_MODEL_ACTIONS)return;
-  const el=getModelStatusEl();if(!results){el.textContent='No results.';return}
-  el.textContent='Predicting…';
-  try{const r=await fetch(`${API_BASE}/predict`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildBackendPayload(results,null))});
-    const b=await r.json();if(!r.ok)throw new Error(b.detail||'Prediction failed.');
-    el.textContent=`🎯 Predicted: ${b.predicted_target_score}`;
-  }catch(e){el.textContent=`Prediction failed: ${e.message}`}
-}
-async function predictExternalModelsFromLatestAssessment(){
-  if(!CAN_ACCESS_MODEL_ACTIONS)return;
-  const el=getModelStatusEl();if(!results){el.textContent='No results.';return}
-  el.textContent='Running external models…';
-  try{const r=await fetch(`${API_BASE}/external/predict`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildBackendPayload(results,null))});
-    const b=await r.json();if(!r.ok)throw new Error(b.detail||'Failed.');
-    el.textContent=`🤖 Score: ${b.predicted_score}, Risk: ${b.risk_assessment?.predicted_label||'?'}, Grade: ${b.grade_classification?.predicted_grade||'?'}`;
-  }catch(e){el.textContent=`External predict failed: ${e.message}`}
-}
-async function importKaggleDataFromUI(){
-  if(!CAN_ACCESS_MODEL_ACTIONS)return;
-  const el=getModelStatusEl();
-  const cf=document.getElementById('kaggle-csv-file').files?.[0];
-  const mf=document.getElementById('kaggle-map-file').files?.[0];
-  if(!cf||!mf){el.textContent='Select both CSV and JSON files.';return}
-  const fd=new FormData();fd.append('csv_file',cf);fd.append('mapping_file',mf);
-  el.textContent='Importing…';
-  try{const r=await fetch(`${API_BASE}/import-kaggle`,{method:'POST',body:fd});
-    const b=await r.json();if(!r.ok)throw new Error(b.detail||'Import failed.');
-    el.textContent=`✅ Imported ${b.imported_rows}, skipped ${b.skipped_rows}.`;
-  }catch(e){el.textContent=`Import failed: ${e.message}`}
-}
-
-async function analyzeCareerGap(){
-  const resultEl=document.getElementById('career-result');
-  const goal=document.getElementById('career-goal').value;
-  const role=document.getElementById('career-role').value;
-  const text=document.getElementById('career-text').value.trim();
-  const file=document.getElementById('career-doc').files?.[0];
-
-  if(!text && !file){
-    resultEl.textContent='Provide text or upload a document first.';
-    return;
+// ============ PROFILE ============
+function updateProfile(){
+  if(!_u)return;
+  const _sd=Store.get();
+  document.getElementById("prof-score").textContent=_sd.bestScore||"—";
+  document.getElementById("prof-assessments").textContent=_sd.assessmentCount||0;
+  const latest=_sd.assessmentHistory[0];
+  if(latest){
+    document.getElementById("profile-history").innerHTML=`<div style="display:flex;align-items:center;gap:14px;padding:12px 0"><div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--indigo),var(--pink));display:flex;align-items:center;justify-content:center;font-size:18px">🎯</div><div style="flex:1"><div style="font-weight:600;font-size:13px">Analysis — ${(latest.skills||[]).length} skill(s)</div><div class="muted" style="font-size:11px">${latest.date}</div></div><div style="font-family:Syne,sans-serif;font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--indigo-l),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${latest.score}</div></div>`;
   }
-
-  const form=new FormData();
-  form.append('career_goal',goal);
-  if(role)form.append('target_role',role);
-  if(text)form.append('resume_text',text);
-  if(file)form.append('document',file);
-
-  resultEl.innerHTML='<span class="loading-spinner"></span> Analyzing your CSE profile...';
-  try{
-    const resp=await fetch(`${API_BASE}/cse/skill-gap/analyze`,{method:'POST',body:form});
-    const data=await resp.json();
-    if(!resp.ok)throw new Error(data.detail||'Analysis failed.');
-
-    const mandatory=(data.required_mandatory_skills||[]).map(s=>`<li>${s}</li>`).join('');
-    const have=(data.skills_detected||[]).map(s=>`<li>${s}</li>`).join('');
-    const missing=(data.missing_mandatory_skills||[]).map(s=>`<li>${s}</li>`).join('');
-    const recs=(data.recommendations||[]).map(s=>`<li>${s}</li>`).join('');
-    const prof=Object.entries(data.skill_proficiency||{}).map(([skill,p])=>`<li>${skill}: ${p.level} (confidence ${p.confidence}%)</li>`).join('');
-
-    resultEl.innerHTML=`
-      <p><strong>Goal:</strong> ${data.goal_label}${data.target_role?` | <strong>Role:</strong> ${data.target_role}`:''} | <strong>Readiness:</strong> ${data.readiness_percentage}%</p>
-      <h4>Mandatory Skills Required</h4>
-      <ul>${mandatory || '<li>No mandatory skills defined.</li>'}</ul>
-      <h4>Skills You Have</h4>
-      <ul>${have || '<li>No matching skills detected.</li>'}</ul>
-      <h4>Skill Proficiency</h4>
-      <ul>${prof || '<li>No proficiency data available.</li>'}</ul>
-      <h4>Remaining Mandatory Skills</h4>
-      <ul>${missing || '<li>Great! No mandatory gaps found.</li>'}</ul>
-      <h4>Next Steps</h4>
-      <ul>${recs || '<li>Keep practicing advanced projects and mocks.</li>'}</ul>
-    `;
-  }catch(e){
-    resultEl.textContent=`Analysis failed: ${e.message}`;
+  if(results){
+    const k=Object.keys(results.skillScores).length;
+    document.getElementById("achievements").innerHTML=`<div class="ach-green">🏆 First Analysis</div>${results.overallScore>=80?'<div class="ach-amber">⭐ Score 80+</div>':'<div class="ach-locked">🔒 Score 80+</div>'}${k>=3?'<div class="ach-green">🎯 All Paths</div>':'<div class="ach-locked">🔒 All Paths</div>'}<div class="ach-locked">🔒 5-Day Streak</div>`;
   }
 }
 
-async function downloadCareerReport(){
-  const resultEl=document.getElementById('career-result');
-  const goal=document.getElementById('career-goal').value;
-  const role=document.getElementById('career-role').value;
-  const text=document.getElementById('career-text').value.trim();
-  const file=document.getElementById('career-doc').files?.[0];
-
-  if(!text && !file){
-    resultEl.textContent='Provide text or upload a document first.';
-    return;
-  }
-
-  const form=new FormData();
-  form.append('career_goal',goal);
-  if(role)form.append('target_role',role);
-  if(text)form.append('resume_text',text);
-  if(file)form.append('document',file);
-
-  try{
-    const resp=await fetch(`${API_BASE}/cse/skill-gap/report`,{method:'POST',body:form});
-    if(!resp.ok){
-      const data=await resp.json();
-      throw new Error(data.detail||'Report generation failed.');
-    }
-
-    const blob=await resp.blob();
-    const url=URL.createObjectURL(blob);
-    const dispo=resp.headers.get('Content-Disposition')||'';
-    const match=dispo.match(/filename=([^;]+)/i);
-    const filename=match?match[1].replace(/"/g,'').trim():'skilliq_cse_skill_gap_report.txt';
-    const a=document.createElement('a');
-    a.href=url;
-    a.download=filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }catch(e){
-    resultEl.textContent=`Report download failed: ${e.message}`;
-  }
+// ============ PROGRESS PAGE ============
+function buildProgressPage(){
+  const data=Store.get();
+  document.getElementById("progress-metrics").innerHTML=`
+    <div class="metric"><div class="metric-label">Total Analyses</div><div class="metric-val">${data.assessmentCount}</div></div>
+    <div class="metric"><div class="metric-label">Best Score</div><div class="metric-val">${data.bestScore||"—"}</div></div>
+    <div class="metric"><div class="metric-label">Achievements</div><div class="metric-val">${data.unlockedAchievements.length}/${ACHIEVEMENTS.length}</div></div>
+    <div class="metric"><div class="metric-label">Career Analyses</div><div class="metric-val">${data.careerAnalysesDone||0}</div></div>`;
+  document.getElementById("prog-streak").textContent=data.streak||0;
+  document.getElementById("prog-streak-msg").textContent=data.streak>=7?"🔮 You're on fire! Week Warrior streak!":data.streak>=3?"📅 Great consistency! Keep going!":data.streak>=1?`Day ${data.streak} — come back tomorrow to continue!`:"Complete an analysis to start a streak!";
+  buildWeeklyChart(data.weeklyScores);
+  buildAchievementsGrid(document.getElementById("achievements-grid"));
+  const hl=document.getElementById("history-list");
+  if(!data.assessmentHistory.length){hl.innerHTML='<p class="muted">No analysis history yet.</p>';return}
+  const skillColors={math:"#378ADD",logic:"#7F77DD",aptitude:"#BA7517",problem:"#1D9E75"};
+  hl.innerHTML=data.assessmentHistory.map(h=>{
+    const scoreColor=h.score>=80?"#69F0AE":h.score>=60?"#FFD54F":"#FF8A80";
+    return`<div class="history-row"><div class="history-score" style="color:${scoreColor}">${h.score}</div><div class="history-meta"><strong>${h.date}</strong></div><div class="muted" style="font-size:12px">${h.accuracy||""}% acc</div></div>`;
+  }).join("");
+}
+function buildWeeklyChart(scores){
+  const el=document.getElementById("weekly-chart-wrap");
+  if(!scores||!scores.length){el.innerHTML='<p class="muted" style="font-size:12px;padding:12px 0">No data yet — run analyses to see your trend.</p>';return}
+  const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const maxScore=Math.max(...scores.map(s=>s.score),100);
+  el.innerHTML=`<div class="week-bar-grid">${scores.map(s=>{const d=new Date(s.date);const pct=Math.max(5,Math.round(s.score/maxScore*100));return`<div class="week-bar-wrap"><div class="week-bar" style="height:${pct}%" title="${s.score}"></div><div class="week-bar-day">${days[d.getDay()]}</div></div>`}).join("")}</div><p class="muted" style="font-size:11px;text-align:center">Last ${scores.length} analysis${scores.length>1?"es":""}</p>`;
+}
+function buildAchievementsGrid(container,compact=false){
+  if(!container||typeof ACHIEVEMENTS==="undefined")return;
+  const data=Store.get();
+  container.innerHTML=ACHIEVEMENTS.map(a=>{
+    const unlocked=data.unlockedAchievements.includes(a.id);
+    if(compact)return`<div class="${unlocked?"ach-green":"ach-locked"}" title="${a.desc}">${a.icon} ${a.label}</div>`;
+    return`<div class="ach-card ${unlocked?"unlocked":"locked"}"><div class="ach-icon-wrap">${a.icon}</div><div><div class="ach-name">${a.label}</div><div class="ach-desc">${a.desc}</div></div></div>`;
+  }).join("");
 }
 
-async function downloadCareerPdfReport(){
-  const resultEl=document.getElementById('career-result');
-  const goal=document.getElementById('career-goal').value;
-  const role=document.getElementById('career-role').value;
-  const text=document.getElementById('career-text').value.trim();
-  const file=document.getElementById('career-doc').files?.[0];
-
-  if(!text && !file){
-    resultEl.textContent='Provide text or upload a document first.';
-    return;
-  }
-
-  const form=new FormData();
-  form.append('career_goal',goal);
-  if(role)form.append('target_role',role);
-  if(text)form.append('resume_text',text);
-  if(file)form.append('document',file);
-
-  try{
-    const resp=await fetch(`${API_BASE}/cse/skill-gap/report-pdf`,{method:'POST',body:form});
-    if(!resp.ok){
-      const data=await resp.json();
-      throw new Error(data.detail||'PDF generation failed.');
-    }
-
-    const blob=await resp.blob();
-    const url=URL.createObjectURL(blob);
-    const dispo=resp.headers.get('Content-Disposition')||'';
-    const match=dispo.match(/filename=([^;]+)/i);
-    const filename=match?match[1].replace(/"/g,'').trim():'skilliq_cse_skill_gap_report.pdf';
-    const a=document.createElement('a');
-    a.href=url;
-    a.download=filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }catch(e){
-    resultEl.textContent=`PDF download failed: ${e.message}`;
-  }
+// ============ ACHIEVEMENT TOAST ============
+function showAchToast(ach){
+  const t=document.getElementById("ach-toast");
+  document.getElementById("ach-toast-icon").textContent=ach.icon;
+  document.getElementById("ach-toast-name").textContent="Achievement Unlocked: "+ach.label;
+  document.getElementById("ach-toast-desc").textContent=ach.desc;
+  t.classList.add("show");setTimeout(()=>t.classList.remove("show"),4000);
 }
 
-function updateCareerRoleOptions(){
-  const goalEl=document.getElementById('career-goal');
-  const roleEl=document.getElementById('career-role');
-  if(!goalEl||!roleEl)return;
+// ============ MODEL ACTIONS (admin/teacher) ============
+function getModelStatusEl(){return document.getElementById("model-status")}
+function buildBackendPayload(r,ts=null){const sc=r.skillScores||{};return{selected_skills_count:Object.keys(sc).length||1,total_questions:r.totalAns,total_correct:r.totalCorrect,accuracy_pct:r.totalAns?Math.round(r.totalCorrect/r.totalAns*1000)/10:0,avg_time_sec:r.avgTime,overall_score:r.overallScore,math_score:sc.math?.score||0,logic_score:sc.logic?.score||0,aptitude_score:sc.aptitude?.score||0,problem_score:sc.problem?.score||0,target_score:ts}}
 
-  const goal=goalEl.value;
-  const options=CAREER_ROLE_OPTIONS[goal]||[];
-  roleEl.innerHTML='<option value="">Auto / General</option>'+
-    options.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
-}
-
-function initMagneticButtons(){
-  if(window.matchMedia('(pointer: coarse)').matches)return;
-  const items=document.querySelectorAll('button,.btn,.nav-tab,.nav-logout-btn');
-  items.forEach(el=>{
-    el.classList.add('magnetic-ready');
-    el.addEventListener('mousemove',ev=>{
-      const rect=el.getBoundingClientRect();
-      const x=(ev.clientX-rect.left)/rect.width-0.5;
-      const y=(ev.clientY-rect.top)/rect.height-0.5;
-      el.style.transform=`translate(${x*10}px, ${y*8}px)`;
-    });
-    el.addEventListener('mouseleave',()=>{
-      el.style.transform='';
-    });
-  });
-}
-
-/* INIT */
-applyModelActionsVisibility();
-renderSkillSelector();
-initMagneticButtons();
-updateCareerRoleOptions();
-document.getElementById('career-goal')?.addEventListener('change',updateCareerRoleOptions);
+// ============ INIT ============
+switchCareerTab("gate");
+setTimeout(initMag,400);
 </script>
 </body>
 </html>
