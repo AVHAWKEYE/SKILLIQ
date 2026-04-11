@@ -977,4 +977,12 @@ async def websocket_live_test(websocket: WebSocket, test_id: int, student_id: in
 
 # ========== STATIC FILES ==========
 WEB_ROOT = Path(__file__).resolve().parent.parent / "frontend"
-app.mount("/", StaticFiles(directory=str(WEB_ROOT), html=True), name="web")
+if WEB_ROOT.exists():
+    app.mount("/", StaticFiles(directory=str(WEB_ROOT), html=True), name="web")
+else:
+    @app.get("/")
+    def web_root_fallback():
+        return {
+            "message": "SkillIQ API is running",
+            "docs": "/docs",
+        }
