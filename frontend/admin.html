@@ -9,12 +9,122 @@
 <link rel="stylesheet" href="css/glass.css">
 <style>
 .section { padding: 16px 20px; }
+.section.hidden { display: none !important; }
+.section.active { display: block; }
 .topbar { padding: 12px 20px; }
 .stats-grid { gap: 12px; }
 .stat-card { padding: 14px; }
 .glass-card { padding: 16px; }
 .cards-row { grid-template-columns: 1.35fr 1fr; gap: 12px; }
 .data-table td, .data-table th { padding: 10px 10px; }
+.topbar {
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.topbar-sub {
+  color: rgba(255,255,255,.7);
+  letter-spacing: .01em;
+}
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(135deg, rgba(255,107,157,.18), rgba(67,232,216,.14));
+  color: rgba(255,255,255,.92);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 10px;
+}
+.stats-grid .stat-card,
+.cards-row .glass-card {
+  position: relative;
+  overflow: hidden;
+}
+.stats-grid .stat-card::after,
+.cards-row .glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 120% -10%, rgba(255,255,255,.16), transparent 45%);
+  pointer-events: none;
+}
+.stats-grid .stat-card {
+  transition: transform .24s ease, box-shadow .24s ease;
+}
+.stats-grid .stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.24);
+}
+.cards-row .glass-card {
+  transition: transform .22s ease, border-color .22s ease;
+}
+.cards-row .glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.2);
+}
+.leader-row,
+.activity-item,
+.setting-row {
+  transition: background-color .2s ease;
+}
+.leader-row:hover,
+.activity-item:hover,
+.setting-row:hover {
+  background-color: rgba(255,255,255,.05);
+}
+.overview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.overview-toolbar .left,
+.overview-toolbar .right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.admin-chip {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.88);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.admin-select {
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(13,17,28,.6);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+}
+.table-shell {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+}
+.table-shell .data-table {
+  min-width: 760px;
+}
+.section-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: sectionIn .34s ease forwards;
+}
+@keyframes sectionIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .mobile-sidebar-backdrop {
   position: fixed;
   inset: 0;
@@ -34,6 +144,11 @@
 @media (max-width: 640px) {
   .section { padding: 12px; }
   .topbar { padding: 10px 12px; }
+  .overview-toolbar { flex-direction: column; align-items: stretch; }
+  .overview-toolbar .left,
+  .overview-toolbar .right { width: 100%; }
+  .overview-toolbar .right .btn-primary-sm,
+  .overview-toolbar .right .btn-xs { flex: 1; }
 }
 </style>
 </head>
@@ -55,12 +170,12 @@
     </div>
   </div>
   <nav class="sidebar-nav">
-    <a class="nav-item active" onclick="showSection('overview')">📊 Overview</a>
-    <a class="nav-item" onclick="showSection('users')">👥 User Management</a>
-    <a class="nav-item" onclick="showSection('analytics')">📈 System Analytics</a>
-    <a class="nav-item" onclick="showSection('assessments')">📋 Assessments</a>
-    <a class="nav-item" onclick="showSection('settings')">⚙️ Settings</a>
-    <a class="nav-item" onclick="showSection('reports')">📄 Reports</a>
+    <a class="nav-item active" onclick="showSection('overview', this)">📊 Overview</a>
+    <a class="nav-item" onclick="showSection('users', this)">👥 User Management</a>
+    <a class="nav-item" onclick="showSection('analytics', this)">📈 System Analytics</a>
+    <a class="nav-item" onclick="showSection('assessments', this)">📋 Assessments</a>
+    <a class="nav-item" onclick="showSection('settings', this)">⚙️ Settings</a>
+    <a class="nav-item" onclick="showSection('reports', this)">📄 Reports</a>
   </nav>
   <div class="sidebar-footer">
     <div class="user-chip">
@@ -92,6 +207,23 @@
 
   <!-- ===== OVERVIEW SECTION ===== -->
   <div class="section active" id="sec-overview">
+    <div class="section-kicker">Overview • Live Ops</div>
+    <div class="overview-toolbar glass-card">
+      <div class="left">
+        <span class="admin-chip">Admin Command Center</span>
+        <span class="admin-chip">Live Monitoring Enabled</span>
+      </div>
+      <div class="right">
+        <select id="range-select" class="admin-select" aria-label="Select analytics range">
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
+        </select>
+        <button class="btn-primary-sm" onclick="refreshOverview()">Refresh Metrics</button>
+        <button class="btn-xs" onclick="showAlert('Snapshot exported.','success')">Export Snapshot</button>
+      </div>
+    </div>
+
     <div class="stats-grid">
       <div class="stat-card admin-accent">
         <div class="stat-icon">👥</div>
@@ -156,6 +288,7 @@
 
   <!-- ===== USERS SECTION ===== -->
   <div class="section hidden" id="sec-users">
+    <div class="section-kicker">Users • Identity & Access</div>
     <div class="section-actions">
       <input type="text" class="search-input" placeholder="🔍 Search users..." oninput="filterUsers(this.value)" id="user-search">
       <div class="filter-pills">
@@ -166,17 +299,20 @@
       <button class="btn-primary-sm" onclick="showAddUserModal()">+ Add User</button>
     </div>
     <div class="glass-card">
-      <table class="data-table">
-        <thead>
-          <tr><th>User</th><th>Role</th><th>Status</th><th>Assessments</th><th>Joined</th><th>Actions</th></tr>
-        </thead>
-        <tbody id="users-table"></tbody>
-      </table>
+      <div class="table-shell">
+        <table class="data-table">
+          <thead>
+            <tr><th>User</th><th>Role</th><th>Status</th><th>Assessments</th><th>Joined</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="users-table"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
   <!-- ===== ANALYTICS SECTION ===== -->
   <div class="section hidden" id="sec-analytics">
+    <div class="section-kicker">Analytics • Trends & Signals</div>
     <div class="cards-row">
       <div class="glass-card chart-card">
         <div class="card-header">📊 Monthly Growth</div>
@@ -195,6 +331,7 @@
 
   <!-- ===== ASSESSMENTS SECTION ===== -->
   <div class="section hidden" id="sec-assessments">
+    <div class="section-kicker">Assessments • Quality Tracking</div>
     <div class="stats-grid mini">
       <div class="stat-card"><div class="stat-val">9,421</div><div class="stat-label">Total Assessments</div></div>
       <div class="stat-card"><div class="stat-val">342</div><div class="stat-label">Today</div></div>
@@ -203,15 +340,18 @@
     </div>
     <div class="glass-card">
       <div class="card-header">📋 Recent Assessments</div>
-      <table class="data-table">
-        <thead><tr><th>User</th><th>Skills</th><th>Score</th><th>Accuracy</th><th>Time</th><th>Risk</th></tr></thead>
-        <tbody id="assessments-table"></tbody>
-      </table>
+      <div class="table-shell">
+        <table class="data-table">
+          <thead><tr><th>User</th><th>Skills</th><th>Score</th><th>Accuracy</th><th>Time</th><th>Risk</th></tr></thead>
+          <tbody id="assessments-table"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
   <!-- ===== SETTINGS SECTION ===== -->
   <div class="section hidden" id="sec-settings">
+    <div class="section-kicker">Settings • Platform Controls</div>
     <div class="cards-row">
       <div class="glass-card">
         <div class="card-header">⚙️ Platform Settings</div>
@@ -238,6 +378,7 @@
 
   <!-- ===== REPORTS SECTION ===== -->
   <div class="section hidden" id="sec-reports">
+    <div class="section-kicker">Reports • Export & Sharing</div>
     <div class="cards-row">
       <div class="glass-card">
         <div class="card-header">📄 Generate Reports</div>
@@ -289,13 +430,30 @@ function updateClock() {
 updateClock(); setInterval(updateClock, 1000);
 
 // Section switching
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-  document.getElementById('sec-' + id).classList.remove('hidden');
+function showSection(id, navEl) {
+  document.querySelectorAll('.section').forEach(s => {
+    s.classList.add('hidden');
+    s.classList.remove('active');
+    s.classList.remove('section-reveal');
+  });
+  const target = document.getElementById('sec-' + id);
+  target.classList.remove('hidden');
+  target.classList.add('active');
+  target.classList.add('section-reveal');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  if (navEl) navEl.classList.add('active');
   const titles = { overview:'Overview', users:'User Management', analytics:'System Analytics', assessments:'Assessments', settings:'Settings', reports:'Reports' };
+  const subtitles = {
+    overview:'System-wide performance metrics',
+    users:'User lifecycle and access overview',
+    analytics:'Usage trends and skill intelligence',
+    assessments:'Assessment quality and risk signals',
+    settings:'Configure platform behavior',
+    reports:'Generate and export operational reports'
+  };
   document.getElementById('section-title').textContent = titles[id];
+  const subEl = document.querySelector('.topbar-sub');
+  if (subEl) subEl.textContent = subtitles[id] || '';
 }
 
 // ===== CHARTS =====
@@ -404,6 +562,7 @@ const users = [
 ];
 
 let filteredUsers = [...users];
+let currentSearchQuery = '';
 
 function renderUsers(data) {
   const roleColors = { admin: '#FF6B9D', user: '#6C63FF' };
@@ -421,8 +580,8 @@ function renderUsers(data) {
 renderUsers(users);
 
 function filterUsers(q) {
-  filteredUsers = users.filter(u => u.name.toLowerCase().includes(q.toLowerCase()) || u.email.toLowerCase().includes(q.toLowerCase()));
-  renderUsers(filteredUsers);
+  currentSearchQuery = (q || '').toLowerCase();
+  applyUserFilters();
 }
 
 let currentRoleFilter = 'all';
@@ -430,8 +589,18 @@ function filterRole(role, el) {
   currentRoleFilter = role;
   document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
-  const data = role === 'all' ? users : users.filter(u => u.role === role);
-  renderUsers(data);
+  applyUserFilters();
+}
+
+function applyUserFilters() {
+  filteredUsers = users.filter(u => {
+    const byRole = currentRoleFilter === 'all' || u.role === currentRoleFilter;
+    const bySearch = !currentSearchQuery
+      || u.name.toLowerCase().includes(currentSearchQuery)
+      || u.email.toLowerCase().includes(currentSearchQuery);
+    return byRole && bySearch;
+  });
+  renderUsers(filteredUsers);
 }
 
 // Assessments table
@@ -529,6 +698,12 @@ function initTopbarScrollBehavior() {
   }, { passive: true });
 }
 
+function refreshOverview() {
+  const range = document.getElementById('range-select')?.value || '7d';
+  const labels = { '7d': 'Last 7 days', '30d': 'Last 30 days', '90d': 'Last 90 days' };
+  showAlert(`Overview refreshed for ${labels[range]}.`, 'success');
+}
+
 function toggleSidebar(forceOpen) {
   const sidebar = document.getElementById('sidebar');
   const backdrop = document.getElementById('mobile-backdrop');
@@ -544,6 +719,13 @@ window.addEventListener('resize', () => {
 });
 
 initTopbarScrollBehavior();
+
+// Ensure the first visible section is consistent on initial render.
+const initialSection = document.querySelector('.section.active') || document.getElementById('sec-overview');
+if (initialSection) {
+  initialSection.classList.remove('hidden');
+  initialSection.classList.add('active');
+}
 </script>
 <footer style="margin:0 auto 20px;width:min(100% - 24px,1320px);padding:12px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
   <div style="font-size:12px;color:rgba(255,255,255,.72)">© 2026 SkillIQ. All Copyrights Reserved.</div>
