@@ -24,12 +24,11 @@ pandas
 numpy
 scikit-learn
 
-# NLP / Transformers (for CSE domain skill detection)
-# Model: distilbert-base-uncased fine-tuned on CSE domain data
-transformers>=4.35.0
-torch>=2.0.0
-datasets>=2.14.0
-accelerate>=0.24.0
+# NLP / Transformers (optional; install only if you explicitly run transformer pipelines)
+# transformers>=4.35.0
+# torch>=2.0.0
+# datasets>=2.14.0
+# accelerate>=0.24.0
 
 # Additional utilities
 requests
