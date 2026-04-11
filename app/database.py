@@ -26,7 +26,13 @@ def _create_engine_with_fallback(url: str):
     try:
         if url.startswith("sqlite"):
             return create_engine(url, connect_args={"check_same_thread": False})
-        return create_engine(url)
+
+        # For non-sqlite URLs, eagerly validate connectivity so misconfigured
+        # DATABASE_URL values don't crash endpoints later in serverless runtime.
+        engine = create_engine(url)
+        with engine.connect() as conn:
+            conn.exec_driver_sql("SELECT 1")
+        return engine
     except Exception as exc:
         if os.getenv("VERCEL"):
             fallback_url = "sqlite:////tmp/skilliq.db"

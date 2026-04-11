@@ -30,7 +30,11 @@ from .mongo_sync import (
     upsert_instances,
 )
 
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+except Exception as exc:
+    # Do not crash serverless cold start if initial DB setup fails.
+    print(f"DB init warning: {exc}")
 
 app = FastAPI(title="SkillIQ API", version="2.0.0")
 
@@ -82,13 +86,29 @@ def seed_demo_users(db: Session) -> None:
     db.commit()
 
 
+def ensure_demo_users_seeded(db: Session) -> None:
+    """Best-effort seeding for serverless runtimes where startup hooks may be skipped."""
+    try:
+        seed_demo_users(db)
+    except Exception as exc:
+        # Do not block auth endpoints if seeding fails unexpectedly.
+        print(f"Demo seed warning: {exc}")
+
+
 @app.on_event("startup")
 def startup_mongo_sync() -> None:
     """On startup, mirror SQL data to MongoDB Atlas if reachable."""
     db = SessionLocal()
     try:
-        seed_demo_users(db)
+        try:
+            seed_demo_users(db)
+        except Exception as exc:
+            print(f"Startup seed warning: {exc}")
+
+        # Mongo sync is best-effort and should never block app startup.
         safe_sync(full_sync_from_sql, db)
+    except Exception as exc:
+        print(f"Startup warning: {exc}")
     finally:
         db.close()
 
@@ -129,6 +149,8 @@ def login(
     db: Session = Depends(get_db),
 ):
     """Login user and return JWT token"""
+    ensure_demo_users_seeded(db)
+
     identifier = (username or email or "").strip()
     if not identifier:
         raise HTTPException(status_code=400, detail="Username or email is required")
@@ -155,6 +177,8 @@ def login(
 @app.get("/api/auth/demo-users-status")
 def demo_users_status(db: Session = Depends(get_db)):
     """Return availability status for seeded demo users (no password exposure)."""
+    ensure_demo_users_seeded(db)
+
     targets = [
         ("admin", "admin_demo", "admin.demo@skilliq.com"),
         ("user", "user_demo", "user.demo@skilliq.com"),
