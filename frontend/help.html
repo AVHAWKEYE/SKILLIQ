@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillIQ - Help</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;min-height:100vh;background:linear-gradient(135deg,#0a0a1a,#101a3b 45%,#1a1030);color:#eef2ff;padding:28px 18px}
+.wrap{max-width:980px;margin:0 auto}
+.card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:22px;backdrop-filter:blur(12px)}
+h1{font-family:'Space Grotesk',sans-serif;font-size:34px;margin-bottom:8px}
+.sub{color:rgba(238,242,255,.75);margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
+.tile{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px}
+.tile h3{font-size:15px;margin-bottom:6px}
+.tile p{font-size:13px;color:rgba(238,242,255,.78);line-height:1.6}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{padding:9px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;cursor:pointer;text-decoration:none}
+.btn:hover{background:rgba(255,255,255,.14)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Help Center</h1>
+    <p class="sub">Find quick guidance for authentication, analysis, dashboards, and reports.</p>
+    <div class="grid">
+      <div class="tile"><h3>Sign In Issues</h3><p>Use your username or email and password. If login fails, verify your account exists and the backend server is running.</p></div>
+      <div class="tile"><h3>Analysis Not Running</h3><p>Upload or paste profile content first, then click Analyze. Ensure local API is reachable at 127.0.0.1:8000.</p></div>
+      <div class="tile"><h3>Download Reports</h3><p>Use TXT or PDF buttons in each sector panel. Reports are generated from your SkillIQ backend model.</p></div>
+      <div class="tile"><h3>Admin Access</h3><p>Admin-only actions include model operations, user management controls, and system-level analytics.</p></div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="auth.html">Go to Sign In</a>
+      <a class="btn" href="index.html">Back to Home</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -483,12 +483,7 @@ function buildErrorAnalysis(skillScores) {
 
 function buildAIInsights(r) {
   const el = document.getElementById('ai-insights-section');
-  el.innerHTML = `<div style="padding:8px 0;"><span class="loading-spinner"></span> <span class="muted">Claude is analyzing your performance...</span></div>`;
-  const prompt = buildInsightPrompt(r);
-  callClaude(prompt,
-    (text) => { el.innerHTML = `<div class="ai-response">${formatAIText(text)}</div>`; },
-    () => { el.innerHTML = `<div class="ai-response"><p class="muted">Could not load AI insights. Make sure you have a valid Anthropic API key configured.</p></div>`; }
-  );
+  el.innerHTML = `<div class="ai-response">${formatAIText(buildLocalInsightText(r))}</div>`;
 }
 
 // ========== RECOMMENDATIONS ==========
@@ -497,15 +492,10 @@ function buildRecommendations() {
   document.getElementById('recs-empty').classList.add('hidden');
   document.getElementById('recs-content').classList.remove('hidden');
   const el = document.getElementById('recs-plan');
-  el.innerHTML = `<div class="card" style="padding:28px;"><span class="loading-spinner"></span> <span class="muted">Claude is building your personalized plan...</span></div>`;
-  const prompt = buildPlanPrompt(results);
-  callClaude(prompt,
-    (text) => { el.innerHTML = `<div class="card"><div class="ai-response">${formatAIText(text)}</div></div>`; },
-    () => { el.innerHTML = `<div class="card" style="text-align:center; padding:40px;"><p class="muted">Could not generate plan. Please check your API key.</p></div>`; }
-  );
+  el.innerHTML = `<div class="card"><div class="ai-response">${formatAIText(buildLocalPlanText(results))}</div></div>`;
 }
 
-// ========== CLAUDE API ==========
+// ========== LOCAL INSIGHT ENGINE ==========
 function buildInsightPrompt(r) {
   const details = Object.entries(r.skillScores).map(([id, sc]) => {
     const skill = SKILLS.find(s => s.id === id);
@@ -522,25 +512,35 @@ function buildPlanPrompt(r) {
   return `You are an expert personalized learning coach. A student completed a skills assessment:\n\n${details}\n\nCreate a structured 4-week improvement plan. For each skill (worst-performing first), provide:\n- 2-3 specific exercises or practice techniques\n- A daily time recommendation\n- 1-2 specific topics to focus on based on their error types\n- 1 resource type (e.g., "practice problem sets", "video tutorials", "flashcards")\n\nAlso add a final section with 3 general study strategies based on their performance patterns.\n\nFormat clearly with skill names as labels (not markdown), short bullets, and practical specific advice. Keep it motivating. Maximum 400 words.`;
 }
 
-async function callClaude(prompt, onSuccess, onError) {
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await resp.json();
-    const text = data.content?.map(b => b.text || '').join('') || '';
-    if (text) onSuccess(text);
-    else onError();
-  } catch (e) {
-    console.error('Claude API error:', e);
-    onError();
-  }
+function buildLocalInsightText(r) {
+  const ranked = Object.entries(r.skillScores)
+    .map(([id, s]) => ({ id, ...s, skill: SKILLS.find(x => x.id === id)?.name || id }))
+    .sort((a, b) => b.score - a.score);
+  const strongest = ranked[0];
+  const weakest = ranked[ranked.length - 1];
+  const overall = Math.round((r.totalCorrect / r.totalAns) * 100);
+  const slowest = [...ranked].sort((a, b) => b.avgTime - a.avgTime)[0];
+
+  return [
+    `Overall performance is ${r.overallScore}/100 with ${overall}% accuracy. Strongest area: ${strongest.skill} (${strongest.score}). Weakest area: ${weakest.skill} (${weakest.score}).`,
+    `The biggest score gap is between ${strongest.skill} and ${weakest.skill}, which suggests targeted practice on ${weakest.skill} can quickly raise your total score.`,
+    `Response-time pattern shows ${slowest.skill} is taking the longest on average (${slowest.avgTime}s), so improving speed there should increase both confidence and marks.`,
+    `Focus this week: do 20-30 minutes daily on ${weakest.skill}, review medium/hard errors first, and end each session with a timed mini-quiz.`
+  ].join('\n\n');
+}
+
+function buildLocalPlanText(r) {
+  const ranked = Object.entries(r.skillScores)
+    .map(([id, s]) => ({ id, ...s, skill: SKILLS.find(x => x.id === id)?.name || id }))
+    .sort((a, b) => a.score - b.score);
+
+  const blocks = ranked.slice(0, 3).map((s, idx) => {
+    const mins = s.score < 60 ? 40 : 30;
+    return `Week ${idx + 1}: ${s.skill}\n- Daily ${mins} minutes focused practice\n- Solve 8-12 mixed questions with timer\n- Rework all medium/hard mistakes from previous attempts\n- Quick review checklist before finishing session`;
+  });
+
+  blocks.push('General strategy\n- Track accuracy and time together, not score alone\n- Practice in short daily sessions instead of long irregular sessions\n- End each week with one timed mock and error review');
+  return blocks.join('\n\n');
 }
 
 function formatAIText(text) {

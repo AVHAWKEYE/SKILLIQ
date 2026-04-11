@@ -8,7 +8,7 @@ class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=50)
     email: EmailStr
     full_name: Optional[str] = None
-    role: str = Field(default="student")  # student, teacher, admin
+    role: str = Field(default="user")  # user, admin
 
 
 class UserCreate(UserBase):

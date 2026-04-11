@@ -26,7 +26,7 @@ echo ─────────────────────────
 echo Starting SkillIQ Server...
 echo ─────────────────────────────────────────────────────────────
 echo.
-echo ✓ Frontend:    http://127.0.0.1:8000
+echo ✓ Frontend:    http://127.0.0.1:8000/
 echo ✓ Auth Page:   http://127.0.0.1:8000/auth.html
 echo ✓ API Docs:    http://127.0.0.1:8000/docs
 echo.

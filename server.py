@@ -36,7 +36,7 @@ EXTERNAL_FEATURES = [
     "previous_gpa",
 ]
 
-STAFF_ROLES = {"admin", "teacher"}
+STAFF_ROLES = {"admin"}
 
 
 def get_conn() -> sqlite3.Connection:

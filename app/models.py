@@ -5,7 +5,7 @@ from .database import Base
 
 
 class User(Base):
-    """User model for students, teachers, and admins"""
+    """User model for standard users and admins"""
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -13,7 +13,7 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     full_name = Column(String(100), nullable=True)
-    role = Column(String(20), default="student")  # student, teacher, admin
+    role = Column(String(20), default="user")  # user, admin
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())

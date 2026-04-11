@@ -17,7 +17,7 @@ load_dotenv()
 from . import ml, models, schemas
 from .auth import (
     create_access_token, hash_password, verify_password,
-    get_current_user, get_current_teacher, get_current_admin, require_role
+    get_current_user, get_current_admin
 )
 from .database import SessionLocal, engine, get_db
 from .cse_career import analyze_cse_profile, build_cse_pdf_report, format_cse_report, parse_uploaded_document
@@ -41,11 +41,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-STAFF_ROLES = {"admin", "teacher"}
+STAFF_ROLES = {"admin"}
 
 
 def seed_demo_users(db: Session) -> None:
-    """Create demo users for admin/teacher/student if they do not already exist."""
+    """Create demo users for admin/user if they do not already exist."""
     demo_users = [
         {
             "username": "admin_demo",
@@ -55,18 +55,11 @@ def seed_demo_users(db: Session) -> None:
             "password": "Admin@123",
         },
         {
-            "username": "teacher_demo",
-            "email": "teacher.demo@skilliq.com",
-            "full_name": "Demo Teacher",
-            "role": "teacher",
-            "password": "Teacher@123",
-        },
-        {
-            "username": "student_demo",
-            "email": "student.demo@skilliq.com",
-            "full_name": "Demo Student",
-            "role": "student",
-            "password": "Student@123",
+            "username": "user_demo",
+            "email": "user.demo@skilliq.com",
+            "full_name": "Demo User",
+            "role": "user",
+            "password": "User@123",
         },
     ]
 
@@ -118,7 +111,7 @@ def register(payload: schemas.UserCreate, db: Session = Depends(get_db)):
         email=payload.email,
         password_hash=hash_password(payload.password),
         full_name=payload.full_name,
-        role=payload.role if payload.role in ["student", "teacher", "admin"] else "student"
+        role=payload.role if payload.role in ["user", "admin"] else "user"
     )
     
     db.add(user)
@@ -164,8 +157,7 @@ def demo_users_status(db: Session = Depends(get_db)):
     """Return availability status for seeded demo users (no password exposure)."""
     targets = [
         ("admin", "admin_demo", "admin.demo@skilliq.com"),
-        ("teacher", "teacher_demo", "teacher.demo@skilliq.com"),
-        ("student", "student_demo", "student.demo@skilliq.com"),
+        ("user", "user_demo", "user.demo@skilliq.com"),
     ]
 
     items = []
@@ -260,7 +252,7 @@ def update_label(
     assessment_id: int,
     payload: schemas.LabelUpdate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher),
+    current_user: models.User = Depends(get_current_admin),
 ):
     """Label assessment with target score (staff only)"""
     row = db.query(models.Assessment).filter(models.Assessment.id == assessment_id).first()
@@ -283,7 +275,7 @@ def list_assessments(db: Session = Depends(get_db)):
 @app.post("/api/train", response_model=schemas.TrainResponse)
 def train_model(
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
     """Train model (staff only)"""
     try:
@@ -295,7 +287,7 @@ def train_model(
 @app.post("/api/predict", response_model=schemas.PredictResponse)
 def predict(
     payload: schemas.PredictRequest,
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
     """Predict target score (staff only)"""
     try:
@@ -305,12 +297,12 @@ def predict(
     return {"predicted_target_score": round(y_hat, 2)}
 
 
-# ========== TEST MANAGEMENT ENDPOINTS (Teacher) ==========
+# ========== TEST MANAGEMENT ENDPOINTS (Admin) ==========
 @app.post("/api/tests", response_model=schemas.TestRead)
 def create_test(
     payload: schemas.TestCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
     """Create a new test/quiz"""
     test = models.Test(
@@ -360,13 +352,11 @@ def list_tests(
     published_only: bool = False,
     current_user: models.User = Depends(get_current_user)
 ):
-    """List tests (students see published, teachers see their own)"""
+    """List tests (users see published tests, admins see all tests)."""
     query = db.query(models.Test)
     
-    if current_user.role == "student":
+    if current_user.role == "user":
         query = query.filter(models.Test.is_published == True)
-    elif current_user.role == "teacher":
-        query = query.filter(models.Test.created_by == current_user.id)
     
     if published_only:
         query = query.filter(models.Test.is_published == True)
@@ -383,10 +373,8 @@ def get_test(test_id: int, db: Session = Depends(get_db), current_user: models.U
         raise HTTPException(status_code=404, detail="Test not found")
     
     # Authorization check
-    if current_user.role == "student" and not test.is_published:
+    if current_user.role == "user" and not test.is_published:
         raise HTTPException(status_code=403, detail="Test not published")
-    elif current_user.role == "teacher" and test.created_by != current_user.id:
-        raise HTTPException(status_code=403, detail="Cannot access other teacher's test")
     
     return test
 
@@ -396,16 +384,16 @@ def update_test(
     test_id: int,
     payload: schemas.TestUpdate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
-    """Update test (teacher only)"""
+    """Update test (admin only)"""
     test = db.query(models.Test).filter(models.Test.id == test_id).first()
     
     if not test:
         raise HTTPException(status_code=404, detail="Test not found")
     
     if test.created_by != current_user.id:
-        raise HTTPException(status_code=403, detail="Cannot modify other teacher's test")
+        raise HTTPException(status_code=403, detail="Cannot modify other admin's test")
     
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(test, field, value)
@@ -420,16 +408,16 @@ def update_test(
 def publish_test(
     test_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
-    """Publish test to students"""
+    """Publish test to users"""
     test = db.query(models.Test).filter(models.Test.id == test_id).first()
     
     if not test:
         raise HTTPException(status_code=404, detail="Test not found")
     
     if test.created_by != current_user.id:
-        raise HTTPException(status_code=403, detail="Cannot publish other teacher's test")
+        raise HTTPException(status_code=403, detail="Cannot publish other admin's test")
     
     test.is_published = True
     db.commit()
@@ -443,7 +431,7 @@ def publish_test(
 def delete_test(
     test_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
     """Delete test"""
     test = db.query(models.Test).filter(models.Test.id == test_id).first()
@@ -452,7 +440,7 @@ def delete_test(
         raise HTTPException(status_code=404, detail="Test not found")
     
     if test.created_by != current_user.id:
-        raise HTTPException(status_code=403, detail="Cannot delete other teacher's test")
+        raise HTTPException(status_code=403, detail="Cannot delete other admin's test")
     
     db.delete(test)
     db.commit()
@@ -461,7 +449,7 @@ def delete_test(
     return {"message": "Test deleted successfully"}
 
 
-# ========== TEST ATTEMPT ENDPOINTS (Student) ==========
+# ========== TEST ATTEMPT ENDPOINTS (User) ==========
 @app.post("/api/tests/{test_id}/attempt/start", response_model=schemas.TestAttemptRead)
 def start_test_attempt(
     test_id: int,
@@ -474,8 +462,8 @@ def start_test_attempt(
     if not test or not test.is_published:
         raise HTTPException(status_code=404, detail="Test not found or not published")
     
-    if current_user.role == "teacher":
-        raise HTTPException(status_code=403, detail="Teachers cannot attempt tests")
+    if current_user.role == "admin":
+        raise HTTPException(status_code=403, detail="Admins cannot attempt tests")
     
     # Check if test is available
     if test.is_live:
@@ -581,13 +569,8 @@ def get_test_attempt(
         raise HTTPException(status_code=404, detail="Attempt not found")
     
     # Authorization
-    if current_user.role == "student" and attempt.student_id != current_user.id:
+    if current_user.role == "user" and attempt.student_id != current_user.id:
         raise HTTPException(status_code=403, detail="Cannot access other user's attempt")
-    
-    if current_user.role == "teacher":
-        test = db.query(models.Test).filter(models.Test.id == attempt.test_id).first()
-        if test.created_by != current_user.id:
-            raise HTTPException(status_code=403, detail="Cannot access other teacher's test attempts")
     
     return attempt
 
@@ -596,16 +579,16 @@ def get_test_attempt(
 def get_test_attempts(
     test_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
-    """Get all attempts for a test (teacher only)"""
+    """Get all attempts for a test (admin only)"""
     test = db.query(models.Test).filter(models.Test.id == test_id).first()
     
     if not test:
         raise HTTPException(status_code=404, detail="Test not found")
     
     if test.created_by != current_user.id:
-        raise HTTPException(status_code=403, detail="Cannot access other teacher's test")
+        raise HTTPException(status_code=403, detail="Cannot access other admin's test")
     
     attempts = db.query(models.TestAttempt).filter(
         models.TestAttempt.test_id == test_id
@@ -700,9 +683,9 @@ def analyze_performance(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """Get AI analysis of student performance"""
-    if current_user.role == "teacher":
-        raise HTTPException(status_code=403, detail="Students only")
+    """Get AI analysis of user performance"""
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Users only")
     
     engine = InsightsEngine(db)
     analysis = engine.analyze_student_performance(current_user.id)
@@ -715,9 +698,9 @@ def generate_insights(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """Generate new AI insights for student"""
-    if current_user.role == "teacher":
-        raise HTTPException(status_code=403, detail="Students only")
+    """Generate new AI insights for user"""
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Users only")
     
     # Clear old insights
     db.query(models.AIInsight).filter(models.AIInsight.user_id == current_user.id).delete()
@@ -741,9 +724,9 @@ def get_insights(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """Get AI insights for student"""
-    if current_user.role == "teacher":
-        raise HTTPException(status_code=403, detail="Students only")
+    """Get AI insights for user"""
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Users only")
     
     query = db.query(models.AIInsight).filter(models.AIInsight.user_id == current_user.id)
     
@@ -784,9 +767,9 @@ def get_student_analytics(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """Get student analytics"""
-    if current_user.role == "teacher":
-        raise HTTPException(status_code=403, detail="Students only")
+    """Get user analytics"""
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Users only")
     
     assessments = db.query(models.Assessment).filter(
         models.Assessment.user_id == current_user.id
@@ -813,13 +796,13 @@ def get_student_analytics(
     }
 
 
-@app.get("/api/analytics/teacher/test/{test_id}")
-def get_teacher_test_analytics(
+@app.get("/api/analytics/admin/test/{test_id}")
+def get_admin_test_analytics(
     test_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_teacher)
+    current_user: models.User = Depends(get_current_admin)
 ):
-    """Get analytics for a specific test"""
+    """Get admin analytics for a specific test"""
     test = db.query(models.Test).filter(models.Test.id == test_id).first()
     
     if not test or test.created_by != current_user.id:
@@ -993,5 +976,5 @@ async def websocket_live_test(websocket: WebSocket, test_id: int, student_id: in
 
 
 # ========== STATIC FILES ==========
-WEB_ROOT = Path(__file__).resolve().parent.parent
+WEB_ROOT = Path(__file__).resolve().parent.parent / "frontend"
 app.mount("/", StaticFiles(directory=str(WEB_ROOT), html=True), name="web")

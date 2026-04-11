@@ -36,43 +36,44 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 @keyframes starTwinkle{0%,100%{opacity:.08;transform:scale(1)}50%{opacity:.75;transform:scale(1.5)}}
 
 /* ===== NAV ===== */
-.nav{display:flex;align-items:center;gap:4px;padding:13px 32px;background:rgba(8,9,24,.65);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:0 4px 32px rgba(0,0,0,.35)}
+.nav{display:flex;align-items:center;gap:6px;padding:16px 34px;background:rgba(8,9,24,.65);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:0 4px 32px rgba(0,0,0,.35);transition:transform .32s cubic-bezier(.22,1,.36,1),box-shadow .25s ease,background-color .25s ease}
+.nav.nav-elevated{background:rgba(8,9,24,.84);box-shadow:0 10px 38px rgba(0,0,0,.42)}
 .nav-logo{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-right:8px;letter-spacing:-.5px;display:flex;align-items:center;gap:9px;flex-shrink:0}
 .logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--indigo),var(--pink));display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 20px rgba(92,107,192,.55);position:relative;overflow:hidden}
 .logo-icon::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent)}
 .nav-logo span{background:linear-gradient(135deg,var(--cyan),var(--indigo-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-tab{padding:8px 15px;border-radius:var(--r-sm);font-size:13px;cursor:pointer;border:1px solid transparent;color:var(--text-muted);background:none;transition:all .25s cubic-bezier(.22,1,.36,1);font-family:"DM Sans",sans-serif;font-weight:500;position:relative;will-change:transform}
+.nav-tab{padding:10px 16px;border-radius:var(--r-sm);font-size:14px;cursor:pointer;border:1px solid transparent;color:var(--text-muted);background:none;transition:all .25s cubic-bezier(.22,1,.36,1);font-family:"DM Sans",sans-serif;font-weight:500;position:relative;will-change:transform}
 .nav-tab:hover{color:var(--text);border-color:var(--border);background:var(--glass);box-shadow:0 4px 16px rgba(92,107,192,.18);transform:translateY(-1px)}
 .nav-tab.active{background:var(--glass-b);color:var(--text);border-color:rgba(92,107,192,.4);font-weight:600;box-shadow:0 0 20px rgba(92,107,192,.18)}
 .nav-spacer{flex:1}
 .ai-badge{font-size:11px;padding:4px 12px;border-radius:20px;background:linear-gradient(135deg,rgba(92,107,192,.28),rgba(0,188,212,.18));border:1px solid rgba(92,107,192,.4);color:var(--cyan);font-weight:700;letter-spacing:.06em;box-shadow:0 0 20px rgba(0,188,212,.12)}
 .nav-user{display:flex;align-items:center;gap:8px;padding:5px 5px 5px 14px;border-radius:24px;background:var(--glass);border:1px solid var(--border)}
-.nav-uname{font-size:13px;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-uname{font-size:14px;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-avatar-sm{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(92,107,192,.4)}
 .nav-logout-btn{padding:5px 12px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#FF8A80;cursor:pointer;font-family:inherit;transition:all .2s;will-change:transform}
 .nav-logout-btn:hover{background:rgba(255,82,82,.3);box-shadow:0 4px 16px rgba(255,82,82,.22);transform:translateY(-1px)}
 .app{width:100%}
-.page{display:none;padding:48px 32px;max-width:1080px;margin:0 auto}
+.page{display:none;padding:30px 24px;max-width:1320px;margin:0 auto}
 .page.active{display:block;animation:pgIn .4s cubic-bezier(.22,1,.36,1)}
 .hidden{display:none !important}
 @keyframes pgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
 /* ===== CARDS ===== */
-.card{background:var(--glass-card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;margin-bottom:18px;box-shadow:var(--sh);transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
+.card{background:var(--glass-card);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;margin-bottom:14px;box-shadow:var(--sh);transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)}
 .card:hover{border-color:var(--border-hover);box-shadow:0 24px 64px rgba(0,0,0,.5),0 0 0 1px rgba(92,107,192,.12);transform:translateY(-4px);background:rgba(255,255,255,.09)}
 .card-title{font-size:11px;font-weight:700;margin-bottom:20px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
 .card-title::after{content:"";flex:1;height:1px;background:var(--border)}
 
 /* ===== HERO ===== */
-.hero{text-align:center;padding:72px 0 56px;position:relative}
+.hero{text-align:center;padding:44px 0 30px;position:relative}
 .hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:24px;letter-spacing:.1em;text-transform:uppercase;background:rgba(0,188,212,.1);padding:8px 20px;border-radius:24px;border:1px solid rgba(0,188,212,.3);box-shadow:0 0 30px rgba(0,188,212,.1)}
 .tag-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:tagPulse 2s ease-in-out infinite;flex-shrink:0}
 @keyframes tagPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,188,212,.5)}50%{box-shadow:0 0 0 8px rgba(0,188,212,0)}}
-.hero h1{font-family:"Syne",sans-serif;font-size:56px;font-weight:800;margin-bottom:20px;line-height:1.1;color:var(--text);letter-spacing:-2px}
+.hero h1{font-family:"Syne",sans-serif;font-size:52px;font-weight:800;margin-bottom:14px;line-height:1.08;color:var(--text);letter-spacing:-1.6px}
 .hero h1 .grad{background:linear-gradient(135deg,var(--cyan),var(--indigo-l),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradFlow 5s ease infinite}
 @keyframes gradFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.hero-sub{font-size:17px;color:var(--text-dim);max-width:560px;margin:0 auto 44px;line-height:1.8;font-weight:300}
+.hero-sub{font-size:16px;color:var(--text-dim);max-width:740px;margin:0 auto 30px;line-height:1.7;font-weight:300}
 .hero-sub strong{color:var(--text);font-weight:600}
 
 /* ===== BUTTONS ===== */
@@ -89,12 +90,12 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 .btn-row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
 
 /* ===== GRIDS ===== */
-.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px}
-.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:14px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 
 /* ===== SMALL CARDS ===== */
-.card-sm{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
+.card-sm{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
 .card-sm::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.04),transparent 65%)}
 .card-sm:hover{border-color:var(--border-hover);box-shadow:0 20px 56px rgba(0,0,0,.45);transform:translateY(-6px);background:rgba(255,255,255,.1)}
 .skill-icon-lg{font-size:32px;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(92,107,192,.4))}
@@ -102,8 +103,8 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 .card-sm-desc{font-size:12px;color:var(--text-muted);line-height:1.6}
 
 /* ===== CAREER PATH CARDS ===== */
-.career-paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:28px}
-.cpc{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;transition:all .35s cubic-bezier(.22,1,.36,1);cursor:pointer;position:relative;overflow:hidden;will-change:transform}
+.career-paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:16px}
+.cpc{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all .35s cubic-bezier(.22,1,.36,1);cursor:pointer;position:relative;overflow:hidden;will-change:transform}
 .cpc::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
 .cpc.govt::before{background:linear-gradient(90deg,#FFB300,#FF9800)}
 .cpc.it::before{background:linear-gradient(90deg,#00BCD4,#0288D1)}
@@ -121,13 +122,13 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 .step-num{font-family:"Syne",sans-serif;font-size:42px;font-weight:800;background:linear-gradient(135deg,var(--indigo-l),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;line-height:1}
 .step-name{font-size:15px;font-weight:700;margin-bottom:8px;font-family:"Syne",sans-serif}
 .step-desc{font-size:13px;color:var(--text-muted);line-height:1.7}
-.metric{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-md);padding:22px 24px;transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
+.metric{background:var(--glass-card);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;transition:all .35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;will-change:transform}
 .metric::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--indigo),var(--cyan));opacity:.7}
 .metric:hover{transform:translateY(-5px);box-shadow:0 20px 56px rgba(0,0,0,.45),0 0 0 1px rgba(92,107,192,.15);border-color:var(--border-hover)}
 .metric-label{font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
 .metric-val{font-family:"Syne",sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--text),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .metric-sub{font-size:12px;color:var(--text-muted);margin-top:6px}
-.page-header{margin-bottom:32px}
+.page-header{margin-bottom:20px}
 .section-tag{font-size:11px;color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 .page-h2{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-.5px}
 
@@ -247,7 +248,7 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 .model-row input[type="number"]{padding:8px 12px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:13px;width:160px;outline:none}
 .model-row input[type="file"]{font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:6px 0}
 
-/* ===== PROFILE & RECOMMENDATIONS ===== */
+/* ===== PROFILE ===== */
 .profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));color:#fff;font-size:32px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 28px rgba(92,107,192,.4)}
 .profile-name{font-family:"Syne",sans-serif;font-size:20px;font-weight:800;margin-bottom:4px}
 .profile-role{font-size:13px;color:var(--text-muted);margin-bottom:4px}
@@ -297,11 +298,20 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 .gate-subject-marks{font-size:11px;color:var(--text-muted)}
 
 @keyframes tIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1024px){
+  .nav{padding:13px 16px;gap:8px;flex-wrap:wrap}
+  .nav-logo{font-size:20px}
+  .nav-tab{padding:9px 12px;font-size:13px}
+  .ai-badge{order:3}
+}
 @media(max-width:768px){
-  .page{padding:24px 16px}.nav{padding:10px 16px;gap:2px}
+  .page{padding:24px 16px}.nav{padding:12px 14px;gap:6px}
+  .nav-logo{width:100%;margin-right:0;font-size:19px}
+  .ai-badge{display:none}
+  .nav-user{margin-left:0;width:100%;justify-content:space-between}
   .hero h1{font-size:34px;letter-spacing:-1px}.hero-sub{font-size:15px}
-  .grid-4{grid-template-columns:repeat(2,1fr)}.metric-val{font-size:28px}
-  .nav-uname{display:none}.career-grid{grid-template-columns:1fr}
+  .grid-4{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.metric-val{font-size:28px}
+  .nav-uname{display:block}.career-grid{grid-template-columns:1fr}
   .career-paths{grid-template-columns:1fr}.articles-grid{grid-template-columns:1fr}
   .gate-subject-grid{grid-template-columns:1fr 1fr}
 }
@@ -318,7 +328,6 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
   <button class="nav-tab active mag" onclick="showPage('home')">Home</button>
   <button class="nav-tab mag" onclick="showPage('dashboard')">Dashboard</button>
   <button class="nav-tab mag" onclick="showPage('career')">&#127919; Career Paths</button>
-  <button class="nav-tab mag" onclick="showPage('recommendations')">My Plan</button>
   <button class="nav-tab mag" onclick="showPage('profile')">Profile</button>
   <button class="nav-tab mag" onclick="showPage('progress')">&#128200; Progress</button>
   <div class="nav-spacer"></div>
@@ -336,18 +345,12 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
   <div class="hero">
     <div class="hero-tag"><span class="tag-dot"></span> CSE Career Intelligence Platform</div>
     <h1>Know exactly <span class="grad">where you stand.</span><br>Fix what holds you back.</h1>
-    <p class="hero-sub">Upload your <strong>resume, marksheet or progress card</strong> and get AI-powered skill gap analysis for <strong>GATE</strong>, <strong>Government Jobs</strong>, and <strong>Study Abroad</strong>.</p>
+    <p class="hero-sub">Upload your <strong>resume, marksheet or progress card</strong> and get AI-powered skill gap analysis for <strong>GATE</strong>, <strong>Government Jobs</strong>, <strong>Software / IT Jobs</strong>, and <strong>Study Abroad</strong>.</p>
     <div class="btn-row">
       <button class="btn btn-primary mag" onclick="showPage('career')">&#128196; Upload &amp; Analyze</button>
       <button class="btn btn-cyan mag" onclick="showPage('career')">&#127919; Explore Career Paths</button>
       <button class="btn mag" onclick="showPage('dashboard');loadDemoData()">View Demo</button>
     </div>
-  </div>
-  <div class="grid-4 mb-16">
-    <div class="card-sm"><div class="skill-icon-lg">&#129513;</div><div class="card-sm-name">DSA Foundations</div><div class="card-sm-desc">Complexity, recursion, trees, graphs</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">&#129504;</div><div class="card-sm-name">Algorithmic Reasoning</div><div class="card-sm-desc">Tracing, optimization, edge cases</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">&#128190;</div><div class="card-sm-name">CS Fundamentals</div><div class="card-sm-desc">DBMS, OS, CN, OOP core concepts</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">&#128296;</div><div class="card-sm-name">Debugging &amp; Engineering</div><div class="card-sm-desc">Testing, debugging, practical coding</div></div>
   </div>
   <div class="career-paths">
     <div class="cpc govt mag" onclick="showPage('career');switchCareerTab('gate')">
@@ -362,6 +365,12 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
       <p>ISRO, DRDO, SSC-CGL IT &mdash; upload your resume and know your strengths, gaps, and improvement roadmap.</p>
       <span class="path-tag pti">UPSC &middot; SSC &middot; ISRO</span>
     </div>
+    <div class="cpc it mag" onclick="showPage('career');switchCareerTab('it_job')">
+      <span class="path-icon">&#128187;</span>
+      <h3>Software / IT Jobs</h3>
+      <p>Target SDE, Backend, Full Stack, QA, DevOps, or Data roles with a job-ready skills roadmap from your profile.</p>
+      <span class="path-tag pti">SDE &middot; Backend &middot; Full Stack</span>
+    </div>
     <div class="cpc abroad mag" onclick="showPage('career');switchCareerTab('study_abroad')">
       <span class="path-icon">&#127758;</span>
       <h3>Study Abroad</h3>
@@ -373,7 +382,7 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
     <div class="card-title">How it works</div>
     <div class="grid-3">
       <div><div class="step-num">01</div><div class="step-name">Upload Your Document</div><div class="step-desc">Drag and drop your resume, marksheet, or progress card. We accept PDF, DOCX, and TXT files.</div></div>
-      <div><div class="step-num">02</div><div class="step-name">Select Your Goal</div><div class="step-desc">Choose between GATE, Government Jobs, or Study Abroad to get targeted skill gap analysis.</div></div>
+      <div><div class="step-num">02</div><div class="step-name">Select Your Goal</div><div class="step-desc">Choose between GATE, Government Jobs, Software/IT Jobs, or Study Abroad to get targeted skill gap analysis.</div></div>
       <div><div class="step-num">03</div><div class="step-name">Get Your Roadmap</div><div class="step-desc">See exactly which skills you have, what's missing, and get curated articles and resources to acquire them.</div></div>
     </div>
   </div>
@@ -388,7 +397,7 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 <!-- DASHBOARD -->
 <div class="page" id="page-dashboard">
   <div class="flex-row mb-16 flex-wrap">
-    <div style="flex:1"><div class="section-tag">Your Results</div><h2 class="page-h2" style="margin-bottom:0">Performance Dashboard</h2></div>
+    <div style="flex:1"><div class="section-tag">Dashboard</div><h2 class="page-h2" style="margin-bottom:0">Dashboard</h2></div>
     <button class="btn btn-sm mag" onclick="showPage('career')">&#128196; Analyze Again</button>
   </div>
   <div class="grid-4 mb-16">
@@ -407,7 +416,7 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
   <div class="card"><div class="card-title">Response Time by Question</div><div class="chart-wrap"><canvas id="timeChart"></canvas></div></div>
   <div class="card"><div class="card-title">Error Pattern Analysis</div><div id="error-analysis"><p class="muted">Run an analysis to see error patterns.</p></div></div>
   <div class="card">
-    <div class="card-title">AI Insights <span style="font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(92,107,192,.14);color:var(--indigo-l);font-weight:700;border:1px solid rgba(92,107,192,.28)">Claude AI</span></div>
+    <div class="card-title">AI Insights <span style="font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(92,107,192,.14);color:var(--indigo-l);font-weight:700;border:1px solid rgba(92,107,192,.28)">SkillIQ AI</span></div>
     <div id="ai-insights-section"><p class="muted">Upload a document and run an analysis to get AI-generated insights.</p></div>
   </div>
 </div>
@@ -449,6 +458,7 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
   <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
     <button class="btn btn-sm career-tab-btn mag" id="tab-gate" onclick="switchCareerTab('gate')">&#127979; GATE</button>
     <button class="btn btn-sm career-tab-btn mag" id="tab-govt" onclick="switchCareerTab('government_jobs')">&#127963;&#65039; Government Jobs</button>
+    <button class="btn btn-sm career-tab-btn mag" id="tab-it" onclick="switchCareerTab('it_job')">&#128187; Software / IT Jobs</button>
     <button class="btn btn-sm career-tab-btn mag" id="tab-abroad" onclick="switchCareerTab('study_abroad')">&#127758; Study Abroad</button>
   </div>
 
@@ -527,10 +537,79 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
         </div>
         <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
           <button class="btn btn-primary mag" onclick="analyzeCareerGap('gate')">Analyze GATE Gaps &#8599;</button>
-          <button class="btn mag" onclick="downloadCareerReport('gate')">&#8675; Report</button>
+          <button class="btn mag" onclick="downloadCareerReport('gate')">&#8675; TXT</button>
+          <button class="btn mag" onclick="downloadCareerPdf('gate')">&#128196; PDF</button>
         </div>
       </div>
       <div id="career-result-gate" class="career-result">Upload your marksheet or profile above, then click Analyze to see your GATE-ready skills, missing subjects, and a personalized study plan.</div>
+    </div>
+  </div>
+
+  <!-- IT JOB PANEL -->
+  <div class="career-panel hidden" id="panel-it_job">
+    <div class="card" style="border-color:rgba(0,188,212,.22)">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div style="font-size:48px">&#128187;</div>
+        <div><h3 style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">Software / IT Jobs</h3>
+        <p style="color:var(--text-muted);font-size:13px">SDE &middot; Backend &middot; Full Stack &middot; QA &middot; DevOps &middot; Data Roles</p></div>
+      </div>
+      <div class="card-title">&#127775; Core Skills Required for Software / IT Jobs</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+        <span class="skill-pill sph">&#128202; Data Structures &amp; Algorithms</span><span class="skill-pill sph">&#9889; Problem Solving</span>
+        <span class="skill-pill sph">&#128187; OOP &amp; Design Principles</span><span class="skill-pill sph">&#128451; DBMS &amp; SQL</span>
+        <span class="skill-pill sph">&#127760; APIs &amp; Web Basics</span><span class="skill-pill sph">&#128736;&#65039; Git &amp; Version Control</span>
+        <span class="skill-pill spo">&#9881;&#65039; System Design (for SDE2+)</span><span class="skill-pill spo">&#128039; Linux / Cloud Basics</span>
+      </div>
+      <div class="card-title">&#128218; How to Acquire Software Job Skills</div>
+      <div class="acquire-card"><div class="acq-skill">&#128202; DSA + Problem Solving</div>
+        <ul class="acq-steps">
+          <li>Solve 250+ curated problems (arrays, strings, trees, graphs, DP)</li>
+          <li>Practice timed mock contests weekly to improve speed and accuracy</li>
+          <li>Revise patterns: sliding window, two pointers, BFS/DFS, topological sort</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#127760; Backend / Full Stack Fundamentals</div>
+        <ul class="acq-steps">
+          <li>Build 2-3 portfolio projects with auth, CRUD, and role-based access</li>
+          <li>Learn REST APIs, database schema design, and deployment workflow</li>
+          <li>Document projects with clear README and architecture notes</li>
+        </ul>
+      </div>
+      <div class="acquire-card"><div class="acq-skill">&#128188; Interview Readiness</div>
+        <ul class="acq-steps">
+          <li>Prepare resume bullets using impact-focused language and metrics</li>
+          <li>Practice 10+ mock interviews (DSA + projects + behavioral)</li>
+          <li>Create quick notes for SQL joins, OOP, OS, CN, and DBMS revision</li>
+        </ul>
+      </div>
+      <div class="card-title">&#128240; Suggested Articles &amp; Resources for Software Jobs</div>
+      <div class="articles-grid">
+        <a class="article-card" href="https://roadmap.sh" target="_blank"><span class="article-tag">Roadmaps</span><div class="article-title">Developer Roadmaps</div><div class="article-desc">Role-based maps for backend, frontend, full stack, DevOps, and more.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://leetcode.com" target="_blank"><span class="article-tag">Practice</span><div class="article-title">LeetCode Problem Practice</div><div class="article-desc">Coding interview problems with company-wise and topic-wise preparation.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://www.geeksforgeeks.org/interview-preparation-for-software-developer/" target="_blank"><span class="article-tag">Guide</span><div class="article-title">Software Developer Interview Prep</div><div class="article-desc">Structured prep plan for DSA, CS fundamentals, and interview process.</div><div class="article-arrow">↗</div></a>
+        <a class="article-card" href="https://github.com" target="_blank"><span class="article-tag">Portfolio</span><div class="article-title">GitHub Portfolio Building</div><div class="article-desc">Publish projects and show consistent contribution history for recruiters.</div><div class="article-arrow">↗</div></a>
+      </div>
+    </div>
+    <div class="career-analyzer">
+      <div class="card-title" style="margin-bottom:16px">&#128640; Software / IT Job Skill Gap Analysis</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="flex:1;min-width:200px">
+          <div class="section-title">Target Role</div>
+          <select id="career-role-it" style="width:100%;padding:11px 14px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;">
+            <option value="">All Software Roles</option>
+            <option value="software_engineer">Software Engineer</option>
+            <option value="backend_developer">Backend Developer</option>
+            <option value="full_stack_developer">Full Stack Developer</option>
+            <option value="qa_engineer">QA / Test Engineer</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary mag" onclick="analyzeCareerGap('it_job')">Analyze Skill Gap &#8599;</button>
+          <button class="btn mag" onclick="downloadCareerReport('it_job')">&#8675; TXT</button>
+          <button class="btn mag" onclick="downloadCareerPdf('it_job')">&#128196; PDF</button>
+        </div>
+      </div>
+      <div id="career-result-it" class="career-result">Upload your resume above, then click Analyze to get your Software/IT job readiness, missing skills, and improvement roadmap.</div>
     </div>
   </div>
 
@@ -598,7 +677,8 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
         </div>
         <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
           <button class="btn btn-primary mag" onclick="analyzeCareerGap('government_jobs')">Analyze Skill Gap &#8599;</button>
-          <button class="btn mag" onclick="downloadCareerReport('government_jobs')">&#8675; Report</button>
+          <button class="btn mag" onclick="downloadCareerReport('government_jobs')">&#8675; TXT</button>
+          <button class="btn mag" onclick="downloadCareerPdf('government_jobs')">&#128196; PDF</button>
         </div>
       </div>
       <div id="career-result-govt" class="career-result">Upload your resume or marksheet above, then click Analyze to see which Government Job skills you already have, which are missing, and exactly how to acquire them.</div>
@@ -679,27 +759,12 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
         </div>
         <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
           <button class="btn btn-primary mag" onclick="analyzeCareerGap('study_abroad')">Analyze Skill Gap &#8599;</button>
-          <button class="btn mag" onclick="downloadCareerReport('study_abroad')">&#8675; Report</button>
+          <button class="btn mag" onclick="downloadCareerReport('study_abroad')">&#8675; TXT</button>
+          <button class="btn mag" onclick="downloadCareerPdf('study_abroad')">&#128196; PDF</button>
         </div>
       </div>
       <div id="career-result-abroad" class="career-result">Upload your resume or marksheet above, then click Analyze to see your Study Abroad readiness, missing skills, language requirements, and how to prepare.</div>
     </div>
-  </div>
-</div>
-
-<!-- RECOMMENDATIONS -->
-<div class="page" id="page-recommendations">
-  <div class="flex-row mb-16 flex-wrap">
-    <div style="flex:1"><div class="section-tag">Your Custom Plan</div><h2 class="page-h2" style="margin-bottom:0">Personalized Learning Path</h2></div>
-    <button class="btn btn-sm btn-primary mag" onclick="showPage('career')">&#128196; New Analysis &#8599;</button>
-  </div>
-  <div id="recs-empty" class="card" style="text-align:center;padding:56px">
-    <div style="font-size:48px;margin-bottom:16px">&#128200;</div>
-    <p class="muted" style="margin-bottom:22px;font-size:15px">Upload a document and run a career analysis to get your personalized improvement plan.</p>
-    <button class="btn btn-primary mt-12 mag" onclick="showPage('career')">Upload &amp; Analyze &#8599;</button>
-  </div>
-  <div id="recs-content" class="hidden">
-    <div id="recs-plan"></div>
   </div>
 </div>
 
@@ -788,12 +853,11 @@ body{font-family:"DM Sans",sans-serif;background:#080918;color:var(--text);min-h
 <script>
 // ============ AUTH & INIT ============
 const _u=(function(){try{return JSON.parse(sessionStorage.getItem("skilliq_user"))}catch(e){return null}})();
-const CAN_ACCESS_MODEL_ACTIONS=!!(_u&&(_u.role==="admin"||_u.role==="teacher"));
+const CAN_ACCESS_MODEL_ACTIONS=!!(_u&&_u.role==="admin");
 (function(){
   if(!_u)return;
   if(_u.role==="admin"){location.href="admin.html";return}
-  if(_u.role==="teacher"){location.href="teacher.html";return}
-  const n=_u.name||"Student";
+  const n=_u.name||"User";
   document.getElementById("nav-uname").textContent=n;
   document.getElementById("nav-avatar").textContent=n[0].toUpperCase();
   document.getElementById("prof-name").textContent=n;
@@ -839,12 +903,22 @@ function initMag(){
 }
 setTimeout(initMag,300);
 
+function initNavbarScrollBehavior(){
+  const nav=document.querySelector(".nav");
+  if(!nav)return;
+  window.addEventListener("scroll",()=>{
+    const y=window.scrollY;
+    nav.classList.toggle("nav-elevated",y>8);
+  },{passive:true});
+}
+initNavbarScrollBehavior();
+
 // ============ NAVIGATION ============
 function showPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
   const p=document.getElementById("page-"+id);if(p)p.classList.add("active");
-  const tabs=["home","dashboard","career","recommendations","profile","progress"];
+  const tabs=["home","dashboard","career","profile","progress"];
   const idx=tabs.indexOf(id);
   if(idx>=0)document.querySelectorAll(".nav-tab")[idx].classList.add("active");
   if(id==="progress")buildProgressPage();
@@ -919,11 +993,12 @@ function switchCareerTab(goal){
     b.style.cssText="";
   });
   const p=document.getElementById("panel-"+goal);if(p)p.classList.remove("hidden");
-  const map={gate:"gate",government_jobs:"govt",study_abroad:"abroad"};
+  const map={gate:"gate",government_jobs:"govt",it_job:"it",study_abroad:"abroad"};
   const btn=document.getElementById("tab-"+map[goal]);
   if(btn){
     if(goal==="gate")btn.classList.add("ctab-active-gate");
     else if(goal==="government_jobs")btn.classList.add("ctab-active-govt");
+    else if(goal==="it_job")btn.classList.add("ctab-active-it");
     else if(goal==="study_abroad")btn.classList.add("ctab-active-abroad");
   }
   setTimeout(initMag,150);
@@ -931,8 +1006,11 @@ function switchCareerTab(goal){
 
 // ============ CAREER GAP ANALYSIS ============
 const API_BASE="/api";
+function mapCareerGoalForApi(goal){
+  return goal;
+}
 async function analyzeCareerGap(goal){
-  const sfxMap={gate:"gate",government_jobs:"govt",study_abroad:"abroad"};
+  const sfxMap={gate:"gate",government_jobs:"govt",it_job:"it",study_abroad:"abroad"};
   const sfx=sfxMap[goal];
   const resultEl=document.getElementById("career-result-"+sfx);
   const role=document.getElementById("career-role-"+sfx)?.value||"";
@@ -945,46 +1023,27 @@ async function analyzeCareerGap(goal){
     showToast("Upload or paste your profile first","error");
     return;
   }
-  resultEl.innerHTML='<span class="loading-spinner"></span> Analyzing your CSE profile with AI…';
-  // Try backend first
+  resultEl.innerHTML='<span class="loading-spinner"></span> Analyzing your CSE profile using SkillIQ model…';
   try{
     const form=new FormData();
-    form.append("career_goal",goal);
+    form.append("career_goal",mapCareerGoalForApi(goal));
     if(role)form.append("target_role",role);
     if(text)form.append("resume_text",text);
     if(file)form.append("document",file);
     const resp=await fetch(`${API_BASE}/cse/skill-gap/analyze`,{method:"POST",body:form});
-    if(resp.ok){renderCareerResult(resultEl,await resp.json(),goal);return}
-  }catch(e){console.log("Backend unavailable, using Claude directly")}
-  // Fallback: use Claude directly
-  let docText=text;
-  if(file&&!text){try{docText=await file.text()}catch(e){docText="Document uploaded but could not read as text."}}
-  await analyzeWithClaude(docText,goal,role,resultEl);
-  const newAch=Store.recordCareerAnalysis(goal);
-  newAch.forEach((a,i)=>setTimeout(()=>showAchToast(a),i*1600+400));
-  // Trigger recommendations
-  if(docText){
-    document.getElementById("recs-empty").classList.add("hidden");
-    document.getElementById("recs-content").classList.remove("hidden");
-    buildPlanFromAnalysis(docText,goal,role);
-  }
-}
-
-async function analyzeWithClaude(docText,goal,role,resultEl){
-  const labels={gate:"GATE CSE Examination",government_jobs:"Government Jobs (GATE/ISRO/SSC)",study_abroad:"Study Abroad (MS/PhD Programs)"};
-  const gateSkills="Engineering Mathematics, Data Structures, Algorithms, Theory of Computation, Compiler Design, Computer Organization, Digital Logic, Programming in C, DBMS, Operating Systems, Computer Networks, General Aptitude";
-  const govtSkills="Data Structures, Algorithms, DBMS, Operating Systems, Computer Networks, Quantitative Aptitude, Logical Reasoning, English Communication, Current Affairs/GK";
-  const abroadSkills="IELTS/TOEFL, GRE, SOP Writing, Research Methodology, Data Structures, Algorithms, DBMS, Academic English, Python/R, Project Portfolio";
-  const requiredSkills=goal==="gate"?gateSkills:goal==="government_jobs"?govtSkills:abroadSkills;
-  const prompt=`You are an expert CSE career counselor for Indian students. Analyze this student profile for: ${labels[goal]}${role?` (Target: ${role})`:""}.\n\nStudent Profile:\n${docText}\n\nRequired skills for ${labels[goal]}: ${requiredSkills}\n\nRespond ONLY with valid JSON (no markdown, no backticks, no preamble):\n{"goal_label":"${labels[goal]}","target_role":"${role||"General"}","readiness_percentage":<0-100 integer>,"skills_detected":["skill1","skill2"],"required_mandatory_skills":["skill1","skill2"],"missing_mandatory_skills":["skill1","skill2"],"good_to_have_skills":["skill1","skill2"],"recommendations":["action1","action2","action3","action4","action5"],"languages_required":[{"name":"English","level":"Required","reason":"Primary language of instruction"}],"acquisition_plan":[{"skill":"skill_name","steps":["step1","step2","step3"],"articles":[{"title":"Article Title","url":"https://example.com","tag":"Free Course"}]}]}\n\nFor acquisition_plan articles, provide real, relevant learning resources (GFG, NPTEL, Coursera, YouTube, official sites). Include 2-3 articles per skill.`;
-  try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,messages:[{role:"user",content:prompt}]})});
-    const d=await r.json();
-    const raw=d.content?.map(b=>b.text||"").join("")||"";
-    const clean=raw.replace(/```json|```/g,"").trim();
-    renderCareerResult(resultEl,JSON.parse(clean),goal);
+    if(!resp.ok){
+      let detail="Project model endpoint failed.";
+      try{
+        const err=await resp.json();
+        if(typeof err.detail==="string")detail=err.detail;
+      }catch(_){ }
+      throw new Error(detail);
+    }
+    renderCareerResult(resultEl,await resp.json(),goal);
+    const newAch=Store.recordCareerAnalysis(goal);
+    newAch.forEach((a,i)=>setTimeout(()=>showAchToast(a),i*1600+400));
   }catch(e){
-    resultEl.innerHTML=`<p style="color:#FF8A80">⚠️ Analysis failed: ${e.message}. Please ensure Anthropic API access is configured.</p>`;
+    resultEl.innerHTML=`<p style="color:#FF8A80">⚠️ Analysis failed: ${e.message}. Ensure the local SkillIQ API is running and reachable.</p>`;
   }
 }
 
@@ -1029,7 +1088,7 @@ function renderCareerResult(el,data,goal){
 }
 
 async function downloadCareerReport(goal){
-  const sfxMap={gate:"gate",government_jobs:"govt",study_abroad:"abroad"};
+  const sfxMap={gate:"gate",government_jobs:"govt",it_job:"it",study_abroad:"abroad"};
   const sfx=sfxMap[goal];
   const resultEl=document.getElementById("career-result-"+sfx);
   let text=document.getElementById("global-text-input")?.value.trim()||"";
@@ -1038,7 +1097,7 @@ async function downloadCareerReport(goal){
   if(!text&&!file){resultEl.innerHTML="<p style='color:#FF8A80'>Please upload or paste your profile first.</p>";return}
   try{
     const form=new FormData();
-    form.append("career_goal",goal);
+    form.append("career_goal",mapCareerGoalForApi(goal));
     const role=document.getElementById("career-role-"+sfx)?.value||"";
     if(role)form.append("target_role",role);
     if(text)form.append("resume_text",text);
@@ -1050,13 +1109,27 @@ async function downloadCareerReport(goal){
   }catch(e){showToast("Download failed: "+e.message,"error")}
 }
 
-// ============ RECOMMENDATIONS ============
-function buildPlanFromAnalysis(docText,goal,role){
-  const el=document.getElementById("recs-plan");
-  el.innerHTML=`<div class="card" style="text-align:center;padding:48px"><span class="loading-spinner"></span><span class="muted"> Claude is building your personalized plan…</span></div>`;
-  const labels={gate:"GATE CSE",government_jobs:"Government Jobs",study_abroad:"Study Abroad"};
-  const prompt=`You are an expert CSE learning coach. Based on this student profile:\n\n${docText.substring(0,1500)}\n\nGoal: ${labels[goal]}${role?" ("+role+")":""}\n\nCreate a structured 6-week improvement plan with the most critical skills first. For each skill: 2-3 specific exercises/resources, daily time allocation, specific topics to focus on, and 1-2 free online resources. Add a final motivating summary section. Format with skill names as section headers, practical short bullets. Max 500 words.`;
-  callClaude(prompt,t=>{el.innerHTML=`<div class="card"><div class="ai-response">${fmt(t)}</div></div>`},()=>{el.innerHTML=`<div class="card" style="text-align:center;padding:48px"><p class="muted">Could not generate plan. Please check API configuration.</p></div>`});
+async function downloadCareerPdf(goal){
+  const sfxMap={gate:"gate",government_jobs:"govt",it_job:"it",study_abroad:"abroad"};
+  const sfx=sfxMap[goal];
+  const resultEl=document.getElementById("career-result-"+sfx);
+  let text=document.getElementById("global-text-input")?.value.trim()||"";
+  if(!text&&globalUploadedText)text=globalUploadedText;
+  const file=globalUploadedFile;
+  if(!text&&!file){resultEl.innerHTML="<p style='color:#FF8A80'>Please upload or paste your profile first.</p>";return}
+  try{
+    const form=new FormData();
+    form.append("career_goal",mapCareerGoalForApi(goal));
+    const role=document.getElementById("career-role-"+sfx)?.value||"";
+    if(role)form.append("target_role",role);
+    if(text)form.append("resume_text",text);
+    if(file)form.append("document",file);
+    const resp=await fetch(`${API_BASE}/cse/skill-gap/report-pdf`,{method:"POST",body:form});
+    if(!resp.ok)throw new Error("PDF generation failed.");
+    const blob=await resp.blob();const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=`skilliq_${goal}_report.pdf`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    showToast("PDF report downloaded","success");
+  }catch(e){showToast("PDF download failed: "+e.message,"error")}
 }
 
 // ============ DEMO / DASHBOARD ============
@@ -1094,23 +1167,6 @@ function buildDashboard(){
     return`<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)"><strong style="font-size:13px">${sk.name}</strong><div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap"><span class="diff diff-easy">Easy: ${s.errors.easy}</span><span class="diff diff-med">Med: ${s.errors.med}</span><span class="diff diff-hard">Hard: ${s.errors.hard}</span></div></div>`;
   }).join("");
   showPage("dashboard");
-}
-
-// ============ CLAUDE API ============
-async function callClaude(prompt,onOk,onErr){
-  try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
-    const d=await r.json();const t=d.content?.map(b=>b.text||"").join("")||"";
-    if(t)onOk(t);else onErr();
-  }catch(e){console.error(e);onErr()}
-}
-function fmt(text){
-  return text.split("\n").filter(l=>l.trim()).map(l=>{
-    const t=l.trim();
-    if(t.startsWith("- ")||t.startsWith("• "))return`<li>${t.slice(2)}</li>`;
-    if(t.endsWith(":")&&t.length<70)return`<h4>${t}</h4>`;
-    return`<p>${t}</p>`;
-  }).join("");
 }
 
 // ============ PROFILE ============
@@ -1175,7 +1231,7 @@ function showAchToast(ach){
   t.classList.add("show");setTimeout(()=>t.classList.remove("show"),4000);
 }
 
-// ============ MODEL ACTIONS (admin/teacher) ============
+// ============ MODEL ACTIONS (admin) ============
 function getModelStatusEl(){return document.getElementById("model-status")}
 function buildBackendPayload(r,ts=null){const sc=r.skillScores||{};return{selected_skills_count:Object.keys(sc).length||1,total_questions:r.totalAns,total_correct:r.totalCorrect,accuracy_pct:r.totalAns?Math.round(r.totalCorrect/r.totalAns*1000)/10:0,avg_time_sec:r.avgTime,overall_score:r.overallScore,math_score:sc.math?.score||0,logic_score:sc.logic?.score||0,aptitude_score:sc.aptitude?.score||0,problem_score:sc.problem?.score||0,target_score:ts}}
 
@@ -1183,5 +1239,13 @@ function buildBackendPayload(r,ts=null){const sc=r.skillScores||{};return{select
 switchCareerTab("gate");
 setTimeout(initMag,400);
 </script>
+<footer style="margin:22px auto 26px;max-width:1320px;padding:12px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+  <div style="font-size:12px;color:rgba(255,255,255,.72)">© 2026 SkillIQ. All Copyrights Reserved.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button onclick="location.href='help.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">Help</button>
+    <button onclick="location.href='about.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">About</button>
+    <button onclick="location.href='contact.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">Contact</button>
+  </div>
+</footer>
 </body>
 </html>

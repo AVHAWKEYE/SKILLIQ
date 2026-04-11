@@ -53,14 +53,18 @@ def decode_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id_str = payload.get("sub")
-        user_id: int = int(user_id_str) if user_id_str else None
-        username: str = payload.get("username")
-        role: str = payload.get("role")
+        user_id: Optional[int] = int(user_id_str) if user_id_str is not None else None
+        username = payload.get("username")
+        role = payload.get("role")
         
         if user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
         
-        return {"user_id": user_id, "username": username, "role": role}
+        return {
+            "user_id": user_id,
+            "username": username if isinstance(username, str) else "",
+            "role": role if isinstance(role, str) else "",
+        }
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
     except jwt.InvalidTokenError:
@@ -79,29 +83,17 @@ async def get_current_user(
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     
-    if not user.is_active:
+    if not bool(user.is_active):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is inactive")
     
     return user
-
-
-async def get_current_teacher(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    """Dependency to ensure user is a teacher"""
-    if current_user.role not in ["teacher", "admin"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only teachers can access this resource"
-        )
-    return current_user
 
 
 async def get_current_admin(
     current_user: User = Depends(get_current_user),
 ) -> User:
     """Dependency to ensure user is an admin"""
-    if current_user.role != "admin":
+    if str(current_user.role) != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can access this resource"

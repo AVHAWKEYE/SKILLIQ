@@ -1,6 +1,6 @@
 """AI Insights and Recommendations Engine"""
 import json
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
@@ -8,6 +8,27 @@ from sqlalchemy.orm import Session
 from .models import (
     User, Assessment, TestAttempt, Test, AIInsight, LearningResource, PerformanceMetric
 )
+
+
+def _to_float(value: object, default: float = 0.0) -> float:
+    """Safely convert potentially ORM-typed values to float."""
+    try:
+        if value is None:
+            return default
+        if isinstance(value, bool):
+            return float(value)
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            return float(value)
+        return default
+    except (TypeError, ValueError):
+        return default
+
+
+def _to_bool(value: object) -> bool:
+    """Safely convert potentially ORM-typed values to bool."""
+    return bool(value)
 
 
 class InsightsEngine:
@@ -85,13 +106,13 @@ class InsightsEngine:
         if not test_attempts:
             return {"message": "No test attempts available"}
 
-        completed = [t for t in test_attempts if t.status == "submitted" or t.status == "graded"]
+        completed = [t for t in test_attempts if str(t.status) in {"submitted", "graded"}]
         if not completed:
             return {"message": "No completed tests"}
 
-        scores = [t.percentage for t in completed if t.percentage is not None]
+        scores = [_to_float(t.percentage) for t in completed if t.percentage is not None]
         avg_score = sum(scores) / len(scores) if scores else 0
-        pass_count = sum(1 for t in completed if t.is_passed)
+        pass_count = sum(1 for t in completed if _to_bool(t.is_passed))
 
         return {
             "total_attempts": len(completed),
@@ -113,20 +134,20 @@ class InsightsEngine:
             key=lambda x: x.start_time
         )
 
-        trends = {"assessment_trend": [], "test_trend": []}
+        trends: Dict[str, object] = {"assessment_trend": [], "test_trend": []}
 
         # Assessment trend
         if len(assessments) >= 2:
-            first_avg = assessments[0].overall_score
-            last_avg = assessments[-1].overall_score
+            first_avg = _to_float(assessments[0].overall_score)
+            last_avg = _to_float(assessments[-1].overall_score)
             improvement = last_avg - first_avg
             trends["assessment_improvement"] = round(improvement, 2)
             trends["assessment_improvement_percentage"] = round((improvement / first_avg * 100), 2) if first_avg > 0 else 0
 
         # Test trend
         if len(completed_tests) >= 2:
-            first_score = completed_tests[0].percentage or 0
-            last_score = completed_tests[-1].percentage or 0
+            first_score = _to_float(completed_tests[0].percentage)
+            last_score = _to_float(completed_tests[-1].percentage)
             improvement = last_score - first_score
             trends["test_improvement"] = round(improvement, 2)
             trends["test_improvement_percentage"] = round((improvement / first_score * 100), 2) if first_score > 0 else 0
@@ -298,7 +319,7 @@ class InsightsEngine:
             "Seek help from instructors or peers",
         ])
 
-    def get_recommended_resources(self, user_id: int, skill: str = None, limit: int = 5) -> List[LearningResource]:
+    def get_recommended_resources(self, user_id: int, skill: Optional[str] = None, limit: int = 5) -> List[LearningResource]:
         """Get recommended learning resources for a student"""
         query = self.db.query(LearningResource).filter(
             LearningResource.is_verified == True
@@ -314,16 +335,19 @@ class InsightsEngine:
 
         return resources
 
-    def update_performance_metrics(self, user_id: int, test_id: int = None) -> None:
+    def update_performance_metrics(self, user_id: int, test_id: Optional[int] = None) -> None:
         """Update performance metrics after each test/assessment"""
         user = self.db.query(User).filter(User.id == user_id).first()
-        if not user or user.role != "student":
+        if not user or str(user.role) != "user":
             return
 
         # Overall performance metric
         assessments = self.db.query(Assessment).filter(Assessment.user_id == user_id).all()
         if assessments:
-            avg_score = sum(a.overall_score for a in assessments) / len(assessments)
+            assessment_scores = [_to_float(a.overall_score) for a in assessments]
+            avg_score = sum(assessment_scores) / len(assessment_scores)
+            highest_score = max(assessment_scores)
+            successful_attempts = sum(1 for score in assessment_scores if score >= 70)
             
             metric = self.db.query(PerformanceMetric).filter(
                 PerformanceMetric.user_id == user_id,
@@ -332,10 +356,10 @@ class InsightsEngine:
             ).first()
             
             if metric:
-                metric.total_attempts = len(assessments)
-                metric.average_score = avg_score
-                metric.highest_score = max(a.overall_score for a in assessments)
-                metric.last_attempt_date = datetime.utcnow()
+                setattr(metric, "total_attempts", len(assessments))
+                setattr(metric, "average_score", avg_score)
+                setattr(metric, "highest_score", highest_score)
+                setattr(metric, "last_attempt_date", datetime.utcnow())
             else:
                 metric = PerformanceMetric(
                     user_id=user_id,
@@ -343,8 +367,8 @@ class InsightsEngine:
                     category="Overall",
                     total_attempts=len(assessments),
                     average_score=avg_score,
-                    highest_score=max(a.overall_score for a in assessments),
-                    successful_attempts=len([a for a in assessments if a.overall_score >= 70]),
+                    highest_score=highest_score,
+                    successful_attempts=successful_attempts,
                     last_attempt_date=datetime.utcnow(),
                 )
                 self.db.add(metric)
@@ -361,8 +385,10 @@ class InsightsEngine:
                 completed = [t for t in test_attempts if t.percentage is not None]
                 
                 if completed:
-                    avg_score = sum(t.percentage for t in completed) / len(completed)
-                    passed = sum(1 for t in completed if t.is_passed)
+                    completed_scores = [_to_float(t.percentage) for t in completed]
+                    avg_score = sum(completed_scores) / len(completed_scores)
+                    passed = sum(1 for t in completed if _to_bool(t.is_passed))
+                    highest_score = max(completed_scores)
                     
                     metric = self.db.query(PerformanceMetric).filter(
                         PerformanceMetric.user_id == user_id,
@@ -370,10 +396,10 @@ class InsightsEngine:
                     ).first()
                     
                     if metric:
-                        metric.total_attempts = len(test_attempts)
-                        metric.average_score = avg_score
-                        metric.successful_attempts = passed
-                        metric.last_attempt_date = datetime.utcnow()
+                        setattr(metric, "total_attempts", len(test_attempts))
+                        setattr(metric, "average_score", avg_score)
+                        setattr(metric, "successful_attempts", passed)
+                        setattr(metric, "last_attempt_date", datetime.utcnow())
                     else:
                         metric = PerformanceMetric(
                             user_id=user_id,
@@ -383,7 +409,7 @@ class InsightsEngine:
                             total_attempts=len(test_attempts),
                             average_score=avg_score,
                             successful_attempts=passed,
-                            highest_score=max(t.percentage for t in completed),
+                            highest_score=highest_score,
                             last_attempt_date=datetime.utcnow(),
                         )
                         self.db.add(metric)

@@ -504,7 +504,7 @@ input.error {
     <div class="logo">
       <div class="logo-mark">🧠</div>
       <div class="logo-text">Skill<span>IQ</span></div>
-      <div class="logo-sub">AI-Powered Student Performance Platform</div>
+      <div class="logo-sub">AI-Powered Performance Platform</div>
     </div>
 
     <!-- Tabs -->
@@ -522,13 +522,9 @@ input.error {
         <span class="role-icon">👑</span>
         <span class="role-label">Admin</span>
       </button>
-      <button class="role-btn" data-role="teacher" onclick="selectRole('teacher')">
-        <span class="role-icon">📚</span>
-        <span class="role-label">Teacher</span>
-      </button>
-      <button class="role-btn selected" data-role="student" onclick="selectRole('student')">
-        <span class="role-icon">🎓</span>
-        <span class="role-label">Student</span>
+      <button class="role-btn selected" data-role="user" onclick="selectRole('user')">
+        <span class="role-icon">👤</span>
+        <span class="role-label">User</span>
       </button>
     </div>
 
@@ -546,12 +542,8 @@ input.error {
           <button type="button" class="demo-fill" onclick="fillDemo('admin')">Use</button>
         </div>
         <div class="demo-item">
-          <span class="demo-label" id="demo-teacher-label">Teacher: teacher_demo / Teacher@123</span>
-          <button type="button" class="demo-fill" onclick="fillDemo('teacher')">Use</button>
-        </div>
-        <div class="demo-item">
-          <span class="demo-label" id="demo-student-label">Student: student_demo / Student@123</span>
-          <button type="button" class="demo-fill" onclick="fillDemo('student')">Use</button>
+          <span class="demo-label" id="demo-user-label">User: user_demo / User@123</span>
+          <button type="button" class="demo-fill" onclick="fillDemo('user')">Use</button>
         </div>
       </div>
     </div>
@@ -588,8 +580,8 @@ input.error {
         <label for="remember-me">Remember me for 30 days</label>
       </div>
 
-      <button class="btn-submit" id="login-btn" data-role="student" onclick="handleLogin()">
-        Sign In as Student
+      <button class="btn-submit" id="login-btn" data-role="user" onclick="handleLogin()">
+        Sign In as User
       </button>
     </div>
 
@@ -620,47 +612,6 @@ input.error {
           <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
         </div>
         <div class="field-error" id="reg-email-err">Please enter a valid email address.</div>
-      </div>
-
-      <!-- Teacher-specific field -->
-      <div class="field-wrap hidden" id="field-dept">
-        <div class="field-label">Department / Subject</div>
-        <div class="input-group select-wrap">
-          <span class="input-icon">📖</span>
-          <select id="reg-dept" style="padding-left:40px;">
-            <option value="">Select department</option>
-            <option>Mathematics</option>
-            <option>Science</option>
-            <option>English & Literature</option>
-            <option>Computer Science</option>
-            <option>History & Social Studies</option>
-            <option>Arts & Music</option>
-            <option>Physical Education</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="field-error" id="reg-dept-err">Please select a department.</div>
-      </div>
-
-      <!-- Student-specific field -->
-      <div class="field-wrap hidden" id="field-grade">
-        <div class="field-label">Grade / Class</div>
-        <div class="input-group select-wrap">
-          <span class="input-icon">🎓</span>
-          <select id="reg-grade" style="padding-left:40px;">
-            <option value="">Select grade</option>
-            <option>Grade 6</option>
-            <option>Grade 7</option>
-            <option>Grade 8</option>
-            <option>Grade 9</option>
-            <option>Grade 10</option>
-            <option>Grade 11</option>
-            <option>Grade 12</option>
-            <option>Undergraduate</option>
-            <option>Postgraduate</option>
-          </select>
-        </div>
-        <div class="field-error" id="reg-grade-err">Please select a grade.</div>
       </div>
 
       <!-- Admin-specific field -->
@@ -700,7 +651,7 @@ input.error {
       </div>
       <div class="field-error" id="reg-terms-err" style="margin-top:-10px; margin-bottom:10px;">You must accept the terms.</div>
 
-      <button class="btn-submit" id="register-btn" data-role="student" onclick="handleRegister()">
+      <button class="btn-submit" id="register-btn" data-role="user" onclick="handleRegister()">
         Create Account
       </button>
     </div>
@@ -713,7 +664,7 @@ input.error {
 </div>
 
 <script>
-let currentRole = 'student';
+let currentRole = 'user';
 let currentTab = 'login';
 const API_BASE = '';
 
@@ -725,15 +676,13 @@ function selectRole(role) {
   // Update submit buttons
   const loginBtn = document.getElementById('login-btn');
   const regBtn = document.getElementById('register-btn');
-  const labels = { admin: 'Admin', teacher: 'Teacher', student: 'Student' };
+  const labels = { admin: 'Admin', user: 'User' };
   loginBtn.setAttribute('data-role', role);
   loginBtn.textContent = `Sign In as ${labels[role]}`;
   regBtn.setAttribute('data-role', role);
   regBtn.textContent = `Create ${labels[role]} Account`;
 
   // Show/hide role-specific fields
-  document.getElementById('field-dept').classList.toggle('hidden', role !== 'teacher');
-  document.getElementById('field-grade').classList.toggle('hidden', role !== 'student');
   document.getElementById('field-admin-code').classList.toggle('hidden', role !== 'admin');
 }
 
@@ -802,10 +751,8 @@ function isValidPassword(p) { return p.length >= 8 && /[a-zA-Z]/.test(p) && /[0-
 function redirectByRole(role) {
   if (role === 'admin') {
     window.location.href = 'admin.html';
-  } else if (role === 'teacher') {
-    window.location.href = 'teacher.html';
   } else {
-    window.location.href = 'student.html';
+    window.location.href = 'index.html';
   }
 }
 
@@ -822,8 +769,7 @@ function buildApiErrorMessage(result, fallback) {
 function fillDemo(role) {
   const demoMap = {
     admin: { username: 'admin_demo', password: 'Admin@123' },
-    teacher: { username: 'teacher_demo', password: 'Teacher@123' },
-    student: { username: 'student_demo', password: 'Student@123' }
+    user: { username: 'user_demo', password: 'User@123' }
   };
   const selected = demoMap[role];
   if (!selected) return;
@@ -885,7 +831,7 @@ async function loadDemoStatus() {
     data.items.forEach(item => {
       const label = document.getElementById(`demo-${item.role}-label`);
       if (!label) return;
-      label.textContent = `${item.role.charAt(0).toUpperCase() + item.role.slice(1)}: ${item.username} / ${item.role === 'admin' ? 'Admin@123' : item.role === 'teacher' ? 'Teacher@123' : 'Student@123'} ${item.available ? '• available' : '• not seeded yet'}`;
+      label.textContent = `${item.role.charAt(0).toUpperCase() + item.role.slice(1)}: ${item.username} / ${item.role === 'admin' ? 'Admin@123' : 'User@123'} ${item.available ? '• available' : '• not seeded yet'}`;
       label.style.opacity = item.available ? '1' : '0.6';
     });
   } catch (err) {
@@ -982,14 +928,6 @@ async function handleRegister() {
   if (!isValidEmail(email)) {
     showErr('reg-email-err', 'Please enter a valid email address.'); document.getElementById('reg-email').classList.add('error'); valid = false;
   }
-  if (currentRole === 'teacher') {
-    const dept = document.getElementById('reg-dept').value;
-    if (!dept) { showErr('reg-dept-err', 'Please select a department.'); valid = false; }
-  }
-  if (currentRole === 'student') {
-    const grade = document.getElementById('reg-grade').value;
-    if (!grade) { showErr('reg-grade-err', 'Please select a grade.'); valid = false; }
-  }
   if (currentRole === 'admin') {
     const code = document.getElementById('reg-admin-code').value;
     if (code !== 'SKILLIQ-ADMIN-2025') { showErr('reg-admincode-err', 'Invalid admin access code.'); document.getElementById('reg-admin-code').classList.add('error'); valid = false; }
@@ -1058,5 +996,13 @@ loadDemoStatus();
 setInterval(checkBackendConnection, 15000);
 setInterval(loadDemoStatus, 20000);
 </script>
+<footer style="margin:14px auto 22px;max-width:820px;padding:12px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:relative;z-index:10;">
+  <div style="font-size:12px;color:rgba(255,255,255,.72)">© 2026 SkillIQ. All Copyrights Reserved.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button onclick="location.href='help.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">Help</button>
+    <button onclick="location.href='about.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">About</button>
+    <button onclick="location.href='contact.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">Contact</button>
+  </div>
+</footer>
 </body>
 </html>

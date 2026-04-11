@@ -45,6 +45,25 @@ SKILL_ALIASES: Dict[str, List[str]] = {
 
 
 CAREER_SKILL_MAP: Dict[str, Dict[str, Any]] = {
+    "gate": {
+        "label": "GATE Examination (CSE)",
+        "mandatory": [
+            "data structures",
+            "algorithms",
+            "dbms",
+            "operating systems",
+            "computer networks",
+            "quantitative aptitude",
+            "reasoning",
+            "english communication",
+        ],
+        "good_to_have": ["python", "c++", "linux", "debugging"],
+        "roles": {
+            "gate_top100": ["data structures", "algorithms", "dbms", "operating systems", "computer networks"],
+            "gate_psu": ["data structures", "algorithms", "operating systems", "computer networks", "reasoning"],
+            "mtech_iit": ["data structures", "algorithms", "dbms", "operating systems", "quantitative aptitude"],
+        },
+    },
     "government_jobs": {
         "label": "Government Jobs (CSE)",
         "mandatory": [
@@ -128,6 +147,9 @@ SUBJECT_TO_SKILLS: Dict[str, List[str]] = {
 def _normalize_goal(goal: str) -> str:
     g = (goal or "").strip().lower()
     aliases = {
+        "gate": "gate",
+        "gate cse": "gate",
+        "gate_cse": "gate",
         "govt": "government_jobs",
         "government": "government_jobs",
         "government_jobs": "government_jobs",
@@ -196,7 +218,7 @@ def build_recommendations(missing_skills: List[str], goal_key: str) -> List[str]
     for skill in missing_skills[:5]:
         recs.append(f"Focus on {skill}: 30-45 minutes daily practice for 4 weeks.")
 
-    if goal_key == "government_jobs":
+    if goal_key in {"government_jobs", "gate"}:
         recs.append("Add a weekly mock test for aptitude, reasoning, and CSE core subjects.")
     elif goal_key == "study_abroad":
         recs.append("Start SOP draft and IELTS/TOEFL preparation with weekly speaking practice.")
@@ -387,6 +409,10 @@ def parse_uploaded_document(filename: str, content: bytes) -> str:
 
 
 LANGUAGE_MAP = {
+    "gate": [
+        {"name": "English", "level": "Required", "reason": "Question paper language and technical terminology for GATE CSE"},
+        {"name": "Hindi", "level": "Helpful", "reason": "Useful for preparation resources and discussions"},
+    ],
     "government_jobs": [
         {"name": "English", "level": "Required", "reason": "Official exam language for GATE, UPSC, SSC and interview rounds"},
         {"name": "Hindi", "level": "Required", "reason": "Required for central government exams; many official communications in Hindi"},
@@ -440,7 +466,7 @@ def analyze_cse_profile(raw_text: str, goal: str, target_role: Optional[str] = N
     goal_key = _normalize_goal(goal)
     profile = CAREER_SKILL_MAP.get(goal_key)
     if not profile:
-        raise ValueError("Unsupported goal. Use: government_jobs, study_abroad, or it_job.")
+        raise ValueError("Unsupported goal. Use: gate, government_jobs, study_abroad, or it_job.")
 
     role_key = _normalize_role(goal_key, target_role)
     if target_role and not role_key:

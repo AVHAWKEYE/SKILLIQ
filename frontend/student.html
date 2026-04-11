@@ -42,7 +42,7 @@
             background: var(--glass);
             backdrop-filter: blur(18px);
             border-bottom: 1px solid var(--glass-b);
-            padding: 16px 28px;
+            padding: 18px 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -50,11 +50,17 @@
             position: sticky;
             top: 0;
             z-index: 200;
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, background-color 0.25s ease;
+        }
+
+        .navbar.nav-elevated {
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: 0 14px 34px rgba(108, 99, 255, .14);
         }
 
         .navbar-brand {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: var(--text);
             display: flex;
@@ -72,7 +78,7 @@
         }
 
         .nav-item {
-            padding: 8px 16px;
+            padding: 10px 18px;
             border-radius: 8px;
             background: none;
             border: 1px solid transparent;
@@ -81,6 +87,13 @@
             transition: all 0.2s;
             color: var(--muted);
             font-family: inherit;
+            font-size: 14px;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .nav-item:hover,
@@ -370,6 +383,44 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @media (max-width: 980px) {
+            .navbar {
+                padding: 14px 16px;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .navbar-brand {
+                width: 100%;
+                font-size: 20px;
+            }
+
+            .navbar-menu {
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .navbar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .container {
+                padding: 22px 14px;
+            }
+
+            .metrics-grid,
+            .test-grid,
+            .resource-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -384,7 +435,7 @@
             <button class="nav-item" onclick="showPage('insights')">💡 AI Insights</button>
             <button class="nav-item" onclick="showPage('resources')">📚 Resources</button>
         </div>
-        <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="navbar-right">
             <span id="student-name" style="font-weight: 600;">Student</span>
             <button class="btn btn-sm" onclick="logout()">🚪 Logout</button>
         </div>
@@ -730,11 +781,29 @@
             window.location.href = 'auth.html';
         }
 
+        function initNavbarScrollBehavior() {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            window.addEventListener('scroll', () => {
+                const y = window.scrollY;
+                navbar.classList.toggle('nav-elevated', y > 8);
+            }, { passive: true });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            initNavbarScrollBehavior();
             loadUserInfo();
             loadDashboard();
         });
     </script>
+    <footer style="margin:20px auto 24px;max-width:1200px;padding:12px 16px;border:1px solid rgba(108,99,255,.2);border-radius:12px;background:rgba(255,255,255,.62);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div style="font-size:12px;color:var(--muted)">© 2026 SkillIQ. All Copyrights Reserved.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="location.href='help.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(108,99,255,.25);background:rgba(108,99,255,.08);color:var(--purple);cursor:pointer">Help</button>
+            <button onclick="location.href='about.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(108,99,255,.25);background:rgba(108,99,255,.08);color:var(--purple);cursor:pointer">About</button>
+            <button onclick="location.href='contact.html'" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(108,99,255,.25);background:rgba(108,99,255,.08);color:var(--purple);cursor:pointer">Contact</button>
+        </div>
+    </footer>
 </body>
 </html>
