@@ -1,11 +1,13 @@
 import json
+import io
 from pathlib import Path
 from typing import List, Optional
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, status
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -18,6 +20,7 @@ from .auth import (
     get_current_user, get_current_teacher, get_current_admin, require_role
 )
 from .database import SessionLocal, engine, get_db
+from .cse_career import analyze_cse_profile, build_cse_pdf_report, format_cse_report, parse_uploaded_document
 from .insights import InsightsEngine
 from .mongo_sync import (
     full_sync_from_sql,
@@ -843,6 +846,120 @@ def get_teacher_test_analytics(
         "students_passed": pass_count,
         "students_failed": len(attempts) - pass_count
     }
+
+
+# ========== CSE CAREER GAP ANALYZER ==========
+@app.post("/api/cse/skill-gap/analyze")
+async def analyze_cse_skill_gap(
+    career_goal: str = Form(...),
+    target_role: Optional[str] = Form(None),
+    resume_text: Optional[str] = Form(None),
+    document: Optional[UploadFile] = File(None),
+):
+    """Analyze resume/marksheet/performance sheet and return CSE goal-based skill gaps."""
+    content_parts: List[str] = []
+
+    if resume_text and resume_text.strip():
+        content_parts.append(resume_text.strip())
+
+    if document:
+        raw = await document.read()
+        if raw:
+            parsed = parse_uploaded_document(document.filename or "uploaded_document", raw)
+            if parsed.strip():
+                content_parts.append(parsed.strip())
+
+    if not content_parts:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide resume_text or upload a resume/marksheet/performance sheet.",
+        )
+
+    combined_text = "\n".join(content_parts)
+    try:
+        return analyze_cse_profile(combined_text, career_goal, target_role)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/cse/skill-gap/report")
+async def download_cse_skill_gap_report(
+    career_goal: str = Form(...),
+    target_role: Optional[str] = Form(None),
+    resume_text: Optional[str] = Form(None),
+    document: Optional[UploadFile] = File(None),
+):
+    """Generate downloadable text report for CSE goal-based skill gaps."""
+    content_parts: List[str] = []
+
+    if resume_text and resume_text.strip():
+        content_parts.append(resume_text.strip())
+
+    if document:
+        raw = await document.read()
+        if raw:
+            parsed = parse_uploaded_document(document.filename or "uploaded_document", raw)
+            if parsed.strip():
+                content_parts.append(parsed.strip())
+
+    if not content_parts:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide resume_text or upload a resume/marksheet/performance sheet.",
+        )
+
+    combined_text = "\n".join(content_parts)
+    try:
+        analysis = analyze_cse_profile(combined_text, career_goal, target_role)
+        report_text = format_cse_report(analysis)
+        filename = f"skilliq_{analysis.get('goal', 'career')}_report.txt"
+        return StreamingResponse(
+            iter([report_text]),
+            media_type="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={filename}"},
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/cse/skill-gap/report-pdf")
+async def download_cse_skill_gap_report_pdf(
+    career_goal: str = Form(...),
+    target_role: Optional[str] = Form(None),
+    resume_text: Optional[str] = Form(None),
+    document: Optional[UploadFile] = File(None),
+):
+    """Generate downloadable PDF report for CSE goal-based skill gaps."""
+    content_parts: List[str] = []
+
+    if resume_text and resume_text.strip():
+        content_parts.append(resume_text.strip())
+
+    if document:
+        raw = await document.read()
+        if raw:
+            parsed = parse_uploaded_document(document.filename or "uploaded_document", raw)
+            if parsed.strip():
+                content_parts.append(parsed.strip())
+
+    if not content_parts:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide resume_text or upload a resume/marksheet/performance sheet.",
+        )
+
+    combined_text = "\n".join(content_parts)
+    try:
+        analysis = analyze_cse_profile(combined_text, career_goal, target_role)
+        pdf_bytes = build_cse_pdf_report(analysis)
+        filename = f"skilliq_{analysis.get('goal', 'career')}_report.pdf"
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={filename}"},
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 # ========== LIVE TEST WEBSOCKET ENDPOINT ==========

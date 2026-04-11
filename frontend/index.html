@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillIQ — AI Student Performance Analyzer</title>
+<title>SkillIQ — CSE Career Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -103,6 +103,14 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;
   box-shadow:0 10px 28px rgba(108,99,255,.45);color:#fff}
 .btn-sm{padding:6px 14px;font-size:12px;border-radius:var(--r-sm)}
 .btn-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+
+.career-analyzer{background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.9);border-radius:var(--r-lg);padding:20px;box-shadow:var(--glass-sh)}
+.career-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+.career-grid textarea{min-height:150px;resize:vertical;padding:10px 12px;border-radius:12px;border:1px solid rgba(108,99,255,.25);background:rgba(255,255,255,.82);font-family:inherit;font-size:13px;color:var(--text)}
+.career-grid select{padding:9px 12px;border-radius:10px;border:1px solid rgba(108,99,255,.25);background:rgba(255,255,255,.86);font-family:inherit}
+.career-result{margin-top:14px;padding:14px;border-radius:12px;background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.16);font-size:13px;line-height:1.65}
+
+.magnetic-ready{will-change:transform}
 
 /* GRIDS */
 .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px}
@@ -276,6 +284,7 @@ input[type="number"]{max-width:200px}
   .page{padding:20px 14px}.nav{padding:8px 14px}
   .hero h1{font-size:26px}.grid-4{grid-template-columns:repeat(2,1fr)}
   .metric-val{font-size:24px}.nav-uname{display:none}
+  .career-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -303,9 +312,9 @@ input[type="number"]{max-width:200px}
 <div class="page active" id="page-home">
   <div class="hero">
     <div class="hero-orb h1"></div><div class="hero-orb h2"></div>
-    <div class="hero-tag">✦ Multi-Skill AI Performance Analyzer</div>
+    <div class="hero-tag">✦ CSE Career Readiness Platform</div>
     <h1>Know exactly <span class="grad">where you stand.</span><br>Fix what holds you back.</h1>
-    <p class="hero-sub">AI-powered analysis of your accuracy, response time, and error patterns across 4 skill domains — with a personalized improvement plan built just for you.</p>
+    <p class="hero-sub">AI-powered analysis of your Computer Science strengths, skill gaps, and career readiness for IT jobs, government roles, and study-abroad pathways.</p>
     <div class="btn-row">
       <button class="btn btn-primary" onclick="showPage('quiz');startFresh();">Start Assessment ↗</button>
       <button class="btn" onclick="showPage('dashboard');loadDemoData();">View Demo Dashboard</button>
@@ -313,18 +322,18 @@ input[type="number"]{max-width:200px}
   </div>
 
   <div class="grid-4 mb-16">
-    <div class="card-sm"><div class="skill-icon-lg">🧮</div><div class="card-sm-name">Mathematics</div><div class="card-sm-desc">Arithmetic, algebra, geometry, calculus</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">🧠</div><div class="card-sm-name">Logical Reasoning</div><div class="card-sm-desc">Patterns, deduction, syllogisms</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">⚡</div><div class="card-sm-name">Aptitude</div><div class="card-sm-desc">Speed, quantitative ability, data</div></div>
-    <div class="card-sm"><div class="skill-icon-lg">🔧</div><div class="card-sm-name">Problem Solving</div><div class="card-sm-desc">Strategy, critical thinking, puzzles</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">🧩</div><div class="card-sm-name">DSA Foundations</div><div class="card-sm-desc">Complexity, recursion, trees, graphs</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">🧠</div><div class="card-sm-name">Algorithmic Reasoning</div><div class="card-sm-desc">Tracing, optimization, edge cases</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">💾</div><div class="card-sm-name">CS Fundamentals</div><div class="card-sm-desc">DBMS, OS, CN, OOP concepts</div></div>
+    <div class="card-sm"><div class="skill-icon-lg">🛠️</div><div class="card-sm-name">Debugging & Engineering</div><div class="card-sm-desc">Testing, practical coding, reliability</div></div>
   </div>
 
   <div class="card">
     <div class="card-title">How it works</div>
     <div class="grid-3">
-      <div><div class="step-num">01</div><div class="step-name">Take the assessment</div><div class="step-desc">Answer 20 questions across 4 skill domains. Speed and accuracy tracked in real time.</div></div>
-      <div><div class="step-num">02</div><div class="step-name">Get AI analysis</div><div class="step-desc">Claude identifies your micro-level skill gaps from error patterns, not just your score.</div></div>
-      <div><div class="step-num">03</div><div class="step-name">Follow your plan</div><div class="step-desc">Receive a targeted improvement plan with exercises tailored to your specific gaps.</div></div>
+      <div><div class="step-num">01</div><div class="step-name">Take the CSE assessment</div><div class="step-desc">Answer 20 CSE-focused questions across DSA, reasoning, fundamentals, and debugging.</div></div>
+      <div><div class="step-num">02</div><div class="step-name">Upload your documents</div><div class="step-desc">Add resume, marksheet, or performance sheet to extract your practical skill profile.</div></div>
+      <div><div class="step-num">03</div><div class="step-name">Get goal-based gaps</div><div class="step-desc">See mandatory skills for your chosen goal and exactly what is still missing.</div></div>
     </div>
   </div>
 
@@ -447,6 +456,46 @@ input[type="number"]{max-width:200px}
     <button class="btn btn-primary mt-12" onclick="showPage('quiz');startFresh()">Start Assessment ↗</button>
   </div>
   <div id="recs-content" class="hidden"><div id="recs-plan"></div></div>
+
+  <div class="career-analyzer" style="margin-top:16px">
+    <div class="card-title" style="margin-bottom:12px">CSE Career Skill Gap Analyzer</div>
+    <div class="career-grid">
+      <div>
+        <div class="section-title">Paste Resume/Marksheet/Performance Text</div>
+        <textarea id="career-text" placeholder="Paste content from resume, marksheet, grade sheet, or performance report..."></textarea>
+      </div>
+      <div>
+        <div class="section-title">Choose Career Goal</div>
+        <select id="career-goal" style="width:100%;margin-bottom:10px">
+          <option value="government_jobs">Government Jobs (CSE)</option>
+          <option value="study_abroad">Study Abroad (CSE)</option>
+          <option value="it_job">IT Job</option>
+        </select>
+        <div class="section-title">Target Role (Optional)</div>
+        <select id="career-role" style="width:100%;margin-bottom:10px">
+          <option value="">Auto / General</option>
+          <option value="gate_cse">GATE CSE</option>
+          <option value="isro_drdo_technical">ISRO/DRDO Technical</option>
+          <option value="ssc_cgl_it">SSC CGL IT</option>
+          <option value="ms_cs">MS CS</option>
+          <option value="ms_data_science">MS Data Science</option>
+          <option value="research_track">Research Track</option>
+          <option value="software_engineer">Software Engineer</option>
+          <option value="backend_developer">Backend Developer</option>
+          <option value="qa_automation">QA Automation</option>
+        </select>
+        <div class="section-title">Or Upload Document</div>
+        <input id="career-doc" type="file" accept=".txt,.csv,.pdf,.docx" style="width:100%;margin-bottom:10px">
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="flex:1" onclick="analyzeCareerGap()">Analyze Skill Gap ↗</button>
+          <button class="btn" style="flex:1" onclick="downloadCareerReport()">Download Report</button>
+          <button class="btn" style="flex:1" onclick="downloadCareerPdfReport()">Download PDF</button>
+        </div>
+        <p class="muted" style="margin-top:8px">Supported: TXT, CSV, PDF, DOCX</p>
+      </div>
+    </div>
+    <div id="career-result" class="career-result">Choose a goal and submit a document or text to see required skills, existing skills, and missing mandatory skills.</div>
+  </div>
 </div>
 
 <!-- PROFILE -->
@@ -538,6 +587,23 @@ function showToast(msg,type='info'){
 let selectedSkills=[],quizQueue=[],qIdx=0,answers=[],timerInterval=null,
     timeLeft=30,qStartTime=0,results=null,radarChart=null,timeChart=null,latestAssessmentId=null;
 const API_BASE='/api';
+const CAREER_ROLE_OPTIONS={
+  government_jobs:[
+    {value:'gate_cse',label:'GATE CSE'},
+    {value:'isro_drdo_technical',label:'ISRO/DRDO Technical'},
+    {value:'ssc_cgl_it',label:'SSC CGL IT'}
+  ],
+  study_abroad:[
+    {value:'ms_cs',label:'MS CS'},
+    {value:'ms_data_science',label:'MS Data Science'},
+    {value:'research_track',label:'Research Track'}
+  ],
+  it_job:[
+    {value:'software_engineer',label:'Software Engineer'},
+    {value:'backend_developer',label:'Backend Developer'},
+    {value:'qa_automation',label:'QA Automation'}
+  ]
+};
 
 /* NAV */
 function showPage(id){
@@ -871,9 +937,172 @@ async function importKaggleDataFromUI(){
   }catch(e){el.textContent=`Import failed: ${e.message}`}
 }
 
+async function analyzeCareerGap(){
+  const resultEl=document.getElementById('career-result');
+  const goal=document.getElementById('career-goal').value;
+  const role=document.getElementById('career-role').value;
+  const text=document.getElementById('career-text').value.trim();
+  const file=document.getElementById('career-doc').files?.[0];
+
+  if(!text && !file){
+    resultEl.textContent='Provide text or upload a document first.';
+    return;
+  }
+
+  const form=new FormData();
+  form.append('career_goal',goal);
+  if(role)form.append('target_role',role);
+  if(text)form.append('resume_text',text);
+  if(file)form.append('document',file);
+
+  resultEl.innerHTML='<span class="loading-spinner"></span> Analyzing your CSE profile...';
+  try{
+    const resp=await fetch(`${API_BASE}/cse/skill-gap/analyze`,{method:'POST',body:form});
+    const data=await resp.json();
+    if(!resp.ok)throw new Error(data.detail||'Analysis failed.');
+
+    const mandatory=(data.required_mandatory_skills||[]).map(s=>`<li>${s}</li>`).join('');
+    const have=(data.skills_detected||[]).map(s=>`<li>${s}</li>`).join('');
+    const missing=(data.missing_mandatory_skills||[]).map(s=>`<li>${s}</li>`).join('');
+    const recs=(data.recommendations||[]).map(s=>`<li>${s}</li>`).join('');
+    const prof=Object.entries(data.skill_proficiency||{}).map(([skill,p])=>`<li>${skill}: ${p.level} (confidence ${p.confidence}%)</li>`).join('');
+
+    resultEl.innerHTML=`
+      <p><strong>Goal:</strong> ${data.goal_label}${data.target_role?` | <strong>Role:</strong> ${data.target_role}`:''} | <strong>Readiness:</strong> ${data.readiness_percentage}%</p>
+      <h4>Mandatory Skills Required</h4>
+      <ul>${mandatory || '<li>No mandatory skills defined.</li>'}</ul>
+      <h4>Skills You Have</h4>
+      <ul>${have || '<li>No matching skills detected.</li>'}</ul>
+      <h4>Skill Proficiency</h4>
+      <ul>${prof || '<li>No proficiency data available.</li>'}</ul>
+      <h4>Remaining Mandatory Skills</h4>
+      <ul>${missing || '<li>Great! No mandatory gaps found.</li>'}</ul>
+      <h4>Next Steps</h4>
+      <ul>${recs || '<li>Keep practicing advanced projects and mocks.</li>'}</ul>
+    `;
+  }catch(e){
+    resultEl.textContent=`Analysis failed: ${e.message}`;
+  }
+}
+
+async function downloadCareerReport(){
+  const resultEl=document.getElementById('career-result');
+  const goal=document.getElementById('career-goal').value;
+  const role=document.getElementById('career-role').value;
+  const text=document.getElementById('career-text').value.trim();
+  const file=document.getElementById('career-doc').files?.[0];
+
+  if(!text && !file){
+    resultEl.textContent='Provide text or upload a document first.';
+    return;
+  }
+
+  const form=new FormData();
+  form.append('career_goal',goal);
+  if(role)form.append('target_role',role);
+  if(text)form.append('resume_text',text);
+  if(file)form.append('document',file);
+
+  try{
+    const resp=await fetch(`${API_BASE}/cse/skill-gap/report`,{method:'POST',body:form});
+    if(!resp.ok){
+      const data=await resp.json();
+      throw new Error(data.detail||'Report generation failed.');
+    }
+
+    const blob=await resp.blob();
+    const url=URL.createObjectURL(blob);
+    const dispo=resp.headers.get('Content-Disposition')||'';
+    const match=dispo.match(/filename=([^;]+)/i);
+    const filename=match?match[1].replace(/"/g,'').trim():'skilliq_cse_skill_gap_report.txt';
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }catch(e){
+    resultEl.textContent=`Report download failed: ${e.message}`;
+  }
+}
+
+async function downloadCareerPdfReport(){
+  const resultEl=document.getElementById('career-result');
+  const goal=document.getElementById('career-goal').value;
+  const role=document.getElementById('career-role').value;
+  const text=document.getElementById('career-text').value.trim();
+  const file=document.getElementById('career-doc').files?.[0];
+
+  if(!text && !file){
+    resultEl.textContent='Provide text or upload a document first.';
+    return;
+  }
+
+  const form=new FormData();
+  form.append('career_goal',goal);
+  if(role)form.append('target_role',role);
+  if(text)form.append('resume_text',text);
+  if(file)form.append('document',file);
+
+  try{
+    const resp=await fetch(`${API_BASE}/cse/skill-gap/report-pdf`,{method:'POST',body:form});
+    if(!resp.ok){
+      const data=await resp.json();
+      throw new Error(data.detail||'PDF generation failed.');
+    }
+
+    const blob=await resp.blob();
+    const url=URL.createObjectURL(blob);
+    const dispo=resp.headers.get('Content-Disposition')||'';
+    const match=dispo.match(/filename=([^;]+)/i);
+    const filename=match?match[1].replace(/"/g,'').trim():'skilliq_cse_skill_gap_report.pdf';
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }catch(e){
+    resultEl.textContent=`PDF download failed: ${e.message}`;
+  }
+}
+
+function updateCareerRoleOptions(){
+  const goalEl=document.getElementById('career-goal');
+  const roleEl=document.getElementById('career-role');
+  if(!goalEl||!roleEl)return;
+
+  const goal=goalEl.value;
+  const options=CAREER_ROLE_OPTIONS[goal]||[];
+  roleEl.innerHTML='<option value="">Auto / General</option>'+
+    options.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+}
+
+function initMagneticButtons(){
+  if(window.matchMedia('(pointer: coarse)').matches)return;
+  const items=document.querySelectorAll('button,.btn,.nav-tab,.nav-logout-btn');
+  items.forEach(el=>{
+    el.classList.add('magnetic-ready');
+    el.addEventListener('mousemove',ev=>{
+      const rect=el.getBoundingClientRect();
+      const x=(ev.clientX-rect.left)/rect.width-0.5;
+      const y=(ev.clientY-rect.top)/rect.height-0.5;
+      el.style.transform=`translate(${x*10}px, ${y*8}px)`;
+    });
+    el.addEventListener('mouseleave',()=>{
+      el.style.transform='';
+    });
+  });
+}
+
 /* INIT */
 applyModelActionsVisibility();
 renderSkillSelector();
+initMagneticButtons();
+updateCareerRoleOptions();
+document.getElementById('career-goal')?.addEventListener('change',updateCareerRoleOptions);
 </script>
 </body>
 </html>

@@ -28,3 +28,6 @@ scikit-learn
 requests
 python-dateutil
 python-dotenv
+pypdf
+python-docx
+reportlab

@@ -11,13 +11,13 @@ from .models import (
 
 
 class InsightsEngine:
-    """Generate AI-powered insights and recommendations for students"""
+    """Generate AI-powered insights and recommendations for CSE students"""
 
     def __init__(self, db: Session):
         self.db = db
         self.skill_thresholds = {
-            "math": 70,
-            "logic": 75,
+            "math": 72,
+            "logic": 74,
             "aptitude": 70,
             "problem_solving": 75,
             "reasoning": 70,
@@ -250,11 +250,11 @@ class InsightsEngine:
         urgency = "immediately" if current_score < 50 else "soon"
 
         recommendations = {
-            "math": f"Your Math score ({current_score}) is below benchmark. Focus on foundational concepts and practice problems regularly. Dedicate {max(15, int(gap/2))} minutes daily.",
-            "logic": f"Improve your Logical Thinking ({current_score}). Work through logic puzzles and analyze problem patterns systematically.",
-            "aptitude": f"Your Aptitude score needs work ({current_score}). Practice with real exam questions and time management techniques.",
-            "problem_solving": f"Problem-solving skills ({current_score}) can be enhanced. Break complex problems into smaller steps and practice structured approaches.",
-            "reasoning": f"Strengthen your Reasoning abilities ({current_score}). Practice inference and deduction exercises.",
+            "math": f"Your Data Structures and Algorithms base score ({current_score}) is below benchmark. Practice arrays, strings, trees, and dynamic programming for {max(20, int(gap / 2))} minutes daily.",
+            "logic": f"Your algorithmic reasoning score ({current_score}) needs improvement. Solve pattern-based coding problems and explain your logic before writing code.",
+            "aptitude": f"Your CS fundamentals score ({current_score}) can improve. Revise DBMS, OS, and Computer Networks with timed topic quizzes.",
+            "problem_solving": f"Your debugging and problem-solving score ({current_score}) is low. Use step-by-step dry runs, edge-case testing, and post-mortems for mistakes.",
+            "reasoning": f"Strengthen your reasoning ability ({current_score}) with weekly mock tests and mixed difficulty question sets.",
         }
 
         return recommendations.get(
