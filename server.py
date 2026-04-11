@@ -552,7 +552,7 @@ def _train_best_regressor(X: list[list[float]], y: list[float]) -> tuple[dict, d
 
 
 app = Flask(__name__, static_folder=str(ROOT), static_url_path="")
-init_db()
+# init_db()  # Disabled: using FastAPI app.main instead
 
 
 @app.get("/api/health")
