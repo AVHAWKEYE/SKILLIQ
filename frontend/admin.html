@@ -12,6 +12,7 @@
 .section.hidden { display: none !important; }
 .section.active { display: block; }
 .topbar { padding: 12px 20px; }
+.topbar { display: flex !important; }
 .stats-grid { gap: 12px; }
 .stat-card { padding: 14px; }
 .glass-card { padding: 16px; }
@@ -115,13 +116,14 @@
   min-width: 760px;
 }
 .section-reveal {
-  opacity: 0;
   transform: translateY(8px);
   animation: sectionIn .34s ease forwards;
 }
 @keyframes sectionIn {
+  from {
+    transform: translateY(8px);
+  }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -430,16 +432,25 @@ function updateClock() {
 updateClock(); setInterval(updateClock, 1000);
 
 // Section switching
-function showSection(id, navEl) {
+function setSectionVisibility(id) {
   document.querySelectorAll('.section').forEach(s => {
     s.classList.add('hidden');
     s.classList.remove('active');
     s.classList.remove('section-reveal');
+    s.style.display = 'none';
   });
+
   const target = document.getElementById('sec-' + id);
+  if (!target) return;
+
   target.classList.remove('hidden');
   target.classList.add('active');
   target.classList.add('section-reveal');
+  target.style.display = 'block';
+}
+
+function showSection(id, navEl) {
+  setSectionVisibility(id);
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (navEl) navEl.classList.add('active');
   const titles = { overview:'Overview', users:'User Management', analytics:'System Analytics', assessments:'Assessments', settings:'Settings', reports:'Reports' };
@@ -720,12 +731,13 @@ window.addEventListener('resize', () => {
 
 initTopbarScrollBehavior();
 
-// Ensure the first visible section is consistent on initial render.
-const initialSection = document.querySelector('.section.active') || document.getElementById('sec-overview');
-if (initialSection) {
-  initialSection.classList.remove('hidden');
-  initialSection.classList.add('active');
-}
+// Ensure initial render always has visible content.
+window.addEventListener('DOMContentLoaded', () => {
+  const defaultNav = document.querySelector('.sidebar-nav .nav-item');
+  showSection('overview', defaultNav);
+  const topbar = document.querySelector('.topbar');
+  if (topbar) topbar.style.display = 'flex';
+});
 </script>
 <footer style="margin:0 auto 20px;width:min(100% - 24px,1320px);padding:12px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
   <div style="font-size:12px;color:rgba(255,255,255,.72)">© 2026 SkillIQ. All Copyrights Reserved.</div>
