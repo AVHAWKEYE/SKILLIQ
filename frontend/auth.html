@@ -864,8 +864,11 @@ async function handleLogin() {
   btn.innerHTML = '<span class="spinner"></span>Signing in...';
 
   try {
-    const url = `${API_BASE}/api/auth/login?username=${encodeURIComponent(identifier)}&password=${encodeURIComponent(password)}`;
-    const res = await fetch(url, { method: 'POST' });
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: identifier, password: password })
+    });
     const result = await res.json().catch(() => ({}));
 
     if (!res.ok) {

@@ -143,13 +143,15 @@ def register(payload: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/api/auth/login")
 def login(
-    password: str,
-    username: Optional[str] = None,
-    email: Optional[str] = None,
+    payload: schemas.LoginRequest,
     db: Session = Depends(get_db),
 ):
     """Login user and return JWT token"""
     ensure_demo_users_seeded(db)
+    
+    password = payload.password
+    username = payload.username
+    email = payload.email
 
     identifier = (username or email or "").strip()
     if not identifier:

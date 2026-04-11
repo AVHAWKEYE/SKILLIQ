@@ -29,6 +29,12 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
 
 
+class LoginRequest(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    password: str
+
+
 # ========== ASSESSMENT SCHEMAS ==========
 class AssessmentBase(BaseModel):
     selected_skills_count: int = Field(ge=1, le=10)
